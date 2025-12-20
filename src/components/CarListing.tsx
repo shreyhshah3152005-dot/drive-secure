@@ -3,7 +3,7 @@ import { cars } from "@/data/cars";
 import CarCard from "@/components/CarCard";
 import { Button } from "@/components/ui/button";
 
-const categories = ["All", "Sports", "Supercar", "SUV", "Electric", "Gran Turismo", "Grand Tourer"];
+const categories = ["All", "Sports", "Supercar", "SUV", "Electric", "Off-Road", "Gran Turismo", "Grand Tourer"];
 
 const CarListing = () => {
   const [activeCategory, setActiveCategory] = useState("All");
