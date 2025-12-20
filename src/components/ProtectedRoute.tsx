@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import CarListing from "@/components/CarListing";
-import Footer from "@/components/Footer";
 
-const Index = () => {
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -23,14 +23,7 @@ const Index = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <HeroSection />
-      <CarListing />
-      <Footer />
-    </div>
-  );
+  return <>{children}</>;
 };
 
-export default Index;
+export default ProtectedRoute;
