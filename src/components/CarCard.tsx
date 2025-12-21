@@ -1,7 +1,8 @@
 import { Car } from "@/data/cars";
-import { Fuel, Gauge, Zap, MapPin } from "lucide-react";
+import { Fuel, Gauge, Zap, MapPin, GitCompare, Check } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCompare } from "@/contexts/CompareContext";
 
 interface CarCardProps {
   car: Car;
@@ -20,9 +21,21 @@ const formatPrice = (price: number): string => {
 const CarCard = ({ car, index }: CarCardProps) => {
   const [showDealers, setShowDealers] = useState(false);
   const navigate = useNavigate();
+  const { addToCompare, removeFromCompare, isInCompare, selectedCars, maxCars } = useCompare();
+
+  const inCompare = isInCompare(car.id);
 
   const handleCardClick = () => {
     navigate(`/car/${car.id}`);
+  };
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (inCompare) {
+      removeFromCompare(car.id);
+    } else {
+      addToCompare(car);
+    }
   };
 
   return (
@@ -43,7 +56,19 @@ const CarCard = ({ car, index }: CarCardProps) => {
             {car.category}
           </span>
         </div>
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          <button
+            onClick={handleCompareClick}
+            disabled={!inCompare && selectedCars.length >= maxCars}
+            className={`p-1.5 rounded-full backdrop-blur-sm border transition-all duration-300 ${
+              inCompare
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card/80 text-foreground border-border/50 hover:border-primary hover:text-primary"
+            } ${!inCompare && selectedCars.length >= maxCars ? "opacity-50 cursor-not-allowed" : ""}`}
+            title={inCompare ? "Remove from compare" : "Add to compare"}
+          >
+            {inCompare ? <Check className="w-3.5 h-3.5" /> : <GitCompare className="w-3.5 h-3.5" />}
+          </button>
           <span className="px-2 py-1 text-xs font-semibold rounded-full bg-card/80 backdrop-blur-sm text-foreground border border-border/50">
             {car.year}
           </span>

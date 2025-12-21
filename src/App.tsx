@@ -4,9 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CompareProvider } from "@/contexts/CompareContext";
+import CompareBar from "@/components/CompareBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import CarDetail from "./pages/CarDetail";
+import Compare from "./pages/Compare";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,12 +21,16 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/car/:id" element={<CarDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <CompareProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/car/:id" element={<CarDetail />} />
+              <Route path="/compare" element={<Compare />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <CompareBar />
+          </CompareProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
