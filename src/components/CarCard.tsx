@@ -1,6 +1,7 @@
 import { Car } from "@/data/cars";
 import { Fuel, Gauge, Zap, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface CarCardProps {
   car: Car;
@@ -18,11 +19,17 @@ const formatPrice = (price: number): string => {
 
 const CarCard = ({ car, index }: CarCardProps) => {
   const [showDealers, setShowDealers] = useState(false);
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/car/${car.id}`);
+  };
 
   return (
     <div
-      className="group gradient-card rounded-2xl overflow-hidden border border-border/50 shadow-card hover:border-primary/30 transition-all duration-500 hover:-translate-y-2"
+      className="group gradient-card rounded-2xl overflow-hidden border border-border/50 shadow-card hover:border-primary/30 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
       style={{ animationDelay: `${index * 50}ms` }}
+      onClick={handleCardClick}
     >
       <div className="relative h-48 overflow-hidden">
         <img
@@ -79,7 +86,10 @@ const CarCard = ({ car, index }: CarCardProps) => {
             </p>
           </div>
           <button 
-            onClick={() => setShowDealers(!showDealers)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDealers(!showDealers);
+            }}
             className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
           >
             <MapPin className="w-3 h-3" />
