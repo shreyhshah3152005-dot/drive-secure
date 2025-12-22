@@ -8,6 +8,7 @@ import { CompareProvider } from "@/contexts/CompareContext";
 import CompareBar from "@/components/CompareBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Cars from "./pages/Cars";
 import CarDetail from "./pages/CarDetail";
 import Compare from "./pages/Compare";
 import NotFound from "./pages/NotFound";
@@ -25,6 +26,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/cars" element={<Cars />} />
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="*" element={<NotFound />} />

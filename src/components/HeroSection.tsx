@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Shield, Award, Headphones } from "lucide-react";
+import GeneralTestDriveForm from "@/components/GeneralTestDriveForm";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       <div className="absolute inset-0 gradient-dark" />
@@ -50,13 +54,17 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up"
             style={{ animationDelay: "300ms" }}
           >
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="xl" onClick={() => navigate("/cars")}>
               Explore Collection
               <ChevronRight className="w-5 h-5" />
             </Button>
-            <Button variant="glass" size="xl">
-              Book Test Drive
-            </Button>
+            <GeneralTestDriveForm 
+              trigger={
+                <Button variant="glass" size="xl">
+                  Book Test Drive
+                </Button>
+              }
+            />
           </div>
 
           {/* Trust badges */}
