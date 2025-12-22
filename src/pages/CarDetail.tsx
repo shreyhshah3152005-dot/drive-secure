@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import CarImageGallery from "@/components/CarImageGallery";
 import CarSpecifications from "@/components/CarSpecifications";
 import CarInquiryForm from "@/components/CarInquiryForm";
+import EMICalculator from "@/components/EMICalculator";
+import TestDriveForm from "@/components/TestDriveForm";
 import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -136,7 +138,17 @@ const CarDetail = () => {
                   </p>
                 </div>
               </div>
+
+              {/* Test Drive Button */}
+              <TestDriveForm car={car} />
             </div>
+          </div>
+        </section>
+
+        {/* EMI Calculator Section */}
+        <section className="container mx-auto px-4 py-12">
+          <div className="max-w-2xl mx-auto">
+            <EMICalculator carPrice={car.price} />
           </div>
         </section>
 
