@@ -14,27 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      favorites: {
+        Row: {
+          car_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          city: string | null
           created_at: string
           email: string | null
           id: string
+          name: string | null
           phone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          city?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          name?: string | null
           phone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          city?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          name?: string | null
           phone?: string | null
           updated_at?: string
           user_id?: string

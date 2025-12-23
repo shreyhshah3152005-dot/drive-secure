@@ -1,8 +1,9 @@
 import { Car } from "@/data/cars";
-import { Fuel, Gauge, Zap, MapPin, GitCompare, Check } from "lucide-react";
+import { Fuel, Gauge, Zap, MapPin, GitCompare, Check, Heart } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompare } from "@/contexts/CompareContext";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface CarCardProps {
   car: Car;
@@ -22,8 +23,10 @@ const CarCard = ({ car, index }: CarCardProps) => {
   const [showDealers, setShowDealers] = useState(false);
   const navigate = useNavigate();
   const { addToCompare, removeFromCompare, isInCompare, selectedCars, maxCars } = useCompare();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const inCompare = isInCompare(car.id);
+  const inFavorites = isFavorite(car.id);
 
   const handleCardClick = () => {
     navigate(`/car/${car.id}`);
@@ -36,6 +39,11 @@ const CarCard = ({ car, index }: CarCardProps) => {
     } else {
       addToCompare(car);
     }
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(car.id);
   };
 
   return (
@@ -57,6 +65,17 @@ const CarCard = ({ car, index }: CarCardProps) => {
           </span>
         </div>
         <div className="absolute top-3 right-3 flex items-center gap-2">
+          <button
+            onClick={handleFavoriteClick}
+            className={`p-1.5 rounded-full backdrop-blur-sm border transition-all duration-300 ${
+              inFavorites
+                ? "bg-red-500 text-white border-red-500"
+                : "bg-card/80 text-foreground border-border/50 hover:border-red-400 hover:text-red-400"
+            }`}
+            title={inFavorites ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <Heart className={`w-3.5 h-3.5 ${inFavorites ? "fill-current" : ""}`} />
+          </button>
           <button
             onClick={handleCompareClick}
             disabled={!inCompare && selectedCars.length >= maxCars}

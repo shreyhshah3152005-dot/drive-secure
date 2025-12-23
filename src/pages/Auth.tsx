@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Car, Lock, Mail, Eye, EyeOff, Phone } from "lucide-react";
+import { Car, Lock, Mail, Eye, EyeOff, Phone, User, MapPin } from "lucide-react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -16,6 +16,8 @@ const signupSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   phone: z.string().trim().min(10, { message: "Phone number must be at least 10 digits" }).max(15),
+  name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
+  city: z.string().trim().min(2, { message: "City must be at least 2 characters" }).max(100),
 });
 
 const Auth = () => {
@@ -23,6 +25,8 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
@@ -38,7 +42,7 @@ const Auth = () => {
         return;
       }
     } else {
-      const validation = signupSchema.safeParse({ email, password, phone });
+      const validation = signupSchema.safeParse({ email, password, phone, name, city });
       if (!validation.success) {
         toast.error(validation.error.errors[0].message);
         return;
@@ -56,7 +60,7 @@ const Auth = () => {
         navigate("/");
       }
     } else {
-      const { error } = await signUp(email, password, phone);
+      const { error } = await signUp(email, password, phone, name, city);
       if (error) {
         if (error.message.includes("already registered")) {
           toast.error("This email is already registered. Please sign in.");
@@ -95,8 +99,25 @@ const Auth = () => {
           </p>
         </div>
 
-        <div className="animate-slide-up gradient-card rounded-2xl p-8 shadow-card border border-border/50 backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="animate-slide-up gradient-card rounded-2xl p-8 shadow-card border border-border/50 backdrop-blur-sm max-h-[80vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {!isLogin && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="pl-11 h-12 bg-secondary/50 border-border focus:border-primary transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Email</label>
               <div className="relative">
@@ -113,20 +134,37 @@ const Auth = () => {
             </div>
 
             {!isLogin && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Phone Number</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="pl-11 h-12 bg-secondary/50 border-border focus:border-primary transition-colors"
-                    required
-                  />
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Phone Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="pl-11 h-12 bg-secondary/50 border-border focus:border-primary transition-colors"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">City</label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Enter your city"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="pl-11 h-12 bg-secondary/50 border-border focus:border-primary transition-colors"
+                      required
+                    />
+                  </div>
+                </div>
+              </>
             )}
 
             <div className="space-y-2">
