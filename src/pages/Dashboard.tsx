@@ -4,9 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, Calendar, Car, Clock } from "lucide-react";
+import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin } from "lucide-react";
 import { format } from "date-fns";
+import EditProfileDialog from "@/components/EditProfileDialog";
+import { useFavorites } from "@/hooks/useFavorites";
+import { cars } from "@/data/cars";
 
 interface TestDriveInquiry {
   id: string;
@@ -20,6 +24,8 @@ interface TestDriveInquiry {
 interface Profile {
   email: string | null;
   phone: string | null;
+  name: string | null;
+  city: string | null;
   created_at: string;
 }
 
@@ -29,6 +35,7 @@ const Dashboard = () => {
   const [inquiries, setInquiries] = useState<TestDriveInquiry[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { favorites } = useFavorites();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,39 +43,39 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return;
+  const fetchData = async () => {
+    if (!user) return;
 
-      try {
-        // Fetch profile
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("email, phone, created_at")
-          .eq("user_id", user.id)
-          .single();
+    try {
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("email, phone, name, city, created_at")
+        .eq("user_id", user.id)
+        .single();
 
-        if (profileData) {
-          setProfile(profileData);
-        }
-
-        // Fetch test drive inquiries
-        const { data: inquiriesData } = await supabase
-          .from("test_drive_inquiries")
-          .select("id, car_name, preferred_date, preferred_time, status, created_at")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
-
-        if (inquiriesData) {
-          setInquiries(inquiriesData);
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setIsLoading(false);
+      if (profileData) {
+        setProfile(profileData);
       }
-    };
 
+      // Fetch test drive inquiries
+      const { data: inquiriesData } = await supabase
+        .from("test_drive_inquiries")
+        .select("id, car_name, preferred_date, preferred_time, status, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (inquiriesData) {
+        setInquiries(inquiriesData);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [user]);
 
@@ -96,24 +103,44 @@ const Dashboard = () => {
     }
   };
 
+  const favoriteCars = cars.filter((car) => favorites.includes(car.id));
+
+  const formatPrice = (price: number): string => {
+    if (price >= 10000000) {
+      return `₹${(price / 10000000).toFixed(2)} Cr`;
+    } else if (price >= 100000) {
+      return `₹${(price / 100000).toFixed(2)} L`;
+    }
+    return `₹${price.toLocaleString("en-IN")}`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-12">
         <h1 className="text-3xl font-bold mb-8">
-          Welcome, <span className="text-gradient-gold">{user?.email?.split("@")[0]}</span>
+          Welcome, <span className="text-gradient-gold">{profile?.name || user?.email?.split("@")[0]}</span>
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <Card className="gradient-card border-border/50">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5 text-primary" />
                 Profile Information
               </CardTitle>
+              {profile && (
+                <EditProfileDialog profile={profile} onProfileUpdate={fetchData} />
+              )}
             </CardHeader>
             <CardContent className="space-y-4">
+              {profile?.name && (
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-foreground">{profile.name}</span>
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-muted-foreground" />
                 <span className="text-foreground">{user?.email}</span>
@@ -122,6 +149,12 @@ const Dashboard = () => {
                 <div className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-muted-foreground" />
                   <span className="text-foreground">{profile.phone}</span>
+                </div>
+              )}
+              {profile?.city && (
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-foreground">{profile.city}</span>
                 </div>
               )}
               <div className="flex items-center gap-3">
@@ -150,7 +183,7 @@ const Dashboard = () => {
                   You haven't booked any test drives yet. Explore our collection and book one today!
                 </p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[300px] overflow-y-auto">
                   {inquiries.map((inquiry) => (
                     <div
                       key={inquiry.id}
@@ -172,6 +205,49 @@ const Dashboard = () => {
                       <Badge className={`mt-2 sm:mt-0 ${getStatusColor(inquiry.status)}`}>
                         {inquiry.status}
                       </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Wishlist */}
+          <Card className="gradient-card border-border/50 lg:col-span-3">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="w-5 h-5 text-primary" />
+                Your Wishlist
+              </CardTitle>
+              <CardDescription>
+                {favoriteCars.length === 0 ? "No cars in wishlist" : `${favoriteCars.length} car(s) saved`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {favoriteCars.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">
+                    You haven't added any cars to your wishlist yet.
+                  </p>
+                  <Button variant="outline" onClick={() => navigate("/cars")}>
+                    Explore Cars
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {favoriteCars.map((car) => (
+                    <div
+                      key={car.id}
+                      onClick={() => navigate(`/car/${car.id}`)}
+                      className="p-4 rounded-lg bg-secondary/30 border border-border/50 cursor-pointer hover:border-primary/50 transition-colors"
+                    >
+                      <img
+                        src={car.image}
+                        alt={car.name}
+                        className="w-full h-32 object-cover rounded-lg mb-3"
+                      />
+                      <h4 className="font-semibold text-foreground text-sm">{car.name}</h4>
+                      <p className="text-primary font-bold">{formatPrice(car.price)}</p>
                     </div>
                   ))}
                 </div>
