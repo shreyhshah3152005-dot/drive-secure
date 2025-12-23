@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Clock, User, Mail, Phone, Car as CarIcon, MessageSquare, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { cars } from "@/data/cars";
 
 interface GeneralTestDriveFormProps {
   trigger: React.ReactNode;
@@ -19,7 +21,7 @@ const testDriveSchema = z.object({
   phone: z.string().trim().min(10, "Phone must be at least 10 digits").max(15),
   preferredDate: z.string().min(1, "Please select a date"),
   preferredTime: z.string().min(1, "Please select a time"),
-  carPreference: z.string().trim().min(2, "Please enter your car preference").max(200),
+  selectedCarId: z.string().min(1, "Please select a car"),
   message: z.string().max(500).optional(),
 });
 
@@ -45,12 +47,16 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
     phone: "",
     preferredDate: "",
     preferredTime: "",
-    carPreference: "",
+    selectedCarId: "",
     message: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,13 +68,19 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
       return;
     }
 
+    const selectedCar = cars.find(car => car.id === formData.selectedCarId);
+    if (!selectedCar) {
+      toast.error("Please select a valid car");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const { error } = await supabase.from("test_drive_inquiries").insert({
         user_id: user?.id || null,
-        car_id: "general",
-        car_name: formData.carPreference,
+        car_id: selectedCar.id,
+        car_name: selectedCar.name,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -96,7 +108,7 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
       phone: "",
       preferredDate: "",
       preferredTime: "",
-      carPreference: "",
+      selectedCarId: "",
       message: "",
     });
     setIsSuccess(false);
@@ -187,20 +199,24 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
               </div>
             </div>
 
-            {/* Car Preference */}
+            {/* Car Selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Car Preference</label>
-              <div className="relative">
-                <CarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  name="carPreference"
-                  value={formData.carPreference}
-                  onChange={handleChange}
-                  placeholder="e.g., BMW 5 Series, Audi Q7"
-                  className="pl-10 bg-secondary/50 border-border"
-                  required
-                />
-              </div>
+              <label className="text-sm font-medium text-foreground">Select Car</label>
+              <Select value={formData.selectedCarId} onValueChange={(value) => handleSelectChange("selectedCarId", value)}>
+                <SelectTrigger className="bg-secondary/50 border-border">
+                  <div className="flex items-center gap-2">
+                    <CarIcon className="w-4 h-4 text-muted-foreground" />
+                    <SelectValue placeholder="Choose a car for test drive" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  {cars.map((car) => (
+                    <SelectItem key={car.id} value={car.id}>
+                      {car.name} - {car.brand}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Date and Time */}
@@ -222,21 +238,19 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Preferred Time</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <select
-                    name="preferredTime"
-                    value={formData.preferredTime}
-                    onChange={handleChange}
-                    className="w-full h-10 pl-10 pr-4 rounded-md bg-secondary/50 border border-border text-foreground text-sm"
-                    required
-                  >
-                    <option value="">Select time</option>
+                <Select value={formData.preferredTime} onValueChange={(value) => handleSelectChange("preferredTime", value)}>
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <SelectValue placeholder="Select time" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
                     {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>{slot}</option>
+                      <SelectItem key={slot} value={slot}>{slot}</SelectItem>
                     ))}
-                  </select>
-                </div>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
