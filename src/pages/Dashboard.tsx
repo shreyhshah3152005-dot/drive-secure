@@ -1,0 +1,187 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import Navbar from "@/components/Navbar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Mail, Phone, Calendar, Car, Clock } from "lucide-react";
+import { format } from "date-fns";
+
+interface TestDriveInquiry {
+  id: string;
+  car_name: string;
+  preferred_date: string;
+  preferred_time: string;
+  status: string;
+  created_at: string;
+}
+
+interface Profile {
+  email: string | null;
+  phone: string | null;
+  created_at: string;
+}
+
+const Dashboard = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const [inquiries, setInquiries] = useState<TestDriveInquiry[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+
+      try {
+        // Fetch profile
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("email, phone, created_at")
+          .eq("user_id", user.id)
+          .single();
+
+        if (profileData) {
+          setProfile(profileData);
+        }
+
+        // Fetch test drive inquiries
+        const { data: inquiriesData } = await supabase
+          .from("test_drive_inquiries")
+          .select("id, car_name, preferred_date, preferred_time, status, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (inquiriesData) {
+          setInquiries(inquiriesData);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  if (loading || isLoading) {
+    return (
+      <div className="min-h-screen gradient-dark flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "confirmed":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      case "pending":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      case "cancelled":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      default:
+        return "bg-muted text-muted-foreground";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="container mx-auto px-4 pt-24 pb-12">
+        <h1 className="text-3xl font-bold mb-8">
+          Welcome, <span className="text-gradient-gold">{user?.email?.split("@")[0]}</span>
+        </h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Profile Card */}
+          <Card className="gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5 text-primary" />
+                Profile Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <span className="text-foreground">{user?.email}</span>
+              </div>
+              {profile?.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-foreground">{profile.phone}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-3">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground text-sm">
+                  Member since {profile?.created_at ? format(new Date(profile.created_at), "MMM yyyy") : "N/A"}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Test Drive Inquiries */}
+          <Card className="gradient-card border-border/50 lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="w-5 h-5 text-primary" />
+                Your Test Drive Requests
+              </CardTitle>
+              <CardDescription>
+                {inquiries.length === 0 ? "No test drive requests yet" : `${inquiries.length} request(s)`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {inquiries.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  You haven't booked any test drives yet. Explore our collection and book one today!
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {inquiries.map((inquiry) => (
+                    <div
+                      key={inquiry.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border/50"
+                    >
+                      <div className="space-y-1">
+                        <h4 className="font-semibold text-foreground">{inquiry.car_name}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {format(new Date(inquiry.preferred_date), "MMM dd, yyyy")}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {inquiry.preferred_time}
+                          </span>
+                        </div>
+                      </div>
+                      <Badge className={`mt-2 sm:mt-0 ${getStatusColor(inquiry.status)}`}>
+                        {inquiry.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

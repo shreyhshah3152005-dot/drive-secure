@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Cars from "./pages/Cars";
 import CarDetail from "./pages/CarDetail";
 import Compare from "./pages/Compare";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/cars" element={<Cars />} />
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/compare" element={<Compare />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareBar />
