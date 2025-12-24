@@ -1,10 +1,12 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Car, LogOut, User, ArrowLeft, LayoutDashboard } from "lucide-react";
+import { useAdminRole } from "@/hooks/useAdminRole";
+import { Car, LogOut, User, ArrowLeft, LayoutDashboard, Shield } from "lucide-react";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
   const location = useLocation();
   const showBackButton = location.pathname !== "/";
@@ -38,6 +40,14 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button variant="ghost" size="sm" className="gap-2 text-primary">
+                    <Shield className="w-4 h-4" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </Button>
+                </Link>
+              )}
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <LayoutDashboard className="w-4 h-4" />
