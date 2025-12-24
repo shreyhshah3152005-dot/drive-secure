@@ -38,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
         : `Your test drive status has been updated to: ${newStatus}`;
 
     const emailResponse = await resend.emails.send({
-      from: "Car Dealership <onboarding@resend.dev>",
+      from: "WOHCARS <no-reply@wohcars.com>",
       to: [email],
       subject: `${statusEmoji} Test Drive Update - ${carName}`,
       html: `
@@ -63,7 +63,7 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🚗 Test Drive Update</h1>
+              <h1>🚗 WOHCARS Test Drive Update</h1>
             </div>
             <div class="content">
               <p>Hello <strong>${name}</strong>,</p>
@@ -87,10 +87,10 @@ const handler = async (req: Request): Promise<Response> => {
                 </ul>
               ` : ''}
               
-              <p>If you have any questions, please contact our dealership.</p>
+              <p>If you have any questions, please contact WOHCARS at <a href="mailto:contact@wohcars.com">contact@wohcars.com</a>.</p>
               
               <div class="footer">
-                <p>Thank you for choosing our dealership!</p>
+                <p>Thank you for choosing WOHCARS!</p>
                 <p>This is an automated message. Please do not reply directly to this email.</p>
               </div>
             </div>

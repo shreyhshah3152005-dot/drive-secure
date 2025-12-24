@@ -90,8 +90,8 @@ const Auth = () => {
               <Car className="w-8 h-8 text-primary-foreground" />
             </div>
             <span className="text-3xl font-bold tracking-tight">
-              <span className="text-gradient-gold">LUXE</span>
-              <span className="text-foreground">MOTORS</span>
+              <span className="text-gradient-gold">WOH</span>
+              <span className="text-foreground">CARS</span>
             </span>
           </div>
           <p className="text-muted-foreground">

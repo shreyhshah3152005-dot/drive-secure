@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome to WOHCARS project
 
 ## Project info
 
@@ -10,9 +10,9 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Simpy visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) to access deployment tools.
 
-Changes made via Lovable will be committed automatically to this repo.
+This repository powers the WOHCARS frontend; edit locally or via the platform.
 
 **Use your preferred IDE**
 
@@ -23,7 +23,7 @@ The only requirement is having Node.js & npm installed - [install with nvm](http
 Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+	# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
 
 # Step 2: Navigate to the project directory.
@@ -62,7 +62,7 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+To deploy WOHCARS, open the project on the Lovable platform and publish.
 
 ## Can I connect a custom domain to my Lovable project?
 

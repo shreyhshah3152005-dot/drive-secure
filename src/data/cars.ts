@@ -1468,7 +1468,7 @@ export const cars: Car[] = [
     category: "SUV",
     dealers: [
       { name: "Mercedes-Benz Flagship Mumbai", city: "Mumbai", phone: "+91 22 1234 5690" },
-      { name: "Mercedes-Benz Luxe Delhi", city: "Delhi", phone: "+91 11 1234 5690" }
+      { name: "Mercedes-Benz WOHCARS Delhi", city: "Delhi", phone: "+91 11 1234 5690" }
     ]
   },
   {

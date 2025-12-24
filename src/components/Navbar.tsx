@@ -31,8 +31,8 @@ const Navbar = () => {
               <Car className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-gradient-gold">LUXE</span>
-              <span className="text-foreground">MOTORS</span>
+              <span className="text-gradient-gold">WOH</span>
+              <span className="text-foreground">CARS</span>
             </span>
           </Link>
         </div>
