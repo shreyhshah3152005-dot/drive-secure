@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin } from "lucide-react";
+import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useComparisonHistory } from "@/hooks/useComparisonHistory";
 import { cars } from "@/data/cars";
 
 interface TestDriveInquiry {
@@ -36,6 +37,7 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { favorites } = useFavorites();
+  const { history: comparisonHistory, deleteFromHistory, isLoading: historyLoading } = useComparisonHistory();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -205,6 +207,62 @@ const Dashboard = () => {
                       <Badge className={`mt-2 sm:mt-0 ${getStatusColor(inquiry.status)}`}>
                         {inquiry.status}
                       </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Comparison History */}
+          <Card className="gradient-card border-border/50 lg:col-span-3">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GitCompare className="w-5 h-5 text-primary" />
+                Comparison History
+              </CardTitle>
+              <CardDescription>
+                {comparisonHistory.length === 0 ? "No comparisons yet" : `${comparisonHistory.length} comparison(s)`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {historyLoading ? (
+                <div className="text-center py-8">
+                  <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+                </div>
+              ) : comparisonHistory.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">
+                    You haven't compared any cars yet.
+                  </p>
+                  <Button variant="outline" onClick={() => navigate("/cars")}>
+                    Explore Cars
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-[250px] overflow-y-auto">
+                  {comparisonHistory.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border/50"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">
+                          {item.car_names.join(" vs ")}
+                        </p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                          <Calendar className="w-3 h-3" />
+                          {format(new Date(item.created_at), "MMM dd, yyyy")}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteFromHistory(item.id)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   ))}
                 </div>
