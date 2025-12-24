@@ -12,6 +12,7 @@ import Cars from "./pages/Cars";
 import CarDetail from "./pages/CarDetail";
 import Compare from "./pages/Compare";
 import Dashboard from "./pages/Dashboard";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin" element={<AdminPanel />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareBar />
