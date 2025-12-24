@@ -7,6 +7,7 @@ import CarSpecifications from "@/components/CarSpecifications";
 import CarInquiryForm from "@/components/CarInquiryForm";
 import EMICalculator from "@/components/EMICalculator";
 import TestDriveForm from "@/components/TestDriveForm";
+import CarReviews from "@/components/CarReviews";
 import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -180,6 +181,9 @@ const CarDetail = () => {
             ))}
           </div>
         </section>
+
+        {/* Reviews Section */}
+        <CarReviews carId={car.id} carName={car.name} />
 
         {/* Inquiry Form */}
         <CarInquiryForm car={car} />

@@ -1,5 +1,8 @@
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompare } from "@/contexts/CompareContext";
+import { useComparisonHistory } from "@/hooks/useComparisonHistory";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,24 @@ const formatPrice = (price: number): string => {
 const Compare = () => {
   const navigate = useNavigate();
   const { selectedCars, removeFromCompare, clearCompare } = useCompare();
+  const { addToHistory } = useComparisonHistory();
+  const { user } = useAuth();
+  const savedRef = useRef(false);
+
+  // Save comparison to history when 2+ cars are compared
+  useEffect(() => {
+    if (user && selectedCars.length >= 2 && !savedRef.current) {
+      const carIds = selectedCars.map(car => car.id);
+      const carNames = selectedCars.map(car => car.name);
+      addToHistory(carIds, carNames);
+      savedRef.current = true;
+    }
+  }, [selectedCars, user]);
+
+  // Reset the saved ref when cars change
+  useEffect(() => {
+    savedRef.current = false;
+  }, [selectedCars.length]);
 
   if (selectedCars.length < 2) {
     return (
