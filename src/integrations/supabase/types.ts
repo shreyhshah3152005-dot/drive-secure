@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      car_reviews: {
+        Row: {
+          car_id: string
+          created_at: string
+          id: string
+          rating: number
+          review_text: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          review_text: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          review_text?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      comparison_history: {
+        Row: {
+          car_ids: string[]
+          car_names: string[]
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          car_ids: string[]
+          car_names: string[]
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          car_ids?: string[]
+          car_names?: string[]
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           car_id: string
