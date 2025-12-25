@@ -86,10 +86,10 @@ const Auth = () => {
       <div className="relative w-full max-w-md">
         <div className="animate-fade-in text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <img src="/wohcars-logo.png" alt="WOHCARS Logo" className="h-16 w-auto" />
+            <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-16 w-auto" />
             <span className="text-3xl font-bold tracking-tight">
-              <span className="text-gradient-gold">WOH</span>
-              <span className="text-foreground">CARS</span>
+              <span className="text-gradient-primary">CAR</span>
+              <span className="text-foreground">BAZAAR</span>
             </span>
           </div>
           <p className="text-muted-foreground">
