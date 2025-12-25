@@ -7,11 +7,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <img src="/wohcars-logo.png" alt="WOHCARS Logo" className="h-10 w-auto" />
+            <div className="flex items-center gap-3 mb-4">
+              <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-10 w-auto" />
               <span className="text-xl font-bold tracking-tight">
-                <span className="text-gradient-gold">WOH</span>
-                <span className="text-foreground">CARS</span>
+                <span className="text-gradient-primary">CAR</span>
+                <span className="text-foreground">BAZAAR</span>
               </span>
             </div>
             <p className="text-muted-foreground max-w-md">
@@ -42,7 +42,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
-                contact@wohcars.com
+                contact@carbazaar.com
               </li>
               <li className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary mt-1" />
@@ -53,7 +53,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} WOHCARS. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CARBAZAAR. All rights reserved.</p>
         </div>
       </div>
     </footer>

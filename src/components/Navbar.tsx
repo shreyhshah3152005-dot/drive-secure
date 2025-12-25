@@ -26,11 +26,11 @@ const Navbar = () => {
               <span className="hidden sm:inline">Back</span>
             </Button>
           )}
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/wohcars-logo.png" alt="WOHCARS Logo" className="h-10 w-auto" />
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-10 w-auto" />
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-gradient-gold">WOH</span>
-              <span className="text-foreground">CARS</span>
+              <span className="text-gradient-primary">CAR</span>
+              <span className="text-foreground">BAZAAR</span>
             </span>
           </Link>
         </div>
