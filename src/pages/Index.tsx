@@ -2,6 +2,8 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import DealersSection from "@/components/DealersSection";
+import SubscriptionPlans from "@/components/SubscriptionPlans";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -26,6 +28,8 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <DealersSection />
+      <SubscriptionPlans />
       <Footer />
     </div>
   );
