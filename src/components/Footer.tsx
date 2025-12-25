@@ -1,4 +1,4 @@
-import { Car, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -8,9 +8,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-lg gradient-gold">
-                <Car className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src="/wohcars-logo.png" alt="WOHCARS Logo" className="h-10 w-auto" />
               <span className="text-xl font-bold tracking-tight">
                 <span className="text-gradient-gold">WOH</span>
                 <span className="text-foreground">CARS</span>

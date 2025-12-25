@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Car, Lock, Mail, Eye, EyeOff, Phone, User, MapPin } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, Phone, User, MapPin } from "lucide-react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -86,9 +86,7 @@ const Auth = () => {
       <div className="relative w-full max-w-md">
         <div className="animate-fade-in text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl gradient-gold">
-              <Car className="w-8 h-8 text-primary-foreground" />
-            </div>
+            <img src="/wohcars-logo.png" alt="WOHCARS Logo" className="h-16 w-auto" />
             <span className="text-3xl font-bold tracking-tight">
               <span className="text-gradient-gold">WOH</span>
               <span className="text-foreground">CARS</span>

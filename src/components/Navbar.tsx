@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { Car, LogOut, User, ArrowLeft, LayoutDashboard, Shield } from "lucide-react";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield } from "lucide-react";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -27,9 +27,7 @@ const Navbar = () => {
             </Button>
           )}
           <Link to="/" className="flex items-center gap-2">
-            <div className="p-2 rounded-lg gradient-gold">
-              <Car className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img src="/wohcars-logo.png" alt="WOHCARS Logo" className="h-10 w-auto" />
             <span className="text-xl font-bold tracking-tight">
               <span className="text-gradient-gold">WOH</span>
               <span className="text-foreground">CARS</span>
