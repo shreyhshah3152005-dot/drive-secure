@@ -38,7 +38,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="w-4 h-4 text-primary" />
-                +1 (555) 123-4567
+                +91 6358766219
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
@@ -46,7 +46,7 @@ const Footer = () => {
               </li>
               <li className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary mt-1" />
-                123 Automotive Drive,<br />Beverly Hills, CA 90210
+                Shop 1 Avenue Heights,<br />Vadodara, Gujarat - 390019
               </li>
             </ul>
           </div>
