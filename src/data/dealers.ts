@@ -14,14 +14,14 @@ export const dealers: Dealer[] = [
   // Mumbai
   {
     id: "d1",
-    name: "AutoWorld Premium",
+    name: "Big Boy Toyz Mumbai",
     city: "Mumbai",
     address: "Andheri West, Mumbai, Maharashtra",
     phone: "+91 22 4567 8901",
-    email: "contact@autoworldpremium.in",
+    email: "contact@BigBoyToyz.in",
     rating: 4.8,
     specialization: ["Luxury", "Sports Cars"],
-    image: "https://images.unsplash.com/photo-1567449303078-57ad995bd17f?w=400"
+    image: "https://www.bigboytoyz.com/images/showroom-page/mumbai-showroom-img-1.webp"
   },
   {
     id: "d2",
@@ -32,7 +32,7 @@ export const dealers: Dealer[] = [
     email: "sales@elitemotorsmumbai.in",
     rating: 4.6,
     specialization: ["Premium SUVs", "Sedans"],
-    image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400"
+    image: "https://www.architectandinteriorsindia.com/cloud/2023/05/19/SAN_1101-1024x610.jpg"
   },
   // Delhi
   {
@@ -44,7 +44,7 @@ export const dealers: Dealer[] = [
     email: "info@capitalcarshub.in",
     rating: 4.7,
     specialization: ["Luxury", "Electric Vehicles"],
-    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400"
+    image: "https://www.architectandinteriorsindia.com/cloud/2023/05/19/SAN_1068-1024x726.jpg",
   },
   {
     id: "d4",
@@ -67,7 +67,7 @@ export const dealers: Dealer[] = [
     email: "sales@siliconvalleymotors.in",
     rating: 4.9,
     specialization: ["Electric Vehicles", "Tech-Enhanced Cars"],
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400"
+    image: "https://cdn.i-scmp.com/sites/default/files/styles/1200x800/public/d8/images/2019/11/01/1a_bmw_wanchaishowroom_finedata_1.jpg?itok=vi_G10jb"
   },
   {
     id: "d6",
@@ -90,7 +90,7 @@ export const dealers: Dealer[] = [
     email: "contact@marinamotors.in",
     rating: 4.7,
     specialization: ["Japanese Cars", "Sedans"],
-    image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400"
+    image: "https://images.squarespace-cdn.com/content/v1/5ed687cf9ebd14034857d963/1605283562912-NH28O40SS1ZM5756FYSE/APG03447.jpg"
   },
   // Hyderabad
   {
@@ -102,7 +102,7 @@ export const dealers: Dealer[] = [
     email: "sales@deccanautogallery.in",
     rating: 4.8,
     specialization: ["Luxury", "Sports Cars"],
-    image: "https://images.unsplash.com/photo-1580274455191-1c62238fa333?w=400"
+    image: "https://www.architectandinteriorsindia.com/cloud/2023/05/19/SAN_1101-1024x610.jpg"
   },
   {
     id: "d9",
@@ -135,7 +135,7 @@ export const dealers: Dealer[] = [
     address: "Park Street, Kolkata, West Bengal",
     phone: "+91 33 4567 8901",
     email: "sales@heritagemotorskolkata.in",
-    rating: 4.7,
+    rating: 4.5,
     specialization: ["Classic Cars", "Luxury"],
     image: "https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=400"
   },
@@ -185,6 +185,6 @@ export const dealers: Dealer[] = [
     email: "info@citybeautifulcars.in",
     rating: 4.7,
     specialization: ["Sports Cars", "Luxury"],
-    image: "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?w=400"
+    image: "https://www.wheelsofworld.in/_next/static/media/showroom-back.f213b363.jpg"
   }
 ];
