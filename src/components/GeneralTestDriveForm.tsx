@@ -62,6 +62,12 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Require authentication
+    if (!user) {
+      toast.error("Please sign in to book a test drive");
+      return;
+    }
+    
     const validation = testDriveSchema.safeParse(formData);
     if (!validation.success) {
       toast.error(validation.error.errors[0].message);
@@ -78,7 +84,7 @@ const GeneralTestDriveForm = ({ trigger }: GeneralTestDriveFormProps) => {
 
     try {
       const { error } = await supabase.from("test_drive_inquiries").insert({
-        user_id: user?.id || null,
+        user_id: user.id,
         car_id: selectedCar.id,
         car_name: selectedCar.name,
         name: formData.name,
