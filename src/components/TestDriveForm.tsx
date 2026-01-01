@@ -55,6 +55,12 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Require authentication
+    if (!user) {
+      toast.error("Please sign in to book a test drive");
+      return;
+    }
+    
     const validation = testDriveSchema.safeParse(formData);
     if (!validation.success) {
       toast.error(validation.error.errors[0].message);
@@ -65,7 +71,7 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
 
     try {
       const { error } = await supabase.from("test_drive_inquiries").insert({
-        user_id: user?.id || null,
+        user_id: user.id,
         car_id: car.id,
         car_name: `${car.brand} ${car.model}`,
         name: formData.name,
