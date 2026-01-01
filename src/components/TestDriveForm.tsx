@@ -10,7 +10,6 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTestDriveRateLimit } from "@/hooks/useTestDriveRateLimit";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface TestDriveFormProps {
   car: Car;
@@ -39,7 +38,6 @@ const timeSlots = [
 const TestDriveForm = ({ car }: TestDriveFormProps) => {
   const { user } = useAuth();
   const { checkRateLimit, isCheckingLimit } = useTestDriveRateLimit();
-  const { isLoaded: recaptchaLoaded, isVerifying, verifyRecaptcha } = useRecaptcha();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -78,14 +76,6 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
       const rateLimitResult = await checkRateLimit();
       if (!rateLimitResult.allowed) {
         toast.error(rateLimitResult.message || "Rate limit exceeded");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Verify reCAPTCHA
-      const recaptchaResult = await verifyRecaptcha("test_drive_booking");
-      if (!recaptchaResult.success) {
-        toast.error(recaptchaResult.error || "Security verification failed. Please try again.");
         setIsSubmitting(false);
         return;
       }
@@ -134,7 +124,7 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
   };
 
   const today = new Date().toISOString().split("T")[0];
-  const isProcessing = isSubmitting || isCheckingLimit || isVerifying;
+  const isProcessing = isSubmitting || isCheckingLimit;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -276,7 +266,7 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
             {/* Security Notice */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Shield className="w-4 h-4" />
-              <span>Protected by reCAPTCHA • Max 3 requests per day</span>
+              <span>Max 3 requests per day</span>
             </div>
 
             <Button
@@ -284,7 +274,7 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
               variant="hero"
               size="lg"
               className="w-full"
-              disabled={isProcessing || !recaptchaLoaded}
+              disabled={isProcessing}
             >
               {isProcessing ? "Processing..." : "Submit Request"}
             </Button>

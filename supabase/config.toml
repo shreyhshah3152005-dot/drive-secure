@@ -2,6 +2,3 @@ project_id = "bubnuyyvxedsmeuwkune"
 
 [functions.send-test-drive-notification]
 verify_jwt = true
-
-[functions.verify-recaptcha]
-verify_jwt = true
