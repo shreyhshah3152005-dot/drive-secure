@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, Clock, User, Mail, Phone, Car as CarIcon, MessageSquare, CheckCircle } from "lucide-react";
+import { Calendar, Clock, User, Mail, Phone, Car as CarIcon, MessageSquare, CheckCircle, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTestDriveRateLimit } from "@/hooks/useTestDriveRateLimit";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface TestDriveFormProps {
   car: Car;
@@ -36,6 +38,8 @@ const timeSlots = [
 
 const TestDriveForm = ({ car }: TestDriveFormProps) => {
   const { user } = useAuth();
+  const { checkRateLimit, isCheckingLimit } = useTestDriveRateLimit();
+  const { isLoaded: recaptchaLoaded, isVerifying, verifyRecaptcha } = useRecaptcha();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -70,6 +74,22 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
     setIsSubmitting(true);
 
     try {
+      // Check rate limit first
+      const rateLimitResult = await checkRateLimit();
+      if (!rateLimitResult.allowed) {
+        toast.error(rateLimitResult.message || "Rate limit exceeded");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Verify reCAPTCHA
+      const recaptchaResult = await verifyRecaptcha("test_drive_booking");
+      if (!recaptchaResult.success) {
+        toast.error(recaptchaResult.error || "Security verification failed. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase.from("test_drive_inquiries").insert({
         user_id: user.id,
         car_id: car.id,
@@ -114,6 +134,7 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
   };
 
   const today = new Date().toISOString().split("T")[0];
+  const isProcessing = isSubmitting || isCheckingLimit || isVerifying;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -252,14 +273,20 @@ const TestDriveForm = ({ car }: TestDriveFormProps) => {
               </div>
             </div>
 
+            {/* Security Notice */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Shield className="w-4 h-4" />
+              <span>Protected by reCAPTCHA • Max 3 requests per day</span>
+            </div>
+
             <Button
               type="submit"
               variant="hero"
               size="lg"
               className="w-full"
-              disabled={isSubmitting}
+              disabled={isProcessing || !recaptchaLoaded}
             >
-              {isSubmitting ? "Submitting..." : "Submit Request"}
+              {isProcessing ? "Processing..." : "Submit Request"}
             </Button>
           </form>
         )}
