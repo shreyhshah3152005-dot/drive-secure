@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -9,15 +11,26 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface NotificationRequest {
-  email: string;
-  name: string;
-  carName: string;
-  oldStatus: string;
-  newStatus: string;
-  preferredDate: string;
-  preferredTime: string;
-}
+// Input validation schema
+const notificationSchema = z.object({
+  email: z.string().email().max(255),
+  name: z.string().min(1).max(100).trim(),
+  carName: z.string().min(1).max(200).trim(),
+  oldStatus: z.enum(['pending', 'confirmed', 'cancelled', 'completed']),
+  newStatus: z.enum(['pending', 'confirmed', 'cancelled', 'completed']),
+  preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
+  preferredTime: z.string().min(1).max(50).trim()
+});
+
+// HTML escape function to prevent XSS in emails
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -26,21 +39,96 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, name, carName, oldStatus, newStatus, preferredDate, preferredTime }: NotificationRequest = await req.json();
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
 
-    console.log(`Sending notification to ${email} for car ${carName}, status changed from ${oldStatus} to ${newStatus}`);
+    // Create Supabase client with user's auth context
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    // Verify user is authenticated
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error("Authentication failed:", authError?.message);
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    // Verify user has admin role
+    const { data: roleData, error: roleError } = await supabaseClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError) {
+      console.error("Role check failed:", roleError.message);
+      return new Response(JSON.stringify({ error: 'Internal server error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    if (!roleData) {
+      console.error("User does not have admin role:", user.id);
+      return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    // Validate input data
+    const rawData = await req.json();
+    const validationResult = notificationSchema.safeParse(rawData);
+    
+    if (!validationResult.success) {
+      console.error("Input validation failed:", validationResult.error.format());
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid input data', 
+          details: validationResult.error.format() 
+        }), 
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      );
+    }
+
+    const { email, name, carName, oldStatus, newStatus, preferredDate, preferredTime } = validationResult.data;
+
+    // Escape HTML in user-provided values for email template
+    const safeName = escapeHtml(name);
+    const safeCarName = escapeHtml(carName);
+    const safePreferredDate = escapeHtml(preferredDate);
+    const safePreferredTime = escapeHtml(preferredTime);
+
+    console.log(`Sending notification to ${email} for car ${safeCarName}, status changed from ${oldStatus} to ${newStatus}`);
 
     const statusEmoji = newStatus === 'confirmed' ? '✅' : newStatus === 'cancelled' ? '❌' : '📋';
     const statusMessage = newStatus === 'confirmed' 
       ? 'Your test drive has been confirmed!' 
       : newStatus === 'cancelled' 
         ? 'Your test drive has been cancelled.' 
-        : `Your test drive status has been updated to: ${newStatus}`;
+        : `Your test drive status has been updated to: ${escapeHtml(newStatus)}`;
 
     const emailResponse = await resend.emails.send({
       from: "Car Dealership <onboarding@resend.dev>",
       to: [email],
-      subject: `${statusEmoji} Test Drive Update - ${carName}`,
+      subject: `${statusEmoji} Test Drive Update - ${safeCarName}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -66,17 +154,17 @@ const handler = async (req: Request): Promise<Response> => {
               <h1>🚗 Test Drive Update</h1>
             </div>
             <div class="content">
-              <p>Hello <strong>${name}</strong>,</p>
+              <p>Hello <strong>${safeName}</strong>,</p>
               <p>${statusMessage}</p>
               
               <div class="status-badge ${newStatus}">
-                Status: ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}
+                Status: ${escapeHtml(newStatus.charAt(0).toUpperCase() + newStatus.slice(1))}
               </div>
               
               <div class="details">
-                <p><strong>Vehicle:</strong> ${carName}</p>
-                <p><strong>Scheduled Date:</strong> ${preferredDate}</p>
-                <p><strong>Preferred Time:</strong> ${preferredTime}</p>
+                <p><strong>Vehicle:</strong> ${safeCarName}</p>
+                <p><strong>Scheduled Date:</strong> ${safePreferredDate}</p>
+                <p><strong>Preferred Time:</strong> ${safePreferredTime}</p>
               </div>
               
               ${newStatus === 'confirmed' ? `
@@ -112,7 +200,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-test-drive-notification function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "An error occurred while sending the notification" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
