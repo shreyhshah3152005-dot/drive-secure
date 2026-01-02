@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean
+          message: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       car_reviews: {
         Row: {
           car_id: string
@@ -67,6 +97,119 @@ export type Database = {
           car_names?: string[]
           created_at?: string
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      dealer_cars: {
+        Row: {
+          brand: string
+          category: string
+          created_at: string
+          dealer_id: string
+          description: string | null
+          engine: string | null
+          fuel_type: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          mileage: string | null
+          name: string
+          power: string | null
+          price: number
+          seating_capacity: number
+          transmission: string
+          updated_at: string
+        }
+        Insert: {
+          brand: string
+          category: string
+          created_at?: string
+          dealer_id: string
+          description?: string | null
+          engine?: string | null
+          fuel_type: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          mileage?: string | null
+          name: string
+          power?: string | null
+          price: number
+          seating_capacity?: number
+          transmission: string
+          updated_at?: string
+        }
+        Update: {
+          brand?: string
+          category?: string
+          created_at?: string
+          dealer_id?: string
+          description?: string | null
+          engine?: string | null
+          fuel_type?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          mileage?: string | null
+          name?: string
+          power?: string | null
+          price?: number
+          seating_capacity?: number
+          transmission?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_cars_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dealers: {
+        Row: {
+          address: string | null
+          city: string
+          created_at: string
+          dealership_name: string
+          id: string
+          is_active: boolean
+          phone: string | null
+          subscription_end_date: string | null
+          subscription_plan: string
+          subscription_start_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          city: string
+          created_at?: string
+          dealership_name: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          subscription_end_date?: string | null
+          subscription_plan?: string
+          subscription_start_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          city?: string
+          created_at?: string
+          dealership_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          subscription_end_date?: string | null
+          subscription_plan?: string
+          subscription_start_date?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -196,7 +339,10 @@ export type Database = {
         Row: {
           car_id: string
           car_name: string
+          completed_at: string | null
           created_at: string
+          dealer_id: string | null
+          dealer_review: string | null
           email: string
           id: string
           message: string | null
@@ -210,7 +356,10 @@ export type Database = {
         Insert: {
           car_id: string
           car_name: string
+          completed_at?: string | null
           created_at?: string
+          dealer_id?: string | null
+          dealer_review?: string | null
           email: string
           id?: string
           message?: string | null
@@ -224,7 +373,10 @@ export type Database = {
         Update: {
           car_id?: string
           car_name?: string
+          completed_at?: string | null
           created_at?: string
+          dealer_id?: string | null
+          dealer_review?: string | null
           email?: string
           id?: string
           message?: string | null
@@ -235,7 +387,15 @@ export type Database = {
           status?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "test_drive_inquiries_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -263,6 +423,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_dealer_car_count: { Args: { _dealer_id: string }; Returns: number }
+      get_dealer_car_limit: { Args: { _dealer_id: string }; Returns: number }
+      get_dealer_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -270,9 +433,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_dealer: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "dealer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -400,7 +564,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "dealer"],
     },
   },
 } as const
