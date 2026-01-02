@@ -2,11 +2,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { LogOut, User, ArrowLeft, LayoutDashboard, Shield } from "lucide-react";
+import { useDealerRole } from "@/hooks/useDealerRole";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store } from "lucide-react";
+import AdminNotificationBell from "./AdminNotificationBell";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
+  const { isDealer } = useDealerRole();
   const navigate = useNavigate();
   const location = useLocation();
   const showBackButton = location.pathname !== "/";
@@ -39,10 +42,21 @@ const Navbar = () => {
           {user ? (
             <>
               {isAdmin && (
-                <Link to="/admin">
-                  <Button variant="ghost" size="sm" className="gap-2 text-primary">
-                    <Shield className="w-4 h-4" />
-                    <span className="hidden sm:inline">Admin</span>
+                <>
+                  <AdminNotificationBell />
+                  <Link to="/admin">
+                    <Button variant="ghost" size="sm" className="gap-2 text-primary">
+                      <Shield className="w-4 h-4" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Button>
+                  </Link>
+                </>
+              )}
+              {isDealer && (
+                <Link to="/dealer">
+                  <Button variant="ghost" size="sm" className="gap-2 text-orange-500">
+                    <Store className="w-4 h-4" />
+                    <span className="hidden sm:inline">Dealer Panel</span>
                   </Button>
                 </Link>
               )}
