@@ -651,8 +651,12 @@ const DealerPanel = () => {
                     {dealerInfo?.subscription_plan === plan ? (
                       <Badge className="mt-4 w-full justify-center">Current Plan</Badge>
                     ) : (
-                      <Button variant="outline" className="mt-4 w-full">
-                        Upgrade
+                      <Button 
+                        variant="outline" 
+                        className="mt-4 w-full"
+                        onClick={() => toast.info("To upgrade your plan, please contact our admin team.")}
+                      >
+                        Contact Admin to Upgrade
                       </Button>
                     )}
                   </CardContent>
