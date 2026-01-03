@@ -159,6 +159,7 @@ const AdminPanel = () => {
     if (dealer.subscription_plan === newPlan) return;
 
     setUpdatingDealerId(dealer.id);
+    const oldPlan = dealer.subscription_plan;
 
     try {
       const { error } = await supabase
@@ -171,7 +172,26 @@ const AdminPanel = () => {
 
       if (error) throw error;
       
-      toast.success(`${dealer.dealership_name}'s plan updated to ${newPlan}`);
+      // Send email notification to dealer
+      const { error: emailError } = await supabase.functions.invoke(
+        "send-subscription-notification",
+        {
+          body: {
+            dealerId: dealer.id,
+            dealershipName: dealer.dealership_name,
+            oldPlan: oldPlan,
+            newPlan: newPlan,
+          },
+        }
+      );
+
+      if (emailError) {
+        console.error("Email notification failed:", emailError);
+        toast.warning(`${dealer.dealership_name}'s plan updated to ${newPlan}, but email notification failed`);
+      } else {
+        toast.success(`${dealer.dealership_name}'s plan updated to ${newPlan} and notification sent`);
+      }
+      
       fetchDealers();
     } catch (error) {
       console.error("Error updating subscription:", error);

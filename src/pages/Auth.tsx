@@ -263,7 +263,7 @@ const Auth = () => {
           </form>
 
           {mode !== "forgot" && (
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center space-y-3">
               <button
                 onClick={() => setMode(mode === "login" ? "signup" : "login")}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -273,6 +273,21 @@ const Auth = () => {
                   {mode === "login" ? "Sign Up" : "Sign In"}
                 </span>
               </button>
+              <div className="flex items-center justify-center gap-4 text-sm">
+                <button
+                  onClick={() => navigate("/admin-auth")}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Admin Login
+                </button>
+                <span className="text-muted-foreground">•</span>
+                <button
+                  onClick={() => navigate("/dealer-auth")}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Dealer Login
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power } from "lucide-react";
 
 interface DealerCar {
   id: string;
@@ -72,9 +72,12 @@ const DealerPanel = () => {
   const [isLoadingTestDrives, setIsLoadingTestDrives] = useState(true);
   const [isAddingCar, setIsAddingCar] = useState(false);
   const [addCarDialogOpen, setAddCarDialogOpen] = useState(false);
+  const [editCarDialogOpen, setEditCarDialogOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [selectedTestDrive, setSelectedTestDrive] = useState<TestDriveInquiry | null>(null);
+  const [selectedCar, setSelectedCar] = useState<DealerCar | null>(null);
   const [reviewText, setReviewText] = useState("");
+  const [isUpdatingCar, setIsUpdatingCar] = useState(false);
 
   const [newCar, setNewCar] = useState({
     name: "",
@@ -209,6 +212,107 @@ const DealerPanel = () => {
       toast.error("Failed to add car");
     } finally {
       setIsAddingCar(false);
+    }
+  };
+
+  const handleEditCar = (car: DealerCar) => {
+    setSelectedCar(car);
+    setNewCar({
+      name: car.name,
+      brand: car.brand,
+      price: car.price.toString(),
+      category: car.category,
+      fuel_type: car.fuel_type,
+      transmission: car.transmission,
+      seating_capacity: car.seating_capacity.toString(),
+      mileage: car.mileage || "",
+      engine: car.engine || "",
+      power: car.power || "",
+      image_url: car.image_url || "",
+      description: car.description || "",
+    });
+    setEditCarDialogOpen(true);
+  };
+
+  const handleUpdateCar = async () => {
+    if (!selectedCar) return;
+
+    if (!newCar.name || !newCar.brand || !newCar.price) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsUpdatingCar(true);
+    try {
+      const { error } = await supabase
+        .from("dealer_cars")
+        .update({
+          name: newCar.name,
+          brand: newCar.brand,
+          price: parseFloat(newCar.price),
+          category: newCar.category,
+          fuel_type: newCar.fuel_type,
+          transmission: newCar.transmission,
+          seating_capacity: parseInt(newCar.seating_capacity),
+          mileage: newCar.mileage || null,
+          engine: newCar.engine || null,
+          power: newCar.power || null,
+          image_url: newCar.image_url || null,
+          description: newCar.description || null,
+        })
+        .eq("id", selectedCar.id);
+
+      if (error) throw error;
+
+      toast.success("Car updated successfully!");
+      setEditCarDialogOpen(false);
+      setSelectedCar(null);
+      setNewCar({
+        name: "",
+        brand: "",
+        price: "",
+        category: "sedan",
+        fuel_type: "petrol",
+        transmission: "manual",
+        seating_capacity: "5",
+        mileage: "",
+        engine: "",
+        power: "",
+        image_url: "",
+        description: "",
+      });
+      fetchCars();
+    } catch (error) {
+      console.error("Error updating car:", error);
+      toast.error("Failed to update car");
+    } finally {
+      setIsUpdatingCar(false);
+    }
+  };
+
+  const handleToggleCarStatus = async (car: DealerCar) => {
+    const carLimit = subscriptionLimits[dealerInfo?.subscription_plan || "basic"];
+    const activeCars = cars.filter(c => c.is_active).length;
+
+    // If trying to activate a car and already at limit
+    if (!car.is_active && activeCars >= carLimit) {
+      toast.error(`You've reached your car limit (${carLimit}). Upgrade your subscription to add more cars.`);
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("dealer_cars")
+        .update({ is_active: !car.is_active })
+        .eq("id", car.id);
+
+      if (error) throw error;
+
+      toast.success(`Car ${car.is_active ? "deactivated" : "activated"} successfully!`);
+      fetchCars();
+    } catch (error) {
+      console.error("Error toggling car status:", error);
+      toast.error("Failed to update car status");
     }
   };
 
@@ -515,6 +619,7 @@ const DealerPanel = () => {
                         <TableHead>Price</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -528,6 +633,26 @@ const DealerPanel = () => {
                             <Badge variant={car.is_active ? "default" : "secondary"}>
                               {car.is_active ? "Active" : "Inactive"}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditCar(car)}
+                              >
+                                <Edit className="w-3 h-3 mr-1" />
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant={car.is_active ? "destructive" : "default"}
+                                onClick={() => handleToggleCarStatus(car)}
+                              >
+                                <Power className="w-3 h-3 mr-1" />
+                                {car.is_active ? "Deactivate" : "Activate"}
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -694,6 +819,176 @@ const DealerPanel = () => {
               <Button onClick={handleCompleteTestDrive}>
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Mark as Completed
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Car Dialog */}
+        <Dialog open={editCarDialogOpen} onOpenChange={(open) => {
+          setEditCarDialogOpen(open);
+          if (!open) {
+            setSelectedCar(null);
+            setNewCar({
+              name: "",
+              brand: "",
+              price: "",
+              category: "sedan",
+              fuel_type: "petrol",
+              transmission: "manual",
+              seating_capacity: "5",
+              mileage: "",
+              engine: "",
+              power: "",
+              image_url: "",
+              description: "",
+            });
+          }
+        }}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Car</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-name">Car Name *</Label>
+                <Input
+                  id="edit-name"
+                  value={newCar.name}
+                  onChange={(e) => setNewCar({ ...newCar, name: e.target.value })}
+                  placeholder="e.g., Tata Nexon"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-brand">Brand *</Label>
+                <Input
+                  id="edit-brand"
+                  value={newCar.brand}
+                  onChange={(e) => setNewCar({ ...newCar, brand: e.target.value })}
+                  placeholder="e.g., Tata"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-price">Price (₹ Lakhs) *</Label>
+                <Input
+                  id="edit-price"
+                  type="number"
+                  value={newCar.price}
+                  onChange={(e) => setNewCar({ ...newCar, price: e.target.value })}
+                  placeholder="e.g., 12.5"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-category">Category</Label>
+                <Select value={newCar.category} onValueChange={(v) => setNewCar({ ...newCar, category: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sedan">Sedan</SelectItem>
+                    <SelectItem value="suv">SUV</SelectItem>
+                    <SelectItem value="hatchback">Hatchback</SelectItem>
+                    <SelectItem value="mpv">MPV</SelectItem>
+                    <SelectItem value="crossover">Crossover</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-fuel_type">Fuel Type</Label>
+                <Select value={newCar.fuel_type} onValueChange={(v) => setNewCar({ ...newCar, fuel_type: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="petrol">Petrol</SelectItem>
+                    <SelectItem value="diesel">Diesel</SelectItem>
+                    <SelectItem value="electric">Electric</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                    <SelectItem value="cng">CNG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-transmission">Transmission</Label>
+                <Select value={newCar.transmission} onValueChange={(v) => setNewCar({ ...newCar, transmission: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manual">Manual</SelectItem>
+                    <SelectItem value="automatic">Automatic</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-seating_capacity">Seating Capacity</Label>
+                <Select value={newCar.seating_capacity} onValueChange={(v) => setNewCar({ ...newCar, seating_capacity: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2">2 Seater</SelectItem>
+                    <SelectItem value="4">4 Seater</SelectItem>
+                    <SelectItem value="5">5 Seater</SelectItem>
+                    <SelectItem value="6">6 Seater</SelectItem>
+                    <SelectItem value="7">7 Seater</SelectItem>
+                    <SelectItem value="8">8 Seater</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-mileage">Mileage (km/l)</Label>
+                <Input
+                  id="edit-mileage"
+                  value={newCar.mileage}
+                  onChange={(e) => setNewCar({ ...newCar, mileage: e.target.value })}
+                  placeholder="e.g., 18.5"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-engine">Engine</Label>
+                <Input
+                  id="edit-engine"
+                  value={newCar.engine}
+                  onChange={(e) => setNewCar({ ...newCar, engine: e.target.value })}
+                  placeholder="e.g., 1.5L Turbo"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-power">Power</Label>
+                <Input
+                  id="edit-power"
+                  value={newCar.power}
+                  onChange={(e) => setNewCar({ ...newCar, power: e.target.value })}
+                  placeholder="e.g., 150 bhp"
+                />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="edit-image_url">Image URL</Label>
+                <Input
+                  id="edit-image_url"
+                  value={newCar.image_url}
+                  onChange={(e) => setNewCar({ ...newCar, image_url: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={newCar.description}
+                  onChange={(e) => setNewCar({ ...newCar, description: e.target.value })}
+                  placeholder="Car description..."
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditCarDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateCar} disabled={isUpdatingCar}>
+                {isUpdatingCar ? "Updating..." : "Update Car"}
               </Button>
             </div>
           </DialogContent>
