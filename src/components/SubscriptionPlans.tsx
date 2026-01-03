@@ -81,9 +81,18 @@ const plans: Plan[] = [
   },
 ];
 
-const SubscriptionPlans = () => {
-  const handleSelectPlan = (planName: string) => {
-    toast.success(`${planName} plan selected! Contact us to complete subscription.`);
+interface SubscriptionPlansProps {
+  currentPlan?: string;
+  onSelectPlan?: (planId: string) => void;
+}
+
+const SubscriptionPlans = ({ currentPlan, onSelectPlan }: SubscriptionPlansProps = {}) => {
+  const handleSelectPlan = (plan: Plan) => {
+    if (onSelectPlan) {
+      onSelectPlan(plan.id);
+    } else {
+      toast.info(`To upgrade to ${plan.name}, please contact our admin team.`);
+    }
   };
 
   return (
@@ -158,9 +167,10 @@ const SubscriptionPlans = () => {
                 <Button
                   variant={plan.popular ? "hero" : "outline"}
                   className="w-full"
-                  onClick={() => handleSelectPlan(plan.name)}
+                  onClick={() => handleSelectPlan(plan)}
+                  disabled={currentPlan === plan.id}
                 >
-                  {plan.popular ? "Get Started" : "Select Plan"}
+                  {currentPlan === plan.id ? "Current Plan" : plan.popular ? "Get Started" : "Select Plan"}
                 </Button>
               </CardContent>
             </Card>
