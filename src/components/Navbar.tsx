@@ -38,7 +38,13 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Link to="/dealers">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Store className="w-4 h-4" />
+              <span className="hidden sm:inline">Dealers</span>
+            </Button>
+          </Link>
           {user ? (
             <>
               {isAdmin && (
