@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useDealerRole } from "@/hooks/useDealerRole";
-import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store } from "lucide-react";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Car } from "lucide-react";
 import AdminNotificationBell from "./AdminNotificationBell";
 
 const Navbar = () => {
@@ -39,6 +39,12 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
+          <Link to="/cars">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Car className="w-4 h-4" />
+              <span className="hidden sm:inline">Explore Cars</span>
+            </Button>
+          </Link>
           <Link to="/dealers">
             <Button variant="ghost" size="sm" className="gap-2">
               <Store className="w-4 h-4" />
