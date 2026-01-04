@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Phone, Store, Search, Car } from "lucide-react";
+import { MapPin, Phone, Store, Search, Car, Filter, X } from "lucide-react";
 
 interface Dealer {
   id: string;
@@ -17,10 +18,16 @@ interface Dealer {
   address: string | null;
 }
 
+interface DealerWithCategories extends Dealer {
+  categories: string[];
+}
+
 const Dealers = () => {
-  const [dealers, setDealers] = useState<Dealer[]>([]);
+  const [dealers, setDealers] = useState<DealerWithCategories[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [carCounts, setCarCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -33,20 +40,30 @@ const Dealers = () => {
           .order("dealership_name");
 
         if (error) throw error;
-        setDealers(data || []);
-
-        // Fetch car counts for each dealer
+        
+        // Fetch car counts and categories for each dealer
         if (data && data.length > 0) {
           const counts: Record<string, number> = {};
+          const dealersWithCategories: DealerWithCategories[] = [];
+
           for (const dealer of data) {
-            const { count } = await supabase
+            const { data: cars, count } = await supabase
               .from("dealer_cars")
-              .select("*", { count: "exact", head: true })
+              .select("category", { count: "exact" })
               .eq("dealer_id", dealer.id)
               .eq("is_active", true);
+            
             counts[dealer.id] = count || 0;
+            
+            // Get unique categories for this dealer
+            const categories = cars ? [...new Set(cars.map(c => c.category))] : [];
+            dealersWithCategories.push({ ...dealer, categories });
           }
+          
           setCarCounts(counts);
+          setDealers(dealersWithCategories);
+        } else {
+          setDealers([]);
         }
       } catch (error) {
         console.error("Error fetching dealers:", error);
@@ -58,11 +75,41 @@ const Dealers = () => {
     fetchDealers();
   }, []);
 
-  const filteredDealers = dealers.filter(
-    (dealer) =>
-      dealer.dealership_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dealer.city.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get unique cities and categories for filters
+  const cities = useMemo(() => {
+    const uniqueCities = [...new Set(dealers.map(d => d.city))];
+    return uniqueCities.sort();
+  }, [dealers]);
+
+  const categories = useMemo(() => {
+    const allCategories = dealers.flatMap(d => d.categories);
+    const uniqueCategories = [...new Set(allCategories)];
+    return uniqueCategories.sort();
+  }, [dealers]);
+
+  // Filter dealers based on search and filters
+  const filteredDealers = useMemo(() => {
+    return dealers.filter((dealer) => {
+      const matchesSearch = 
+        dealer.dealership_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dealer.city.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCity = selectedCity === "all" || dealer.city === selectedCity;
+      
+      const matchesCategory = selectedCategory === "all" || 
+        dealer.categories.includes(selectedCategory);
+      
+      return matchesSearch && matchesCity && matchesCategory;
+    });
+  }, [dealers, searchQuery, selectedCity, selectedCategory]);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCity("all");
+    setSelectedCategory("all");
+  };
+
+  const hasActiveFilters = searchQuery || selectedCity !== "all" || selectedCategory !== "all";
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,8 +127,9 @@ const Dealers = () => {
           </p>
         </div>
 
-        {/* Search */}
-        <div className="max-w-md mx-auto mb-12">
+        {/* Search and Filters */}
+        <div className="max-w-4xl mx-auto mb-8 space-y-4">
+          {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -91,6 +139,57 @@ const Dealers = () => {
               className="pl-10"
             />
           </div>
+          
+          {/* Filter Row */}
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Filter by:</span>
+            </div>
+            
+            {/* City Filter */}
+            <Select value={selectedCity} onValueChange={setSelectedCity}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select City" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                {cities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {/* Category Filter */}
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Car Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+                <X className="w-4 h-4" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
+          
+          {/* Results Count */}
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredDealers.length} of {dealers.length} dealers
+          </p>
         </div>
 
         {loading ? (

@@ -5,6 +5,7 @@ import { useDealerRole } from "@/hooks/useDealerRole";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CarImageUpload from "@/components/CarImageUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -569,13 +570,11 @@ const DealerPanel = () => {
                           placeholder="e.g., 118 bhp"
                         />
                       </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="image_url">Image URL</Label>
-                        <Input
-                          id="image_url"
-                          value={newCar.image_url}
-                          onChange={(e) => setNewCar({ ...newCar, image_url: e.target.value })}
-                          placeholder="https://..."
+                      <div className="col-span-2">
+                        <CarImageUpload
+                          imageUrl={newCar.image_url}
+                          onImageChange={(url) => setNewCar({ ...newCar, image_url: url })}
+                          dealerId={dealerInfo?.id || ""}
                         />
                       </div>
                       <div className="col-span-2 space-y-2">
@@ -963,13 +962,11 @@ const DealerPanel = () => {
                   placeholder="e.g., 150 bhp"
                 />
               </div>
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="edit-image_url">Image URL</Label>
-                <Input
-                  id="edit-image_url"
-                  value={newCar.image_url}
-                  onChange={(e) => setNewCar({ ...newCar, image_url: e.target.value })}
-                  placeholder="https://..."
+              <div className="col-span-2">
+                <CarImageUpload
+                  imageUrl={newCar.image_url}
+                  onImageChange={(url) => setNewCar({ ...newCar, image_url: url })}
+                  dealerId={dealerInfo?.id || ""}
                 />
               </div>
               <div className="col-span-2 space-y-2">
