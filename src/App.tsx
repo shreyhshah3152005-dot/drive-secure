@@ -16,6 +16,9 @@ import Compare from "./pages/Compare";
 import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
 import DealerPanel from "./pages/DealerPanel";
+import Dealers from "./pages/Dealers";
+import DealerDetail from "./pages/DealerDetail";
+import DealerCarDetail from "./pages/DealerCarDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +42,9 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/dealer" element={<DealerPanel />} />
+              <Route path="/dealers" element={<Dealers />} />
+              <Route path="/dealer/:id" element={<DealerDetail />} />
+              <Route path="/dealer-car/:id" element={<DealerCarDetail />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareBar />
