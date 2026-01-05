@@ -42,10 +42,10 @@ interface Dealer {
 }
 
 const formatPrice = (price: number) => {
-  if (price >= 10000000) {
-    return `₹${(price / 10000000).toFixed(2)} Cr`;
+  if (price >= 100) {
+    return `₹${(price / 100).toFixed(2)} Cr`;
   }
-  return `₹${(price / 100000).toFixed(2)} Lakh`;
+  return `₹${price.toFixed(2)} Lakh`;
 };
 
 const DealerCarDetail = () => {
@@ -125,6 +125,24 @@ const DealerCarDetail = () => {
       });
 
       if (error) throw error;
+
+      // Send confirmation email to customer
+      try {
+        await supabase.functions.invoke("send-customer-notification", {
+          body: {
+            type: "submission",
+            email,
+            name,
+            carName: `${car.brand} ${car.name}`,
+            dealerName: dealer.dealership_name,
+            preferredDate,
+            preferredTime,
+          },
+        });
+      } catch (emailError) {
+        console.error("Error sending confirmation email:", emailError);
+        // Don't fail the main request if email fails
+      }
 
       toast.success("Test drive request submitted successfully!");
       setName("");

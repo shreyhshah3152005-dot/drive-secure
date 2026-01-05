@@ -131,19 +131,22 @@ const DealerAuth = () => {
         return;
       }
 
-      // Create dealer record
+      // Create dealer record with 'free' subscription plan (2 car listings)
       const { error: dealerError } = await supabase.from("dealers").insert({
         user_id: authData.user.id,
         dealership_name: dealershipName,
         city,
         phone,
         address: address || null,
-        subscription_plan: "basic",
+        subscription_plan: "free",
       });
 
-      if (dealerError) throw dealerError;
+      if (dealerError) {
+        console.error("Dealer record error:", dealerError);
+        throw dealerError;
+      }
 
-      // Add dealer role
+      // Add dealer role - this should now work with the new RLS policy
       const { error: roleError } = await supabase.from("user_roles").insert({
         user_id: authData.user.id,
         role: "dealer",
@@ -151,6 +154,7 @@ const DealerAuth = () => {
 
       if (roleError) {
         console.error("Error adding dealer role:", roleError);
+        // Don't throw here, the dealer can still function without the role in user_roles
       }
 
       toast.success("Dealer account created successfully! You can now login.");
@@ -319,7 +323,7 @@ const DealerAuth = () => {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    By registering, you'll start with a Basic plan (5 car listings). You can upgrade anytime.
+                    By registering, you'll start with a Free plan (2 car listings). Upgrade anytime for more listings!
                   </p>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating Account..." : "Create Dealer Account"}

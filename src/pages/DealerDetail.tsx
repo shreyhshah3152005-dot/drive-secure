@@ -33,10 +33,10 @@ interface DealerCar {
 }
 
 const formatPrice = (price: number) => {
-  if (price >= 10000000) {
-    return `₹${(price / 10000000).toFixed(2)} Cr`;
+  if (price >= 100) {
+    return `₹${(price / 100).toFixed(2)} Cr`;
   }
-  return `₹${(price / 100000).toFixed(2)} Lakh`;
+  return `₹${price.toFixed(2)} Lakh`;
 };
 
 const DealerDetail = () => {

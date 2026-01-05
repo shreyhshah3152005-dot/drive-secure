@@ -178,6 +178,7 @@ export type Database = {
           id: string
           is_active: boolean
           phone: string | null
+          profile_image_url: string | null
           subscription_end_date: string | null
           subscription_plan: string
           subscription_start_date: string | null
@@ -192,6 +193,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           phone?: string | null
+          profile_image_url?: string | null
           subscription_end_date?: string | null
           subscription_plan?: string
           subscription_start_date?: string | null
@@ -206,6 +208,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           phone?: string | null
+          profile_image_url?: string | null
           subscription_end_date?: string | null
           subscription_plan?: string
           subscription_start_date?: string | null
