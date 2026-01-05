@@ -2,3 +2,9 @@ project_id = "bubnuyyvxedsmeuwkune"
 
 [functions.send-test-drive-notification]
 verify_jwt = true
+
+[functions.send-subscription-notification]
+verify_jwt = true
+
+[functions.send-customer-notification]
+verify_jwt = false

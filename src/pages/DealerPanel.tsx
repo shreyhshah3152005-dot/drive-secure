@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarImageUpload from "@/components/CarImageUpload";
+import DealerProfileImageUpload from "@/components/DealerProfileImageUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings } from "lucide-react";
 
 interface DealerCar {
   id: string;
@@ -51,12 +52,14 @@ interface TestDriveInquiry {
 }
 
 const subscriptionLimits: Record<string, number> = {
+  free: 2,
   basic: 5,
   standard: 15,
   premium: 999999,
 };
 
 const subscriptionPrices: Record<string, string> = {
+  free: "Free",
   basic: "₹999/month",
   standard: "₹1,999/month",
   premium: "₹3,999/month",
@@ -79,6 +82,26 @@ const DealerPanel = () => {
   const [selectedCar, setSelectedCar] = useState<DealerCar | null>(null);
   const [reviewText, setReviewText] = useState("");
   const [isUpdatingCar, setIsUpdatingCar] = useState(false);
+  const [dealerProfileImage, setDealerProfileImage] = useState<string | null>(null);
+
+  const handleProfileImageChange = async (url: string | null) => {
+    if (!dealerInfo?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from("dealers")
+        .update({ profile_image_url: url })
+        .eq("id", dealerInfo.id);
+
+      if (error) throw error;
+      
+      setDealerProfileImage(url);
+      toast.success("Profile image updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+      toast.error("Failed to update profile image");
+    }
+  };
 
   const [newCar, setNewCar] = useState({
     name: "",
@@ -318,7 +341,7 @@ const DealerPanel = () => {
   };
 
   const handleCompleteTestDrive = async () => {
-    if (!selectedTestDrive) return;
+    if (!selectedTestDrive || !dealerInfo) return;
 
     try {
       const { error } = await supabase
@@ -331,6 +354,25 @@ const DealerPanel = () => {
         .eq("id", selectedTestDrive.id);
 
       if (error) throw error;
+
+      // Send notification email to customer
+      try {
+        await supabase.functions.invoke("send-customer-notification", {
+          body: {
+            type: "status_change",
+            email: selectedTestDrive.email,
+            name: selectedTestDrive.name,
+            carName: selectedTestDrive.car_name,
+            dealerName: dealerInfo.dealership_name,
+            preferredDate: selectedTestDrive.preferred_date,
+            preferredTime: selectedTestDrive.preferred_time,
+            newStatus: "completed",
+          },
+        });
+      } catch (emailError) {
+        console.error("Error sending notification email:", emailError);
+        // Don't fail the main request if email fails
+      }
 
       toast.success("Test drive marked as completed!");
       setReviewDialogOpen(false);
@@ -435,6 +477,10 @@ const DealerPanel = () => {
             <TabsTrigger value="subscription" className="gap-2">
               <Package className="w-4 h-4" />
               Subscription
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Settings
             </TabsTrigger>
           </TabsList>
 
@@ -739,8 +785,8 @@ const DealerPanel = () => {
           </TabsContent>
 
           <TabsContent value="subscription">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {["basic", "standard", "premium"].map((plan) => (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {["free", "basic", "standard", "premium"].map((plan) => (
                 <Card
                   key={plan}
                   className={dealerInfo?.subscription_plan === plan ? "border-primary ring-2 ring-primary" : ""}
@@ -759,7 +805,7 @@ const DealerPanel = () => {
                         <CheckCircle className="w-4 h-4 text-green-500" />
                         Test Drive Management
                       </li>
-                      {plan !== "basic" && (
+                      {plan !== "free" && plan !== "basic" && (
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
                           Priority Support
@@ -787,6 +833,29 @@ const DealerPanel = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dealership Settings</CardTitle>
+                <CardDescription>Update your dealership profile</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <DealerProfileImageUpload
+                  imageUrl={dealerProfileImage}
+                  onImageChange={handleProfileImageChange}
+                />
+                <div className="pt-4 border-t">
+                  <p className="text-sm text-muted-foreground">
+                    Your dealership name: <strong>{dealerInfo?.dealership_name}</strong>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Location: <strong>{dealerInfo?.city}</strong>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 

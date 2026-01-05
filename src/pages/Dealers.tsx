@@ -16,6 +16,7 @@ interface Dealer {
   city: string;
   phone: string | null;
   address: string | null;
+  profile_image_url: string | null;
 }
 
 interface DealerWithCategories extends Dealer {
@@ -35,7 +36,7 @@ const Dealers = () => {
       try {
         const { data, error } = await supabase
           .from("dealers")
-          .select("id, dealership_name, city, phone, address")
+          .select("id, dealership_name, city, phone, address, profile_image_url")
           .eq("is_active", true)
           .order("dealership_name");
 
@@ -212,8 +213,16 @@ const Dealers = () => {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Store className="w-6 h-6 text-primary" />
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                          {dealer.profile_image_url ? (
+                            <img 
+                              src={dealer.profile_image_url} 
+                              alt={dealer.dealership_name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Store className="w-6 h-6 text-primary" />
+                          )}
                         </div>
                         <div>
                           <CardTitle className="text-lg group-hover:text-primary transition-colors">

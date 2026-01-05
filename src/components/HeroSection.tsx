@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Shield, Award, Headphones, Sparkles } from "lucide-react";
-import GeneralTestDriveForm from "@/components/GeneralTestDriveForm";
+import { ChevronRight, Shield, Award, Headphones, Sparkles, Store } from "lucide-react";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -59,13 +58,10 @@ const HeroSection = () => {
               Explore Collection
               <ChevronRight className="w-5 h-5" />
             </Button>
-            <GeneralTestDriveForm 
-              trigger={
-                <Button variant="glass" size="xl">
-                  Book Test Drive
-                </Button>
-              }
-            />
+            <Button variant="glass" size="xl" onClick={() => navigate("/dealers")}>
+              <Store className="w-5 h-5 mr-2" />
+              Browse Dealers
+            </Button>
           </div>
 
           {/* Trust badges - Modern style */}
