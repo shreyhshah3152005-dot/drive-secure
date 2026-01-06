@@ -1,10 +1,13 @@
 project_id = "bubnuyyvxedsmeuwkune"
 
 [functions.send-test-drive-notification]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-subscription-notification]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-customer-notification]
+verify_jwt = false
+
+[functions.send-dealer-notification]
 verify_jwt = false
