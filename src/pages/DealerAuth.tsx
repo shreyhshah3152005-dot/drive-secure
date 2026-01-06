@@ -109,7 +109,6 @@ const DealerAuth = () => {
 
     setIsLoading(true);
     try {
-      // Create user account
       const redirectUrl = `${window.location.origin}/dealer`;
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: signupEmail,
@@ -126,14 +125,30 @@ const DealerAuth = () => {
 
       if (authError) throw authError;
 
-      if (!authData.user) {
+      // In case email confirmation is enabled and no session is returned, try to sign in
+      // so we have an authenticated user for RLS-protected inserts.
+      let userId = authData.user?.id ?? null;
+      if (!authData.session) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: signupEmail,
+          password: signupPassword,
+        });
+        if (signInError) {
+          // Most common cause: email confirmation required.
+          toast.success("Account created. Please confirm your email, then login.");
+          return;
+        }
+        userId = signInData.user?.id ?? null;
+      }
+
+      if (!userId) {
         toast.error("Failed to create account");
         return;
       }
 
       // Create dealer record with 'free' subscription plan (2 car listings)
       const { error: dealerError } = await supabase.from("dealers").insert({
-        user_id: authData.user.id,
+        user_id: userId,
         dealership_name: dealershipName,
         city,
         phone,
@@ -146,19 +161,18 @@ const DealerAuth = () => {
         throw dealerError;
       }
 
-      // Add dealer role - this should now work with the new RLS policy
+      // Add dealer role
       const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: authData.user.id,
+        user_id: userId,
         role: "dealer",
       });
 
       if (roleError) {
         console.error("Error adding dealer role:", roleError);
-        // Don't throw here, the dealer can still function without the role in user_roles
       }
 
       toast.success("Dealer account created successfully! You can now login.");
-      // Reset form and switch to login tab
+      // Reset form
       setSignupEmail("");
       setSignupPassword("");
       setDealershipName("");
