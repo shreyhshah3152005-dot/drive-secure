@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import Navbar from "@/components/Navbar";
+import AdminCustomers from "@/components/AdminCustomers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -349,6 +350,10 @@ const AdminPanel = () => {
               <Store className="w-4 h-4" />
               Dealers
             </TabsTrigger>
+            <TabsTrigger value="customers" className="gap-2">
+              <Users className="w-4 h-4" />
+              Customers
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="test-drives">
@@ -530,6 +535,10 @@ const AdminPanel = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="customers">
+            <AdminCustomers />
           </TabsContent>
         </Tabs>
       </div>

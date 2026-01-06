@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompare } from "@/contexts/CompareContext";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2 } from "lucide-react";
+import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play } from "lucide-react";
 import { format } from "date-fns";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -32,6 +33,7 @@ interface Profile {
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
+  const { clearCompare, addToCompare } = useCompare();
   const navigate = useNavigate();
   const [inquiries, setInquiries] = useState<TestDriveInquiry[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -114,6 +116,14 @@ const Dashboard = () => {
       return `₹${(price / 100000).toFixed(2)} L`;
     }
     return `₹${price.toLocaleString("en-IN")}`;
+  };
+
+  const handleReopenComparison = (carIds: string[]) => {
+    // Clear current comparison and add cars from history
+    clearCompare();
+    const carsToCompare = cars.filter((car) => carIds.includes(car.id));
+    carsToCompare.forEach((car) => addToCompare(car));
+    navigate("/compare");
   };
 
   return (
@@ -255,14 +265,25 @@ const Dashboard = () => {
                           {format(new Date(item.created_at), "MMM dd, yyyy")}
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteFromHistory(item.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleReopenComparison(item.car_ids)}
+                          className="gap-1"
+                        >
+                          <Play className="w-3 h-3" />
+                          Re-open
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteFromHistory(item.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

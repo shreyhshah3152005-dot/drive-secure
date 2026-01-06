@@ -140,8 +140,25 @@ const DealerCarDetail = () => {
           },
         });
       } catch (emailError) {
-        console.error("Error sending confirmation email:", emailError);
-        // Don't fail the main request if email fails
+        console.error("Error sending customer confirmation email:", emailError);
+      }
+
+      // Send notification email to dealer
+      try {
+        await supabase.functions.invoke("send-dealer-notification", {
+          body: {
+            dealerId: dealer.id,
+            customerName: name,
+            customerEmail: email,
+            customerPhone: phone,
+            carName: `${car.brand} ${car.name}`,
+            preferredDate,
+            preferredTime,
+            message: message || undefined,
+          },
+        });
+      } catch (dealerEmailError) {
+        console.error("Error sending dealer notification email:", dealerEmailError);
       }
 
       toast.success("Test drive request submitted successfully!");
