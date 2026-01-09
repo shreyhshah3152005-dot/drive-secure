@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import Navbar from "@/components/Navbar";
 import AdminCustomers from "@/components/AdminCustomers";
+import AdminDealerApprovals from "@/components/AdminDealerApprovals";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -340,8 +341,12 @@ const AdminPanel = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="test-drives" className="space-y-6">
+        <Tabs defaultValue="approvals" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="approvals" className="gap-2">
+              <UserCheck className="w-4 h-4" />
+              Approvals
+            </TabsTrigger>
             <TabsTrigger value="test-drives" className="gap-2">
               <Car className="w-4 h-4" />
               Test Drives
@@ -355,6 +360,10 @@ const AdminPanel = () => {
               Customers
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="approvals">
+            <AdminDealerApprovals />
+          </TabsContent>
 
           <TabsContent value="test-drives">
             <Card className="gradient-card border-border/50">

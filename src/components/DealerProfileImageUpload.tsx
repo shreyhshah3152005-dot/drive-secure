@@ -92,7 +92,7 @@ const DealerProfileImageUpload = ({ imageUrl, onImageChange }: DealerProfileImag
             <img
               src={imageUrl}
               alt="Profile"
-              className="w-20 h-20 rounded-full object-cover border-2 border-primary/20"
+              className="w-20 h-20 rounded-lg object-cover border-2 border-primary/20 aspect-[4/3]"
             />
             <Button
               type="button"
@@ -105,7 +105,7 @@ const DealerProfileImageUpload = ({ imageUrl, onImageChange }: DealerProfileImag
             </Button>
           </div>
         ) : (
-          <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+          <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center border-2 border-dashed border-muted-foreground/30 aspect-[4/3]">
             <ImageIcon className="w-8 h-8 text-muted-foreground" />
           </div>
         )}

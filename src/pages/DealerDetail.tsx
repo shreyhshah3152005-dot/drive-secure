@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DealerReviews from "@/components/DealerReviews";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -153,6 +154,11 @@ const DealerDetail = () => {
               <Car className="w-4 h-4 mr-2" />
               {cars.length} Cars
             </Badge>
+          </div>
+
+          {/* Dealer Reviews */}
+          <div className="mb-8">
+            <DealerReviews dealerId={dealer.id} />
           </div>
         </div>
 
