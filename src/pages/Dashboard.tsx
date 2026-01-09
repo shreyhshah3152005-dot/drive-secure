@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompare } from "@/contexts/CompareContext";
 import Navbar from "@/components/Navbar";
+import DealerReviewForm from "@/components/DealerReviewForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play } from "lucide-react";
+import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play, Star } from "lucide-react";
 import { format } from "date-fns";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -21,6 +23,12 @@ interface TestDriveInquiry {
   preferred_time: string;
   status: string;
   created_at: string;
+  dealer_id: string | null;
+  dealers?: {
+    id: string;
+    dealership_name: string;
+  } | null;
+  has_review?: boolean;
 }
 
 interface Profile {
@@ -38,6 +46,8 @@ const Dashboard = () => {
   const [inquiries, setInquiries] = useState<TestDriveInquiry[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [selectedInquiry, setSelectedInquiry] = useState<TestDriveInquiry | null>(null);
   const { favorites } = useFavorites();
   const { history: comparisonHistory, deleteFromHistory, isLoading: historyLoading } = useComparisonHistory();
 
@@ -62,15 +72,31 @@ const Dashboard = () => {
         setProfile(profileData);
       }
 
-      // Fetch test drive inquiries
+      // Fetch test drive inquiries with dealer info
       const { data: inquiriesData } = await supabase
         .from("test_drive_inquiries")
-        .select("id, car_name, preferred_date, preferred_time, status, created_at")
+        .select(`
+          id, car_name, preferred_date, preferred_time, status, created_at, dealer_id,
+          dealers (id, dealership_name)
+        `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (inquiriesData) {
-        setInquiries(inquiriesData);
+        // Check which inquiries already have reviews
+        const { data: reviewsData } = await supabase
+          .from("dealer_reviews")
+          .select("test_drive_id")
+          .in("test_drive_id", inquiriesData.map(i => i.id));
+
+        const reviewedIds = new Set(reviewsData?.map(r => r.test_drive_id) || []);
+        
+        const enrichedInquiries = inquiriesData.map(inquiry => ({
+          ...inquiry,
+          has_review: reviewedIds.has(inquiry.id)
+        }));
+        
+        setInquiries(enrichedInquiries);
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -124,6 +150,17 @@ const Dashboard = () => {
     const carsToCompare = cars.filter((car) => carIds.includes(car.id));
     carsToCompare.forEach((car) => addToCompare(car));
     navigate("/compare");
+  };
+
+  const handleOpenReviewDialog = (inquiry: TestDriveInquiry) => {
+    setSelectedInquiry(inquiry);
+    setReviewDialogOpen(true);
+  };
+
+  const handleReviewSubmitted = () => {
+    setReviewDialogOpen(false);
+    setSelectedInquiry(null);
+    fetchData(); // Refresh data
   };
 
   return (
@@ -213,16 +250,57 @@ const Dashboard = () => {
                             {inquiry.preferred_time}
                           </span>
                         </div>
+                        {inquiry.dealers && (
+                          <p className="text-xs text-muted-foreground">
+                            at {inquiry.dealers.dealership_name}
+                          </p>
+                        )}
                       </div>
-                      <Badge className={`mt-2 sm:mt-0 ${getStatusColor(inquiry.status)}`}>
-                        {inquiry.status}
-                      </Badge>
+                      <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                        {inquiry.status === "completed" && inquiry.dealer_id && !inquiry.has_review && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenReviewDialog(inquiry)}
+                            className="gap-1"
+                          >
+                            <Star className="w-3 h-3" />
+                            Review
+                          </Button>
+                        )}
+                        {inquiry.has_review && (
+                          <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
+                            <Star className="w-3 h-3 mr-1 fill-current" />
+                            Reviewed
+                          </Badge>
+                        )}
+                        <Badge className={getStatusColor(inquiry.status)}>
+                          {inquiry.status}
+                        </Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Review Dialog */}
+          <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Rate Your Test Drive Experience</DialogTitle>
+              </DialogHeader>
+              {selectedInquiry && selectedInquiry.dealer_id && selectedInquiry.dealers && (
+                <DealerReviewForm
+                  testDriveId={selectedInquiry.id}
+                  dealerId={selectedInquiry.dealer_id}
+                  dealerName={selectedInquiry.dealers.dealership_name}
+                  onReviewSubmitted={handleReviewSubmitted}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Comparison History */}
           <Card className="gradient-card border-border/50 lg:col-span-3">

@@ -76,7 +76,7 @@ const DealerAuth = () => {
 
       if (!dealerData.is_active) {
         await supabase.auth.signOut();
-        toast.error("Your dealer account is inactive. Please contact support.");
+        toast.error("Your dealer account is pending approval. Please wait for admin to approve your registration.");
         return;
       }
 
@@ -171,7 +171,7 @@ const DealerAuth = () => {
         console.error("Error adding dealer role:", roleError);
       }
 
-      toast.success("Dealer account created successfully! You can now login.");
+      toast.success("Dealer registration submitted! Your account is pending admin approval.");
       // Reset form
       setSignupEmail("");
       setSignupPassword("");
@@ -337,7 +337,7 @@ const DealerAuth = () => {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    By registering, you'll start with a Free plan (2 car listings). Upgrade anytime for more listings!
+                    By registering, your account will be submitted for admin approval. Once approved, you'll start with a Free plan (2 car listings).
                   </p>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating Account..." : "Create Dealer Account"}

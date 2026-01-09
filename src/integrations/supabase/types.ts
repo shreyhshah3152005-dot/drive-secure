@@ -169,6 +169,51 @@ export type Database = {
           },
         ]
       }
+      dealer_reviews: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          id: string
+          rating: number
+          review_text: string | null
+          test_drive_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          test_drive_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          test_drive_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_reviews_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dealer_reviews_test_drive_id_fkey"
+            columns: ["test_drive_id"]
+            isOneToOne: true
+            referencedRelation: "test_drive_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealers: {
         Row: {
           address: string | null
@@ -237,6 +282,45 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      price_history: {
+        Row: {
+          car_id: string
+          dealer_id: string
+          id: string
+          price: number
+          recorded_at: string
+        }
+        Insert: {
+          car_id: string
+          dealer_id: string
+          id?: string
+          price: number
+          recorded_at?: string
+        }
+        Update: {
+          car_id?: string
+          dealer_id?: string
+          id?: string
+          price?: number
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_history_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

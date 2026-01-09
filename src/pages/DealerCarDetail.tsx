@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PriceHistoryChart from "@/components/PriceHistoryChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -335,6 +336,9 @@ const DealerCarDetail = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Price History */}
+            <PriceHistoryChart carId={car.id} carName={`${car.brand} ${car.name}`} />
           </div>
 
           {/* Sidebar */}
