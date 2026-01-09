@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarImageUpload from "@/components/CarImageUpload";
 import DealerProfileImageUpload from "@/components/DealerProfileImageUpload";
+import DealerAnalytics from "@/components/DealerAnalytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3 } from "lucide-react";
 
 interface DealerCar {
   id: string;
@@ -464,8 +465,12 @@ const DealerPanel = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="cars" className="space-y-6">
+        <Tabs defaultValue="analytics" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="analytics" className="gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Analytics
+            </TabsTrigger>
             <TabsTrigger value="cars" className="gap-2">
               <Car className="w-4 h-4" />
               My Cars
@@ -483,6 +488,10 @@ const DealerPanel = () => {
               Settings
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="analytics">
+            <DealerAnalytics cars={cars} testDrives={testDrives} />
+          </TabsContent>
 
           <TabsContent value="cars">
             <Card>
