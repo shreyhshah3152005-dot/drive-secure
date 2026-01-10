@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DealerReviews from "@/components/DealerReviews";
+import DealerRatingBadge from "@/components/DealerRatingBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,11 +128,14 @@ const DealerDetail = () => {
         {/* Dealer Header */}
         <div className="bg-card border rounded-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <div className="w-20 h-16 aspect-[4/3] rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
               <Store className="w-10 h-10 text-primary" />
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{dealer.dealership_name}</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">{dealer.dealership_name}</h1>
+                <DealerRatingBadge dealerId={dealer.id} showCount />
+              </div>
               <div className="flex flex-wrap gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" />

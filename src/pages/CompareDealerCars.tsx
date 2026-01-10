@@ -31,13 +31,12 @@ interface DealerCar {
   };
 }
 
+// Price is stored in Lakhs
 const formatPrice = (price: number): string => {
-  if (price >= 10000000) {
-    return `₹${(price / 10000000).toFixed(2)} Cr`;
-  } else if (price >= 100000) {
-    return `₹${(price / 100000).toFixed(2)} L`;
+  if (price >= 100) {
+    return `₹${(price / 100).toFixed(2)} Cr`;
   }
-  return `₹${price.toLocaleString("en-IN")}`;
+  return `₹${price.toFixed(2)} L`;
 };
 
 const CompareDealerCars = () => {
