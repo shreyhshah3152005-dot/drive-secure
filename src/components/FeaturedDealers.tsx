@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import DealerRatingBadge from "@/components/DealerRatingBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Car, Store, Star, ChevronRight } from "lucide-react";
 
@@ -104,7 +105,7 @@ const FeaturedDealers = () => {
               <Card className="h-full hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 cursor-pointer group overflow-hidden">
                 <CardContent className="p-0">
                   <div className="flex items-center gap-4 p-6">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-12 aspect-[4/3] rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                       {dealer.profile_image_url ? (
                         <img 
                           src={dealer.profile_image_url} 
@@ -124,10 +125,13 @@ const FeaturedDealers = () => {
                         {dealer.city}
                       </div>
                     </div>
-                    <Badge variant="secondary" className="flex items-center gap-1 flex-shrink-0">
-                      <Car className="w-3 h-3" />
-                      {dealer.car_count}
-                    </Badge>
+                    <div className="flex flex-col gap-1 items-end flex-shrink-0">
+                      <DealerRatingBadge dealerId={dealer.id} />
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Car className="w-3 h-3" />
+                        {dealer.car_count}
+                      </Badge>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

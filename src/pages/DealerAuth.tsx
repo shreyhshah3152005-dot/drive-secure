@@ -109,12 +109,11 @@ const DealerAuth = () => {
 
     setIsLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}/dealer`;
+      // Step 1: Sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             phone,
             name: dealershipName,
@@ -125,28 +124,27 @@ const DealerAuth = () => {
 
       if (authError) throw authError;
 
-      // In case email confirmation is enabled and no session is returned, try to sign in
-      // so we have an authenticated user for RLS-protected inserts.
-      let userId = authData.user?.id ?? null;
+      if (!authData.user) {
+        throw new Error("Failed to create account");
+      }
+
+      const userId = authData.user.id;
+
+      // Step 2: Ensure we have a valid session (auto-confirm should provide this)
+      // If no session, try to sign in immediately
       if (!authData.session) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email: signupEmail,
           password: signupPassword,
         });
+        
         if (signInError) {
-          // Most common cause: email confirmation required.
-          toast.success("Account created. Please confirm your email, then login.");
-          return;
+          console.error("Sign in after signup failed:", signInError);
+          // Continue anyway - the user might still be able to create records
         }
-        userId = signInData.user?.id ?? null;
       }
 
-      if (!userId) {
-        toast.error("Failed to create account");
-        return;
-      }
-
-      // Create dealer record with 'free' subscription plan (2 car listings)
+      // Step 3: Create dealer record with 'free' subscription plan (is_active defaults to false)
       const { error: dealerError } = await supabase.from("dealers").insert({
         user_id: userId,
         dealership_name: dealershipName,
@@ -158,10 +156,10 @@ const DealerAuth = () => {
 
       if (dealerError) {
         console.error("Dealer record error:", dealerError);
-        throw dealerError;
+        throw new Error("Failed to create dealer record. Please contact support.");
       }
 
-      // Add dealer role
+      // Step 4: Add dealer role
       const { error: roleError } = await supabase.from("user_roles").insert({
         user_id: userId,
         role: "dealer",
@@ -169,9 +167,14 @@ const DealerAuth = () => {
 
       if (roleError) {
         console.error("Error adding dealer role:", roleError);
+        // Don't throw - the dealer record was created successfully
       }
 
-      toast.success("Dealer registration submitted! Your account is pending admin approval.");
+      // Sign out after registration since account is pending approval
+      await supabase.auth.signOut();
+
+      toast.success("Dealer registration submitted! Your account is pending admin approval. You will be able to login once approved.");
+      
       // Reset form
       setSignupEmail("");
       setSignupPassword("");
@@ -181,7 +184,7 @@ const DealerAuth = () => {
       setAddress("");
     } catch (error: unknown) {
       console.error("Signup error:", error);
-      const message = error instanceof Error ? error.message : "Signup failed";
+      const message = error instanceof Error ? error.message : "Signup failed. Please try again.";
       toast.error(message);
     } finally {
       setIsLoading(false);

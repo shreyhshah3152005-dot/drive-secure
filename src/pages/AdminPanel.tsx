@@ -5,6 +5,7 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import Navbar from "@/components/Navbar";
 import AdminCustomers from "@/components/AdminCustomers";
 import AdminDealerApprovals from "@/components/AdminDealerApprovals";
+import AdminAnalytics from "@/components/AdminAnalytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -47,14 +48,23 @@ interface Dealer {
   user_id: string;
 }
 
+interface Profile {
+  id: string;
+  name: string | null;
+  city: string | null;
+  created_at: string;
+}
+
 const AdminPanel = () => {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isLoading: adminLoading } = useAdminRole();
   const navigate = useNavigate();
   const [inquiries, setInquiries] = useState<TestDriveInquiry[]>([]);
   const [dealers, setDealers] = useState<Dealer[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingDealers, setIsLoadingDealers] = useState(true);
+  const [isLoadingProfiles, setIsLoadingProfiles] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [updatingDealerId, setUpdatingDealerId] = useState<string | null>(null);
 
@@ -105,10 +115,27 @@ const AdminPanel = () => {
     }
   };
 
+  const fetchProfiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, name, city, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setProfiles(data || []);
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+    } finally {
+      setIsLoadingProfiles(false);
+    }
+  };
+
   useEffect(() => {
     if (isAdmin) {
       fetchInquiries();
       fetchDealers();
+      fetchProfiles();
     }
   }, [isAdmin]);
 
@@ -341,8 +368,12 @@ const AdminPanel = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="approvals" className="space-y-6">
+        <Tabs defaultValue="analytics" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="analytics" className="gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Analytics
+            </TabsTrigger>
             <TabsTrigger value="approvals" className="gap-2">
               <UserCheck className="w-4 h-4" />
               Approvals
@@ -360,6 +391,10 @@ const AdminPanel = () => {
               Customers
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="analytics">
+            <AdminAnalytics profiles={profiles} dealers={dealers} testDrives={inquiries} />
+          </TabsContent>
 
           <TabsContent value="approvals">
             <AdminDealerApprovals />

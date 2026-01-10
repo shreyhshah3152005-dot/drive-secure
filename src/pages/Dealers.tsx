@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DealerRatingBadge from "@/components/DealerRatingBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -211,9 +212,9 @@ const Dealers = () => {
               <Link key={dealer.id} to={`/dealer/${dealer.id}`}>
                 <Card className="h-full hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 cursor-pointer group">
                   <CardHeader>
-                    <div className="flex items-start justify-between">
+                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                        <div className="w-12 h-12 aspect-[4/3] rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                           {dealer.profile_image_url ? (
                             <img 
                               src={dealer.profile_image_url} 
@@ -234,10 +235,13 @@ const Dealers = () => {
                           </div>
                         </div>
                       </div>
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Car className="w-3 h-3" />
-                        {carCounts[dealer.id] || 0}
-                      </Badge>
+                      <div className="flex flex-col gap-1 items-end">
+                        <DealerRatingBadge dealerId={dealer.id} showCount />
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <Car className="w-3 h-3" />
+                          {carCounts[dealer.id] || 0}
+                        </Badge>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
