@@ -3,13 +3,15 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DealerRatingBadge from "@/components/DealerRatingBadge";
+import DealerCompareBar from "@/components/DealerCompareBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Phone, Store, Search, Car, Filter, X } from "lucide-react";
+import { MapPin, Phone, Store, Search, Car, Filter, X, Star, Scale } from "lucide-react";
 
 interface Dealer {
   id: string;
@@ -20,17 +22,21 @@ interface Dealer {
   profile_image_url: string | null;
 }
 
-interface DealerWithCategories extends Dealer {
+interface DealerWithStats extends Dealer {
   categories: string[];
+  avgRating: number;
+  reviewCount: number;
 }
 
 const Dealers = () => {
-  const [dealers, setDealers] = useState<DealerWithCategories[]>([]);
+  const [dealers, setDealers] = useState<DealerWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedRating, setSelectedRating] = useState<string>("all");
   const [carCounts, setCarCounts] = useState<Record<string, number>>({});
+  const [compareDealers, setCompareDealers] = useState<DealerWithStats[]>([]);
 
   useEffect(() => {
     const fetchDealers = async () => {
@@ -43,12 +49,13 @@ const Dealers = () => {
 
         if (error) throw error;
         
-        // Fetch car counts and categories for each dealer
+        // Fetch car counts, categories, and ratings for each dealer
         if (data && data.length > 0) {
           const counts: Record<string, number> = {};
-          const dealersWithCategories: DealerWithCategories[] = [];
+          const dealersWithStats: DealerWithStats[] = [];
 
           for (const dealer of data) {
+            // Get cars and categories
             const { data: cars, count } = await supabase
               .from("dealer_cars")
               .select("category", { count: "exact" })
@@ -59,11 +66,23 @@ const Dealers = () => {
             
             // Get unique categories for this dealer
             const categories = cars ? [...new Set(cars.map(c => c.category))] : [];
-            dealersWithCategories.push({ ...dealer, categories });
+            
+            // Get reviews for rating
+            const { data: reviews } = await supabase
+              .from("dealer_reviews")
+              .select("rating")
+              .eq("dealer_id", dealer.id);
+            
+            const reviewCount = reviews?.length || 0;
+            const avgRating = reviewCount > 0 
+              ? reviews!.reduce((acc, r) => acc + r.rating, 0) / reviewCount 
+              : 0;
+
+            dealersWithStats.push({ ...dealer, categories, avgRating, reviewCount });
           }
           
           setCarCounts(counts);
-          setDealers(dealersWithCategories);
+          setDealers(dealersWithStats);
         } else {
           setDealers([]);
         }
@@ -101,17 +120,42 @@ const Dealers = () => {
       const matchesCategory = selectedCategory === "all" || 
         dealer.categories.includes(selectedCategory);
       
-      return matchesSearch && matchesCity && matchesCategory;
+      // Rating filter
+      let matchesRating = true;
+      if (selectedRating !== "all") {
+        const minRating = parseFloat(selectedRating);
+        matchesRating = dealer.avgRating >= minRating;
+      }
+      
+      return matchesSearch && matchesCity && matchesCategory && matchesRating;
     });
-  }, [dealers, searchQuery, selectedCity, selectedCategory]);
+  }, [dealers, searchQuery, selectedCity, selectedCategory, selectedRating]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCity("all");
     setSelectedCategory("all");
+    setSelectedRating("all");
   };
 
-  const hasActiveFilters = searchQuery || selectedCity !== "all" || selectedCategory !== "all";
+  const hasActiveFilters = searchQuery || selectedCity !== "all" || selectedCategory !== "all" || selectedRating !== "all";
+
+  const toggleCompare = (dealer: DealerWithStats) => {
+    setCompareDealers(prev => {
+      const exists = prev.find(d => d.id === dealer.id);
+      if (exists) {
+        return prev.filter(d => d.id !== dealer.id);
+      }
+      if (prev.length >= 4) {
+        return prev;
+      }
+      return [...prev, dealer];
+    });
+  };
+
+  const isInCompare = (dealerId: string) => {
+    return compareDealers.some(d => d.id === dealerId);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,6 +222,23 @@ const Dealers = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Rating Filter */}
+            <Select value={selectedRating} onValueChange={setSelectedRating}>
+              <SelectTrigger className="w-[180px]">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4" />
+                  <SelectValue placeholder="Min Rating" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Ratings</SelectItem>
+                <SelectItem value="4">4+ Stars</SelectItem>
+                <SelectItem value="3">3+ Stars</SelectItem>
+                <SelectItem value="2">2+ Stars</SelectItem>
+                <SelectItem value="1">1+ Stars</SelectItem>
+              </SelectContent>
+            </Select>
             
             {/* Clear Filters */}
             {hasActiveFilters && (
@@ -209,64 +270,84 @@ const Dealers = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDealers.map((dealer) => (
-              <Link key={dealer.id} to={`/dealer/${dealer.id}`}>
-                <Card className="h-full hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 cursor-pointer group">
-                  <CardHeader>
-                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 aspect-[4/3] rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {dealer.profile_image_url ? (
-                            <img 
-                              src={dealer.profile_image_url} 
-                              alt={dealer.dealership_name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <Store className="w-6 h-6 text-primary" />
-                          )}
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
+              <Card key={dealer.id} className={`h-full transition-all hover:shadow-lg hover:shadow-primary/10 ${isInCompare(dealer.id) ? "border-primary ring-2 ring-primary/20" : "hover:border-primary/50"}`}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 aspect-[4/3] rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {dealer.profile_image_url ? (
+                          <img 
+                            src={dealer.profile_image_url} 
+                            alt={dealer.dealership_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Store className="w-6 h-6 text-primary" />
+                        )}
+                      </div>
+                      <div>
+                        <Link to={`/dealer/${dealer.id}`}>
+                          <CardTitle className="text-lg hover:text-primary transition-colors cursor-pointer">
                             {dealer.dealership_name}
                           </CardTitle>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <MapPin className="w-3 h-3" />
-                            {dealer.city}
-                          </div>
+                        </Link>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <MapPin className="w-3 h-3" />
+                          {dealer.city}
                         </div>
                       </div>
-                      <div className="flex flex-col gap-1 items-end">
-                        <DealerRatingBadge dealerId={dealer.id} showCount />
-                        <Badge variant="secondary" className="flex items-center gap-1">
-                          <Car className="w-3 h-3" />
-                          {carCounts[dealer.id] || 0}
-                        </Badge>
-                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    {dealer.address && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {dealer.address}
-                      </p>
-                    )}
-                    {dealer.phone && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="w-4 h-4" />
-                        {dealer.phone}
-                      </div>
-                    )}
-                    <Button variant="outline" className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      View Inventory
+                    <div className="flex flex-col gap-1 items-end">
+                      <DealerRatingBadge dealerId={dealer.id} showCount />
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Car className="w-3 h-3" />
+                        {carCounts[dealer.id] || 0}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {dealer.address && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {dealer.address}
+                    </p>
+                  )}
+                  {dealer.phone && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                      <Phone className="w-4 h-4" />
+                      {dealer.phone}
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Link to={`/dealer/${dealer.id}`} className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        View Inventory
+                      </Button>
+                    </Link>
+                    <Button
+                      variant={isInCompare(dealer.id) ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => toggleCompare(dealer)}
+                      disabled={!isInCompare(dealer.id) && compareDealers.length >= 4}
+                      title={isInCompare(dealer.id) ? "Remove from compare" : "Add to compare"}
+                    >
+                      <Scale className="w-4 h-4" />
                     </Button>
-                  </CardContent>
-                </Card>
-              </Link>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
       </main>
       <Footer />
+      
+      {/* Compare Bar */}
+      <DealerCompareBar
+        dealers={compareDealers}
+        onRemove={(id) => setCompareDealers(prev => prev.filter(d => d.id !== id))}
+        onClear={() => setCompareDealers([])}
+      />
     </div>
   );
 };
