@@ -14,6 +14,7 @@ import Cars from "./pages/Cars";
 import CarDetail from "./pages/CarDetail";
 import Compare from "./pages/Compare";
 import CompareDealerCars from "./pages/CompareDealerCars";
+import CompareDealersDetail from "./pages/CompareDealersDetail";
 import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
 import DealerPanel from "./pages/DealerPanel";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/compare-dealers" element={<CompareDealerCars />} />
+              <Route path="/compare-dealers-detail" element={<CompareDealersDetail />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/dealer" element={<DealerPanel />} />
