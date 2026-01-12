@@ -101,6 +101,48 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_car_notifications: {
+        Row: {
+          car_id: string
+          created_at: string
+          dealer_id: string
+          id: string
+          is_read: boolean
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          dealer_id: string
+          id?: string
+          is_read?: boolean
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          is_read?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_car_notifications_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dealer_car_notifications_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealer_cars: {
         Row: {
           brand: string
@@ -261,6 +303,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      favorite_dealers: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorite_dealers_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       favorites: {
         Row: {

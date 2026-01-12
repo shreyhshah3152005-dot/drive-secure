@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.send-dealer-notification]
 verify_jwt = false
+
+[functions.send-dealer-approval-notification]
+verify_jwt = false
