@@ -159,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Dealer approval notification sent:", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, emailId: emailResponse.id }), {
+    return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
