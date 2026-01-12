@@ -178,6 +178,7 @@ const Dealers = () => {
         {/* Dealer Recommendations */}
         <div className="max-w-4xl mx-auto mb-8">
           <DealerRecommendations limit={3} />
+        </div>
 
         {/* Search and Filters */}
         <div className="max-w-4xl mx-auto mb-8 space-y-4">
