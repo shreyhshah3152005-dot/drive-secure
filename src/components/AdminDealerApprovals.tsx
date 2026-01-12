@@ -45,6 +45,21 @@ const AdminDealerApprovals = () => {
     fetchPendingDealers();
   }, []);
 
+  const sendApprovalNotification = async (dealer: PendingDealer, action: "approved" | "declined") => {
+    try {
+      await supabase.functions.invoke("send-dealer-approval-notification", {
+        body: {
+          dealerId: dealer.id,
+          action,
+          dealershipName: dealer.dealership_name,
+        },
+      });
+    } catch (emailError) {
+      console.error("Error sending approval notification email:", emailError);
+      // Don't fail the main operation if email fails
+    }
+  };
+
   const handleApprove = async (dealer: PendingDealer) => {
     setProcessingId(dealer.id);
     try {
@@ -54,6 +69,9 @@ const AdminDealerApprovals = () => {
         .eq("id", dealer.id);
 
       if (error) throw error;
+
+      // Send email notification
+      await sendApprovalNotification(dealer, "approved");
 
       toast.success(`${dealer.dealership_name} has been approved!`);
       fetchPendingDealers();
@@ -68,6 +86,9 @@ const AdminDealerApprovals = () => {
   const handleDecline = async (dealer: PendingDealer) => {
     setProcessingId(dealer.id);
     try {
+      // Send email notification before deleting the dealer
+      await sendApprovalNotification(dealer, "declined");
+
       // Delete the dealer record
       const { error: dealerError } = await supabase
         .from("dealers")

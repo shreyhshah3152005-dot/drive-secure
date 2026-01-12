@@ -4,14 +4,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DealerRatingBadge from "@/components/DealerRatingBadge";
 import DealerCompareBar from "@/components/DealerCompareBar";
+import DealerRecommendations from "@/components/DealerRecommendations";
+import { useFavoriteDealers } from "@/hooks/useFavoriteDealers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Phone, Store, Search, Car, Filter, X, Star, Scale } from "lucide-react";
+import { MapPin, Phone, Store, Search, Car, Filter, X, Star, Scale, Heart } from "lucide-react";
 
 interface Dealer {
   id: string;
@@ -37,6 +38,7 @@ const Dealers = () => {
   const [selectedRating, setSelectedRating] = useState<string>("all");
   const [carCounts, setCarCounts] = useState<Record<string, number>>({});
   const [compareDealers, setCompareDealers] = useState<DealerWithStats[]>([]);
+  const { isFavorite, toggleFavorite } = useFavoriteDealers();
 
   useEffect(() => {
     const fetchDealers = async () => {
@@ -169,9 +171,13 @@ const Dealers = () => {
             Trusted <span className="text-gradient-gold">Dealers</span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Browse our network of verified car dealers across India. Each dealer is vetted to ensure quality service and genuine vehicles.
+            Browse our network of verified car dealers across India. Save your favorites to get notified when they add new cars.
           </p>
         </div>
+
+        {/* Dealer Recommendations */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <DealerRecommendations limit={3} />
 
         {/* Search and Filters */}
         <div className="max-w-4xl mx-auto mb-8 space-y-4">
@@ -324,6 +330,14 @@ const Dealers = () => {
                         View Inventory
                       </Button>
                     </Link>
+                    <Button
+                      variant={isFavorite(dealer.id) ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => toggleFavorite(dealer.id)}
+                      title={isFavorite(dealer.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-4 h-4 ${isFavorite(dealer.id) ? "fill-current" : ""}`} />
+                    </Button>
                     <Button
                       variant={isInCompare(dealer.id) ? "default" : "outline"}
                       size="icon"
