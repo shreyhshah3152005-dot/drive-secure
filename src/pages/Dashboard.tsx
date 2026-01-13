@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCompare } from "@/contexts/CompareContext";
 import Navbar from "@/components/Navbar";
 import DealerReviewForm from "@/components/DealerReviewForm";
+import FavoriteDealersSection from "@/components/FavoriteDealersSection";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -368,6 +369,9 @@ const Dashboard = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Favorite Dealers Section */}
+          <FavoriteDealersSection />
 
           {/* Wishlist */}
           <Card className="gradient-card border-border/50 lg:col-span-3">
