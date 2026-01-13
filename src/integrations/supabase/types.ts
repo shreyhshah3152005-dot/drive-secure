@@ -493,6 +493,47 @@ export type Database = {
           },
         ]
       }
+      subscription_upgrade_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          current_plan: string
+          dealer_id: string
+          id: string
+          requested_plan: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          current_plan: string
+          dealer_id: string
+          id?: string
+          requested_plan: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          current_plan?: string
+          dealer_id?: string
+          id?: string
+          requested_plan?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_upgrade_requests_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       test_drive_inquiries: {
         Row: {
           car_id: string

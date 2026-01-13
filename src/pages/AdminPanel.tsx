@@ -19,7 +19,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3 } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp } from "lucide-react";
+import AdminSubscriptionRequests from "@/components/AdminSubscriptionRequests";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -378,6 +379,10 @@ const AdminPanel = () => {
               <UserCheck className="w-4 h-4" />
               Approvals
             </TabsTrigger>
+            <TabsTrigger value="upgrades" className="gap-2">
+              <ArrowUp className="w-4 h-4" />
+              Upgrades
+            </TabsTrigger>
             <TabsTrigger value="test-drives" className="gap-2">
               <Car className="w-4 h-4" />
               Test Drives
@@ -398,6 +403,10 @@ const AdminPanel = () => {
 
           <TabsContent value="approvals">
             <AdminDealerApprovals />
+          </TabsContent>
+
+          <TabsContent value="upgrades">
+            <AdminSubscriptionRequests />
           </TabsContent>
 
           <TabsContent value="test-drives">
