@@ -19,7 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3 } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp } from "lucide-react";
+import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
 
 interface DealerCar {
   id: string;
@@ -794,53 +795,82 @@ const DealerPanel = () => {
           </TabsContent>
 
           <TabsContent value="subscription">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {["free", "basic", "standard", "premium"].map((plan) => (
-                <Card
-                  key={plan}
-                  className={dealerInfo?.subscription_plan === plan ? "border-primary ring-2 ring-primary" : ""}
-                >
-                  <CardHeader>
-                    <CardTitle className="capitalize">{plan}</CardTitle>
-                    <CardDescription>{subscriptionPrices[plan]}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        {plan === "premium" ? "Unlimited" : subscriptionLimits[plan]} Car Listings
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        Test Drive Management
-                      </li>
-                      {plan !== "free" && plan !== "basic" && (
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          Priority Support
-                        </li>
-                      )}
-                      {plan === "premium" && (
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          Featured Placement
-                        </li>
-                      )}
-                    </ul>
-                    {dealerInfo?.subscription_plan === plan ? (
-                      <Badge className="mt-4 w-full justify-center">Current Plan</Badge>
-                    ) : (
-                      <Button 
-                        variant="outline" 
-                        className="mt-4 w-full"
-                        onClick={() => toast.info("To upgrade your plan, please contact our admin team.")}
-                      >
-                        Contact Admin to Upgrade
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="space-y-8">
+              {/* Current Plan & Upgrade Request */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-primary" />
+                    Current Subscription
+                  </CardTitle>
+                  <CardDescription>
+                    You're on the <strong className="capitalize">{dealerInfo?.subscription_plan}</strong> plan - {subscriptionPrices[dealerInfo?.subscription_plan || "basic"]}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">
+                        Active car listings: <strong>{cars.filter(c => c.is_active).length}</strong> / {dealerInfo?.subscription_plan === "premium" ? "Unlimited" : subscriptionLimits[dealerInfo?.subscription_plan || "basic"]}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="capitalize">{dealerInfo?.subscription_plan}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Upgrade Request Component */}
+              {dealerInfo?.id && (
+                <SubscriptionUpgradeRequest 
+                  currentPlan={dealerInfo.subscription_plan || "basic"} 
+                  dealerId={dealerInfo.id} 
+                />
+              )}
+
+              {/* All Plans Comparison */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4">All Plans</h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {["free", "basic", "standard", "premium"].map((plan) => (
+                    <Card
+                      key={plan}
+                      className={dealerInfo?.subscription_plan === plan ? "border-primary ring-2 ring-primary" : ""}
+                    >
+                      <CardHeader>
+                        <CardTitle className="capitalize">{plan}</CardTitle>
+                        <CardDescription>{subscriptionPrices[plan]}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            {plan === "premium" ? "Unlimited" : subscriptionLimits[plan]} Car Listings
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            Test Drive Management
+                          </li>
+                          {plan !== "free" && plan !== "basic" && (
+                            <li className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                              Priority Support
+                            </li>
+                          )}
+                          {plan === "premium" && (
+                            <li className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                              Featured Placement
+                            </li>
+                          )}
+                        </ul>
+                        {dealerInfo?.subscription_plan === plan && (
+                          <Badge className="mt-4 w-full justify-center">Current Plan</Badge>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             </div>
           </TabsContent>
 
