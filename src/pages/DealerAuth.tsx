@@ -144,14 +144,14 @@ const DealerAuth = () => {
         }
       }
 
-      // Step 3: Create dealer record with 'free' subscription plan (is_active defaults to false)
+      // Step 3: Create dealer record with 'basic' subscription plan (is_active defaults to false)
       const { error: dealerError } = await supabase.from("dealers").insert({
         user_id: userId,
         dealership_name: dealershipName,
         city,
         phone,
         address: address || null,
-        subscription_plan: "free",
+        subscription_plan: "basic",
       });
 
       if (dealerError) {
@@ -340,7 +340,7 @@ const DealerAuth = () => {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    By registering, your account will be submitted for admin approval. Once approved, you'll start with a Free plan (2 car listings).
+                    By registering, your account will be submitted for admin approval. Once approved, you'll start with a Basic plan (5 car listings).
                   </p>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating Account..." : "Create Dealer Account"}
