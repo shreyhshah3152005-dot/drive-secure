@@ -40,7 +40,38 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Create Supabase client
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      );
+    }
+
+    // Create client with auth context to verify user
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    // Verify user is authenticated
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      );
+    }
+
+    // Create Supabase client with service role for admin operations
     const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -85,10 +116,10 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Get dealer's email from auth.users
-    const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(dealer.user_id);
+    const { data: authUser, error: authUserError } = await supabase.auth.admin.getUserById(dealer.user_id);
 
-    if (authError || !authUser?.user?.email) {
-      console.error("Dealer email not found:", authError);
+    if (authUserError || !authUser?.user?.email) {
+      console.error("Dealer email not found:", authUserError);
       return new Response(
         JSON.stringify({ error: "Dealer email not found" }),
         {
