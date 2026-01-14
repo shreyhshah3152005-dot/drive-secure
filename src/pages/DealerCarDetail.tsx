@@ -3,6 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
+import SocialShareButtons from "@/components/SocialShareButtons";
+import SimilarCarsSection from "@/components/SimilarCarsSection";
+import PriceAlertButton from "@/components/PriceAlertButton";
+import DealerVerificationBadge from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +44,7 @@ interface Dealer {
   city: string;
   phone: string | null;
   address: string | null;
+  verification_status: "unverified" | "verified" | "trusted" | "premium_partner";
 }
 
 const formatPrice = (price: number) => {
@@ -84,12 +89,15 @@ const DealerCarDetail = () => {
         // Fetch dealer
         const { data: dealerData, error: dealerError } = await supabase
           .from("dealers")
-          .select("id, dealership_name, city, phone, address")
+          .select("id, dealership_name, city, phone, address, verification_status")
           .eq("id", carData.dealer_id)
           .single();
 
         if (dealerError) throw dealerError;
-        setDealer(dealerData);
+        setDealer({
+          ...dealerData,
+          verification_status: (dealerData.verification_status || 'unverified') as Dealer['verification_status']
+        });
       } catch (error) {
         console.error("Error fetching car:", error);
       } finally {
@@ -243,9 +251,22 @@ const DealerCarDetail = () => {
 
             {/* Car Info */}
             <div>
-              <p className="text-muted-foreground">{car.brand}</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-muted-foreground">{car.brand}</p>
+                <SocialShareButtons 
+                  title={`Check out this ${car.brand} ${car.name} on CARBAZAAR!`}
+                  description={`${car.brand} ${car.name} - ${formatPrice(car.price)}`}
+                />
+              </div>
               <h1 className="text-3xl font-bold mb-2">{car.name}</h1>
-              <p className="text-3xl font-bold text-primary">{formatPrice(car.price)}</p>
+              <div className="flex items-center gap-4 flex-wrap">
+                <p className="text-3xl font-bold text-primary">{formatPrice(car.price)}</p>
+                <PriceAlertButton 
+                  carId={car.id} 
+                  carName={`${car.brand} ${car.name}`}
+                  currentPrice={car.price}
+                />
+              </div>
             </div>
 
             {/* Quick Stats */}
@@ -339,6 +360,14 @@ const DealerCarDetail = () => {
 
             {/* Price History */}
             <PriceHistoryChart carId={car.id} carName={`${car.brand} ${car.name}`} />
+
+            {/* Similar Cars */}
+            <SimilarCarsSection 
+              currentCarId={car.id}
+              category={car.category}
+              price={car.price}
+              fuelType={car.fuel_type}
+            />
           </div>
 
           {/* Sidebar */}
@@ -353,7 +382,10 @@ const DealerCarDetail = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="font-semibold text-lg">{dealer.dealership_name}</p>
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <p className="font-semibold text-lg">{dealer.dealership_name}</p>
+                    <DealerVerificationBadge status={dealer.verification_status} showLabel={false} />
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                     <MapPin className="w-4 h-4" />
                     {dealer.city}

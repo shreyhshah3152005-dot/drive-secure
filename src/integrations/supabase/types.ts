@@ -271,6 +271,7 @@ export type Database = {
           subscription_start_date: string | null
           updated_at: string
           user_id: string
+          verification_status: string
         }
         Insert: {
           address?: string | null
@@ -286,6 +287,7 @@ export type Database = {
           subscription_start_date?: string | null
           updated_at?: string
           user_id: string
+          verification_status?: string
         }
         Update: {
           address?: string | null
@@ -301,6 +303,7 @@ export type Database = {
           subscription_start_date?: string | null
           updated_at?: string
           user_id?: string
+          verification_status?: string
         }
         Relationships: []
       }
@@ -353,6 +356,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      price_alerts: {
+        Row: {
+          car_id: string
+          created_at: string
+          id: string
+          is_triggered: boolean
+          target_price: number
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          id?: string
+          is_triggered?: boolean
+          target_price: number
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          id?: string
+          is_triggered?: boolean
+          target_price?: number
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_alerts_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_cars"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_history: {
         Row: {

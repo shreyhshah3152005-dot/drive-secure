@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.send-dealer-approval-notification]
 verify_jwt = false
+
+[functions.send-test-drive-reminder]
+verify_jwt = false

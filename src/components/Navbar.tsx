@@ -6,6 +6,7 @@ import { useDealerRole } from "@/hooks/useDealerRole";
 import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store } from "lucide-react";
 import AdminNotificationBell from "./AdminNotificationBell";
 import NewCarNotificationBell from "./NewCarNotificationBell";
+import PriceAlertNotifications from "./PriceAlertNotifications";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -42,6 +43,9 @@ const Navbar = () => {
         <div className="flex items-center gap-2 sm:gap-4">
           {user ? (
             <>
+              {/* Price Drop Alerts */}
+              <PriceAlertNotifications />
+              
               {/* New Car Notifications for all users */}
               <NewCarNotificationBell />
               
