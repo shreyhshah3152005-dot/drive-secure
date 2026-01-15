@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.send-test-drive-reminder]
 verify_jwt = false
+
+[functions.send-price-alert-notification]
+verify_jwt = false
