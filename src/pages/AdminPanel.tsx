@@ -19,9 +19,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server } from "lucide-react";
 import AdminSubscriptionRequests from "@/components/AdminSubscriptionRequests";
 import AdminDealerVerification from "@/components/AdminDealerVerification";
+import AdminDealerPerformance from "@/components/AdminDealerPerformance";
+import AdminPriceAlertTrigger from "@/components/AdminPriceAlertTrigger";
+import AdminCronSetup from "@/components/AdminCronSetup";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -396,6 +399,18 @@ const AdminPanel = () => {
               <BadgeCheck className="w-4 h-4" />
               Verification
             </TabsTrigger>
+            <TabsTrigger value="performance" className="gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Performance
+            </TabsTrigger>
+            <TabsTrigger value="alerts" className="gap-2">
+              <Bell className="w-4 h-4" />
+              Price Alerts
+            </TabsTrigger>
+            <TabsTrigger value="cron" className="gap-2">
+              <Server className="w-4 h-4" />
+              Scheduled Tasks
+            </TabsTrigger>
             <TabsTrigger value="customers" className="gap-2">
               <Users className="w-4 h-4" />
               Customers
@@ -597,6 +612,18 @@ const AdminPanel = () => {
 
           <TabsContent value="verification">
             <AdminDealerVerification />
+          </TabsContent>
+
+          <TabsContent value="performance">
+            <AdminDealerPerformance />
+          </TabsContent>
+
+          <TabsContent value="alerts">
+            <AdminPriceAlertTrigger />
+          </TabsContent>
+
+          <TabsContent value="cron">
+            <AdminCronSetup />
           </TabsContent>
 
           <TabsContent value="customers">
