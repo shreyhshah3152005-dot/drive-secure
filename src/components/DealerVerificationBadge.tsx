@@ -7,12 +7,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-type VerificationStatus = "unverified" | "verified" | "trusted" | "premium_partner";
+export type VerificationStatus = "unverified" | "verified" | "trusted" | "premium_partner";
 
 interface DealerVerificationBadgeProps {
   status: VerificationStatus;
   className?: string;
   showLabel?: boolean;
+  size?: "sm" | "md";
 }
 
 const verificationConfig: Record<
@@ -54,9 +55,11 @@ const DealerVerificationBadge = ({
   status,
   className = "",
   showLabel = true,
+  size = "md",
 }: DealerVerificationBadgeProps) => {
   const config = verificationConfig[status];
   const Icon = config.icon;
+  const iconSize = size === "sm" ? "w-3 h-3" : "w-4 h-4";
 
   if (status === "unverified" && !showLabel) {
     return null;
@@ -66,8 +69,8 @@ const DealerVerificationBadge = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Badge variant="outline" className={`${config.className} ${className} cursor-help`}>
-            <Icon className="w-3 h-3 mr-1" />
+          <Badge variant="outline" className={`${config.className} ${className} cursor-help ${size === "sm" ? "text-xs py-0" : ""}`}>
+            <Icon className={`${iconSize} mr-1`} />
             {showLabel && config.label}
           </Badge>
         </TooltipTrigger>
