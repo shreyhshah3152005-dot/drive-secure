@@ -215,31 +215,31 @@ const AdminCustomers = () => {
               {/* Profile Info */}
               <Card className="bg-secondary/30 border-border/50">
                 <CardContent className="pt-6">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                      <User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">Name</p>
-                        <p className="font-medium">{selectedCustomer.name || "Not provided"}</p>
+                        <p className="font-medium truncate">{selectedCustomer.name || "Not provided"}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <div>
+                    <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                      <Mail className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">Email</p>
-                        <p className="font-medium text-sm">{selectedCustomer.email || "N/A"}</p>
+                        <p className="font-medium text-sm break-all">{selectedCustomer.email || "N/A"}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      <div>
+                    <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                      <Phone className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">Phone</p>
                         <p className="font-medium">{selectedCustomer.phone || "N/A"}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <div>
+                    <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                      <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">City</p>
                         <p className="font-medium">{selectedCustomer.city || "N/A"}</p>
                       </div>
