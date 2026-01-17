@@ -19,12 +19,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server, Layers, FileText, LayoutDashboard } from "lucide-react";
 import AdminSubscriptionRequests from "@/components/AdminSubscriptionRequests";
 import AdminDealerVerification from "@/components/AdminDealerVerification";
 import AdminDealerPerformance from "@/components/AdminDealerPerformance";
 import AdminPriceAlertTrigger from "@/components/AdminPriceAlertTrigger";
 import AdminCronSetup from "@/components/AdminCronSetup";
+import AdminBulkDealerActions from "@/components/AdminBulkDealerActions";
+import AdminDashboardWidget from "@/components/AdminDashboardWidget";
+import AdminEmailTemplates from "@/components/AdminEmailTemplates";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -373,8 +376,12 @@ const AdminPanel = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList>
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="flex-wrap h-auto gap-1">
+            <TabsTrigger value="dashboard" className="gap-2">
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2">
               <BarChart3 className="w-4 h-4" />
               Analytics
@@ -382,6 +389,10 @@ const AdminPanel = () => {
             <TabsTrigger value="approvals" className="gap-2">
               <UserCheck className="w-4 h-4" />
               Approvals
+            </TabsTrigger>
+            <TabsTrigger value="bulk" className="gap-2">
+              <Layers className="w-4 h-4" />
+              Bulk Actions
             </TabsTrigger>
             <TabsTrigger value="upgrades" className="gap-2">
               <ArrowUp className="w-4 h-4" />
@@ -407,6 +418,10 @@ const AdminPanel = () => {
               <Bell className="w-4 h-4" />
               Price Alerts
             </TabsTrigger>
+            <TabsTrigger value="templates" className="gap-2">
+              <FileText className="w-4 h-4" />
+              Email Templates
+            </TabsTrigger>
             <TabsTrigger value="cron" className="gap-2">
               <Server className="w-4 h-4" />
               Scheduled Tasks
@@ -417,6 +432,10 @@ const AdminPanel = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="dashboard">
+            <AdminDashboardWidget />
+          </TabsContent>
+
           <TabsContent value="analytics">
             <AdminAnalytics profiles={profiles} dealers={dealers} testDrives={inquiries} />
           </TabsContent>
@@ -425,8 +444,16 @@ const AdminPanel = () => {
             <AdminDealerApprovals />
           </TabsContent>
 
+          <TabsContent value="bulk">
+            <AdminBulkDealerActions />
+          </TabsContent>
+
           <TabsContent value="upgrades">
             <AdminSubscriptionRequests />
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <AdminEmailTemplates />
           </TabsContent>
 
           <TabsContent value="test-drives">
