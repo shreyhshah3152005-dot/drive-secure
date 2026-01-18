@@ -307,6 +307,84 @@ export type Database = {
         }
         Relationships: []
       }
+      email_branding: {
+        Row: {
+          company_name: string
+          created_at: string
+          facebook_url: string | null
+          footer_text: string
+          id: string
+          instagram_url: string | null
+          logo_url: string | null
+          primary_color: string
+          secondary_color: string
+          twitter_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string
+          created_at?: string
+          facebook_url?: string | null
+          footer_text?: string
+          id?: string
+          instagram_url?: string | null
+          logo_url?: string | null
+          primary_color?: string
+          secondary_color?: string
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          facebook_url?: string | null
+          footer_text?: string
+          id?: string
+          instagram_url?: string | null
+          logo_url?: string | null
+          primary_color?: string
+          secondary_color?: string
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_html: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          subject: string
+          template_key: string
+          updated_at: string
+          variables: string[]
+        }
+        Insert: {
+          body_html: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          subject: string
+          template_key: string
+          updated_at?: string
+          variables?: string[]
+        }
+        Update: {
+          body_html?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          subject?: string
+          template_key?: string
+          updated_at?: string
+          variables?: string[]
+        }
+        Relationships: []
+      }
       favorite_dealers: {
         Row: {
           created_at: string
