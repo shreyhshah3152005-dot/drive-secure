@@ -212,7 +212,7 @@ const PriceAlertButton = ({
             />
             {targetPrice && parseFloat(targetPrice) > 0 && (
               <p className="text-sm text-muted-foreground">
-                You'll be notified when price drops to {formatPrice(parseFloat(targetPrice))} or below
+                You'll be notified when price drops to or below {formatPrice(parseFloat(targetPrice))}
               </p>
             )}
           </div>
