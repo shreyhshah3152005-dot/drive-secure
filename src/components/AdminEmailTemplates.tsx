@@ -11,8 +11,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Mail, 
   Save, 
@@ -26,7 +42,11 @@ import {
   ArrowUp,
   Tag,
   Code,
-  Loader2
+  Loader2,
+  History,
+  Send,
+  Clock,
+  Users
 } from "lucide-react";
 
 interface EmailTemplate {
@@ -38,6 +58,15 @@ interface EmailTemplate {
   subject: string;
   body_html: string;
   variables: string[];
+}
+
+interface TemplateVersion {
+  id: string;
+  version_number: number;
+  subject: string;
+  body_html: string;
+  change_description: string | null;
+  created_at: string;
 }
 
 interface Branding {
@@ -65,8 +94,8 @@ const defaultTemplates: Omit<EmailTemplate, 'id'>[] = [
 <p><strong>Requested Date:</strong> {{preferred_date}}<br/>
 <strong>Requested Time:</strong> {{preferred_time}}</p>
 <p>The dealer will contact you shortly to confirm the appointment.</p>
-<p>Best regards,<br/>CARBAZAAR Team</p>`,
-    variables: ["customer_name", "car_name", "preferred_date", "preferred_time", "dealer_name"]
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["customer_name", "car_name", "preferred_date", "preferred_time", "dealer_name", "company_name"]
   },
   {
     template_key: "test_drive_status",
@@ -80,25 +109,21 @@ const defaultTemplates: Omit<EmailTemplate, 'id'>[] = [
 <p><strong>Previous Status:</strong> {{old_status}}<br/>
 <strong>New Status:</strong> {{new_status}}</p>
 <p>If you have any questions, please contact us.</p>
-<p>Best regards,<br/>CARBAZAAR Team</p>`,
-    variables: ["customer_name", "car_name", "old_status", "new_status", "preferred_date"]
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["customer_name", "car_name", "old_status", "new_status", "preferred_date", "company_name"]
   },
   {
     template_key: "dealer_approval",
     name: "Dealer Approval/Rejection",
     description: "Sent when a dealer application is approved or rejected",
     icon: UserCheck,
-    subject: "{{status_emoji}} Dealer Registration {{status}} - CARBAZAAR",
+    subject: "{{status_emoji}} Dealer Registration {{status}} - {{company_name}}",
     body_html: `<h1>Dealer Registration {{status}}</h1>
 <p>Dear {{dealership_name}},</p>
 <p>{{status_message}}</p>
-{{#if approved}}
-<p>You can now log in to your dealer panel and start listing your vehicles.</p>
-{{else}}
-<p>If you believe this was in error, please contact our support team.</p>
-{{/if}}
-<p>Best regards,<br/>CARBAZAAR Team</p>`,
-    variables: ["dealership_name", "status", "status_emoji", "status_message"]
+<p>{{next_steps}}</p>
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["dealership_name", "status", "status_emoji", "status_message", "next_steps", "company_name"]
   },
   {
     template_key: "subscription_update",
@@ -114,24 +139,58 @@ const defaultTemplates: Omit<EmailTemplate, 'id'>[] = [
 <strong>Price:</strong> {{plan_price}}<br/>
 <strong>Listing Limit:</strong> {{plan_limit}}</p>
 <p>Log in to your dealer panel to take advantage of your updated plan.</p>
-<p>Best regards,<br/>CARBAZAAR Team</p>`,
-    variables: ["dealership_name", "old_plan", "new_plan", "plan_price", "plan_limit", "action", "emoji"]
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["dealership_name", "old_plan", "new_plan", "plan_price", "plan_limit", "action", "emoji", "company_name"]
   },
   {
     template_key: "price_alert",
     name: "Price Drop Alert",
-    description: "Sent when a car's price drops to user's target",
+    description: "Sent when a car's price drops to or below user target",
     icon: Tag,
     subject: "🎉 Price Drop Alert - {{car_name}}",
     body_html: `<h1>Great News! Price Dropped!</h1>
-<p>Dear Customer,</p>
-<p>The price for <strong>{{car_name}}</strong> has dropped!</p>
-<p><strong>Original Price:</strong> {{original_price}}<br/>
-<strong>New Price:</strong> {{new_price}}<br/>
-<strong>Your Target:</strong> {{target_price}}</p>
+<p>Dear {{customer_name}},</p>
+<p>The price for <strong>{{car_name}}</strong> has dropped to or below your target!</p>
+<p><strong>Your Target:</strong> {{target_price}}<br/>
+<strong>New Price:</strong> {{new_price}}</p>
 <p><a href="{{car_link}}">View the car now</a> before it's gone!</p>
-<p>Best regards,<br/>CARBAZAAR Team</p>`,
-    variables: ["car_name", "original_price", "new_price", "target_price", "car_link"]
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["customer_name", "car_name", "target_price", "new_price", "car_link", "company_name"]
+  },
+  {
+    template_key: "test_drive_reminder",
+    name: "Test Drive Reminder",
+    description: "Sent as a reminder before scheduled test drive",
+    icon: Clock,
+    subject: "🔔 Reminder: Your Test Drive Tomorrow - {{car_name}}",
+    body_html: `<h1>Test Drive Reminder</h1>
+<p>Dear {{customer_name}},</p>
+<p>This is a friendly reminder that your test drive for <strong>{{car_name}}</strong> is scheduled for tomorrow!</p>
+<p><strong>Date:</strong> {{preferred_date}}<br/>
+<strong>Time:</strong> {{preferred_time}}<br/>
+<strong>Dealer:</strong> {{dealer_name}}</p>
+<p>Please arrive 10 minutes early and bring a valid driver's license.</p>
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["customer_name", "car_name", "preferred_date", "preferred_time", "dealer_name", "company_name"]
+  },
+  {
+    template_key: "dealer_notification",
+    name: "New Inquiry for Dealer",
+    description: "Sent to dealer when they receive a new test drive inquiry",
+    icon: Users,
+    subject: "🚗 New Test Drive Inquiry - {{car_name}}",
+    body_html: `<h1>New Test Drive Inquiry</h1>
+<p>Dear {{dealership_name}},</p>
+<p>You have received a new test drive inquiry for <strong>{{car_name}}</strong>.</p>
+<p><strong>Customer:</strong> {{customer_name}}<br/>
+<strong>Email:</strong> {{customer_email}}<br/>
+<strong>Phone:</strong> {{customer_phone}}<br/>
+<strong>Preferred Date:</strong> {{preferred_date}}<br/>
+<strong>Preferred Time:</strong> {{preferred_time}}</p>
+<p>{{message}}</p>
+<p>Please log in to your dealer panel to respond to this inquiry.</p>
+<p>Best regards,<br/>{{company_name}} Team</p>`,
+    variables: ["dealership_name", "car_name", "customer_name", "customer_email", "customer_phone", "preferred_date", "preferred_time", "message", "company_name"]
   }
 ];
 
@@ -141,6 +200,8 @@ const iconMap: Record<string, React.ElementType> = {
   dealer_approval: UserCheck,
   subscription_update: ArrowUp,
   price_alert: Tag,
+  test_drive_reminder: Clock,
+  dealer_notification: Users,
 };
 
 const brandingDefaults: Branding = {
@@ -155,6 +216,7 @@ const brandingDefaults: Branding = {
 };
 
 const AdminEmailTemplates = () => {
+  const { user } = useAuth();
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [editedSubject, setEditedSubject] = useState("");
@@ -165,11 +227,30 @@ const AdminEmailTemplates = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingBranding, setIsSavingBranding] = useState(false);
+  
+  // Versioning state
+  const [versions, setVersions] = useState<TemplateVersion[]>([]);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [showVersions, setShowVersions] = useState(false);
+  const [changeDescription, setChangeDescription] = useState("");
+  
+  // Test email state
+  const [testEmailAddress, setTestEmailAddress] = useState("");
+  const [sendingTest, setSendingTest] = useState(false);
+  const [showTestDialog, setShowTestDialog] = useState(false);
 
   useEffect(() => {
     fetchTemplates();
     fetchBranding();
   }, []);
+
+  useEffect(() => {
+    if (selectedTemplate && selectedTemplate.id && !selectedTemplate.id.startsWith('default-')) {
+      fetchVersions(selectedTemplate.id);
+    } else {
+      setVersions([]);
+    }
+  }, [selectedTemplate?.id]);
 
   const fetchTemplates = async () => {
     try {
@@ -184,7 +265,7 @@ const AdminEmailTemplates = () => {
         const templatesWithIcons = data.map(t => ({
           ...t,
           icon: iconMap[t.template_key] || Mail,
-          description: defaultTemplates.find(dt => dt.template_key === t.template_key)?.description || ""
+          description: defaultTemplates.find(dt => dt.template_key === t.template_key)?.description || t.description || ""
         }));
         setTemplates(templatesWithIcons);
       } else {
@@ -197,7 +278,6 @@ const AdminEmailTemplates = () => {
       }
     } catch (error) {
       console.error("Error fetching templates:", error);
-      // Use defaults on error
       const defaultsWithIds = defaultTemplates.map((t, i) => ({
         ...t,
         id: `default-${i}`
@@ -236,15 +316,36 @@ const AdminEmailTemplates = () => {
     }
   };
 
+  const fetchVersions = async (templateId: string) => {
+    setLoadingVersions(true);
+    try {
+      const { data, error } = await supabase
+        .from("email_template_versions")
+        .select("*")
+        .eq("template_id", templateId)
+        .order("version_number", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setVersions(data || []);
+    } catch (error) {
+      console.error("Error fetching versions:", error);
+      setVersions([]);
+    } finally {
+      setLoadingVersions(false);
+    }
+  };
+
   const selectTemplate = (template: EmailTemplate) => {
     setSelectedTemplate(template);
     setEditedSubject(template.subject);
     setEditedBody(template.body_html);
     setShowPreview(false);
+    setChangeDescription("");
   };
 
   const saveTemplate = async () => {
-    if (!selectedTemplate) return;
+    if (!selectedTemplate || !user) return;
     setIsSaving(true);
 
     try {
@@ -257,7 +358,7 @@ const AdminEmailTemplates = () => {
         variables: selectedTemplate.variables
       };
 
-      // Check if template exists in database
+      let templateId = selectedTemplate.id;
       const { data: existing } = await supabase
         .from("email_templates")
         .select("id")
@@ -265,6 +366,21 @@ const AdminEmailTemplates = () => {
         .single();
 
       if (existing) {
+        templateId = existing.id;
+        
+        // Save version before updating
+        const nextVersion = versions.length > 0 ? versions[0].version_number + 1 : 1;
+        await supabase
+          .from("email_template_versions")
+          .insert({
+            template_id: existing.id,
+            version_number: nextVersion,
+            subject: editedSubject,
+            body_html: editedBody,
+            changed_by: user.id,
+            change_description: changeDescription || null
+          });
+
         // Update existing
         const { error } = await supabase
           .from("email_templates")
@@ -277,20 +393,42 @@ const AdminEmailTemplates = () => {
         if (error) throw error;
       } else {
         // Insert new
-        const { error } = await supabase
+        const { data: newTemplate, error } = await supabase
           .from("email_templates")
-          .insert(templateData);
+          .insert(templateData)
+          .select()
+          .single();
 
         if (error) throw error;
+        if (newTemplate) {
+          templateId = newTemplate.id;
+          // Save initial version
+          await supabase
+            .from("email_template_versions")
+            .insert({
+              template_id: newTemplate.id,
+              version_number: 1,
+              subject: editedSubject,
+              body_html: editedBody,
+              changed_by: user.id,
+              change_description: "Initial version"
+            });
+        }
       }
 
       // Update local state
       setTemplates(prev => prev.map(t =>
         t.template_key === selectedTemplate.template_key
-          ? { ...t, subject: editedSubject, body_html: editedBody }
+          ? { ...t, id: templateId, subject: editedSubject, body_html: editedBody }
           : t
       ));
-      setSelectedTemplate({ ...selectedTemplate, subject: editedSubject, body_html: editedBody });
+      setSelectedTemplate({ ...selectedTemplate, id: templateId, subject: editedSubject, body_html: editedBody });
+      setChangeDescription("");
+
+      // Refresh versions
+      if (templateId && !templateId.startsWith('default-')) {
+        fetchVersions(templateId);
+      }
 
       toast.success("Template saved successfully!");
     } catch (error) {
@@ -301,12 +439,57 @@ const AdminEmailTemplates = () => {
     }
   };
 
+  const rollbackToVersion = (version: TemplateVersion) => {
+    setEditedSubject(version.subject);
+    setEditedBody(version.body_html);
+    setChangeDescription(`Rollback to version ${version.version_number}`);
+    toast.info(`Loaded version ${version.version_number}. Click Save to apply.`);
+  };
+
   const resetTemplate = () => {
     const original = defaultTemplates.find(t => t.template_key === selectedTemplate?.template_key);
     if (original) {
       setEditedSubject(original.subject);
       setEditedBody(original.body_html);
-      toast.info("Template reset to default");
+      setChangeDescription("Reset to default");
+      toast.info("Template reset to default. Click Save to apply.");
+    }
+  };
+
+  const sendTestEmail = async () => {
+    if (!selectedTemplate || !testEmailAddress) return;
+    setSendingTest(true);
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (!accessToken) {
+        toast.error("Please log in to send test emails");
+        return;
+      }
+
+      const response = await supabase.functions.invoke("send-test-email", {
+        body: {
+          templateKey: selectedTemplate.template_key,
+          recipientEmail: testEmailAddress,
+          subject: editedSubject,
+          bodyHtml: editedBody
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to send test email");
+      }
+
+      toast.success(`Test email sent to ${testEmailAddress}`);
+      setShowTestDialog(false);
+      setTestEmailAddress("");
+    } catch (error: any) {
+      console.error("Error sending test email:", error);
+      toast.error(error.message || "Failed to send test email");
+    } finally {
+      setSendingTest(false);
     }
   };
 
@@ -326,7 +509,6 @@ const AdminEmailTemplates = () => {
       };
 
       if (branding.id) {
-        // Update existing
         const { error } = await supabase
           .from("email_branding")
           .update(brandingData)
@@ -334,7 +516,6 @@ const AdminEmailTemplates = () => {
 
         if (error) throw error;
       } else {
-        // Insert new
         const { data, error } = await supabase
           .from("email_branding")
           .insert(brandingData)
@@ -369,6 +550,7 @@ const AdminEmailTemplates = () => {
       status: "Approved",
       status_emoji: "🎉",
       status_message: "Congratulations! Your dealer registration has been approved.",
+      next_steps: "You can now log in to your dealer panel and start listing your vehicles.",
       old_plan: "Basic",
       new_plan: "Premium",
       plan_price: "₹3,999/month",
@@ -378,7 +560,11 @@ const AdminEmailTemplates = () => {
       original_price: "₹45,00,000",
       new_price: "₹42,00,000",
       target_price: "₹43,00,000",
-      car_link: "https://carbazaar.com/car/123"
+      car_link: "https://carbazaar.com/car/123",
+      customer_email: "john.doe@example.com",
+      customer_phone: "+91 98765 43210",
+      message: "I am interested in this vehicle.",
+      company_name: branding.company_name
     };
 
     let preview = editedBody;
@@ -455,11 +641,11 @@ const AdminEmailTemplates = () => {
         <TabsList className="mb-4">
           <TabsTrigger value="templates" className="gap-2">
             <FileText className="w-4 h-4" />
-            Templates
+            <span className="hidden sm:inline">Templates</span>
           </TabsTrigger>
           <TabsTrigger value="branding" className="gap-2">
             <Palette className="w-4 h-4" />
-            Branding
+            <span className="hidden sm:inline">Branding</span>
           </TabsTrigger>
         </TabsList>
 
@@ -544,6 +730,15 @@ const AdminEmailTemplates = () => {
                       />
                     </div>
 
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Change Description (optional)</label>
+                      <Input
+                        value={changeDescription}
+                        onChange={(e) => setChangeDescription(e.target.value)}
+                        placeholder="Describe your changes..."
+                      />
+                    </div>
+
                     <Accordion type="single" collapsible>
                       <AccordionItem value="variables">
                         <AccordionTrigger className="text-sm">
@@ -566,6 +761,101 @@ const AdminEmailTemplates = () => {
                         <Eye className="w-4 h-4" />
                         Preview
                       </Button>
+                      
+                      <Dialog open={showTestDialog} onOpenChange={setShowTestDialog}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="gap-2">
+                            <Send className="w-4 h-4" />
+                            Test Email
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Send Test Email</DialogTitle>
+                            <DialogDescription>
+                              Send a test email to verify how this template renders
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div>
+                              <label className="text-sm font-medium mb-2 block">Recipient Email</label>
+                              <Input
+                                type="email"
+                                value={testEmailAddress}
+                                onChange={(e) => setTestEmailAddress(e.target.value)}
+                                placeholder="your@email.com"
+                              />
+                            </div>
+                            <Button 
+                              onClick={sendTestEmail} 
+                              disabled={sendingTest || !testEmailAddress}
+                              className="w-full gap-2"
+                            >
+                              {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                              Send Test Email
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog open={showVersions} onOpenChange={setShowVersions}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="gap-2" disabled={versions.length === 0}>
+                            <History className="w-4 h-4" />
+                            History ({versions.length})
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Version History</DialogTitle>
+                            <DialogDescription>
+                              View and rollback to previous versions
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="max-h-96 overflow-y-auto space-y-3 py-4">
+                            {loadingVersions ? (
+                              <div className="flex justify-center py-4">
+                                <Loader2 className="w-6 h-6 animate-spin" />
+                              </div>
+                            ) : versions.length === 0 ? (
+                              <p className="text-center text-muted-foreground py-4">
+                                No version history yet
+                              </p>
+                            ) : (
+                              versions.map((version) => (
+                                <div key={version.id} className="p-4 bg-secondary/30 rounded-lg">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant="outline">v{version.version_number}</Badge>
+                                      <span className="text-sm text-muted-foreground">
+                                        {new Date(version.created_at).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => {
+                                        rollbackToVersion(version);
+                                        setShowVersions(false);
+                                      }}
+                                    >
+                                      <RotateCcw className="w-3 h-3 mr-1" />
+                                      Restore
+                                    </Button>
+                                  </div>
+                                  {version.change_description && (
+                                    <p className="text-sm text-muted-foreground">{version.change_description}</p>
+                                  )}
+                                  <p className="text-xs font-mono text-muted-foreground mt-2 truncate">
+                                    Subject: {version.subject}
+                                  </p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
                       <Button onClick={resetTemplate} variant="outline" className="gap-2">
                         <RotateCcw className="w-4 h-4" />
                         Reset

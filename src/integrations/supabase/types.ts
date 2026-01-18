@@ -349,6 +349,47 @@ export type Database = {
         }
         Relationships: []
       }
+      email_template_versions: {
+        Row: {
+          body_html: string
+          change_description: string | null
+          changed_by: string
+          created_at: string
+          id: string
+          subject: string
+          template_id: string
+          version_number: number
+        }
+        Insert: {
+          body_html: string
+          change_description?: string | null
+          changed_by: string
+          created_at?: string
+          id?: string
+          subject: string
+          template_id: string
+          version_number?: number
+        }
+        Update: {
+          body_html?: string
+          change_description?: string | null
+          changed_by?: string
+          created_at?: string
+          id?: string
+          subject?: string
+          template_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_template_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_templates: {
         Row: {
           body_html: string

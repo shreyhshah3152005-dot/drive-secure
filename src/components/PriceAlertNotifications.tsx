@@ -147,7 +147,7 @@ const PriceAlertNotifications = () => {
             Price Drop Alerts
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Cars that dropped to your target price
+            Cars that dropped to or below your target price
           </p>
         </div>
         <div className="max-h-80 overflow-y-auto">
