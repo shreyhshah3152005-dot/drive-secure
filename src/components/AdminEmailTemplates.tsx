@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Mail, 
   Save, 
@@ -24,27 +25,41 @@ import {
   UserCheck,
   ArrowUp,
   Tag,
-  Code
+  Code,
+  Loader2
 } from "lucide-react";
 
 interface EmailTemplate {
   id: string;
+  template_key: string;
   name: string;
   description: string;
   icon: React.ElementType;
   subject: string;
-  bodyHtml: string;
+  body_html: string;
   variables: string[];
 }
 
-const defaultTemplates: EmailTemplate[] = [
+interface Branding {
+  id?: string;
+  primary_color: string;
+  secondary_color: string;
+  logo_url: string;
+  company_name: string;
+  footer_text: string;
+  facebook_url: string;
+  twitter_url: string;
+  instagram_url: string;
+}
+
+const defaultTemplates: Omit<EmailTemplate, 'id'>[] = [
   {
-    id: "test_drive_confirmation",
+    template_key: "test_drive_confirmation",
     name: "Test Drive Confirmation",
     description: "Sent when a customer submits a test drive request",
     icon: Car,
     subject: "🚗 Test Drive Request Confirmed - {{car_name}}",
-    bodyHtml: `<h1>Thank you for your test drive request!</h1>
+    body_html: `<h1>Thank you for your test drive request!</h1>
 <p>Dear {{customer_name}},</p>
 <p>We have received your test drive request for <strong>{{car_name}}</strong>.</p>
 <p><strong>Requested Date:</strong> {{preferred_date}}<br/>
@@ -54,12 +69,12 @@ const defaultTemplates: EmailTemplate[] = [
     variables: ["customer_name", "car_name", "preferred_date", "preferred_time", "dealer_name"]
   },
   {
-    id: "test_drive_status",
+    template_key: "test_drive_status",
     name: "Test Drive Status Update",
     description: "Sent when test drive status is updated by admin",
     icon: Bell,
     subject: "📋 Test Drive Status Update - {{car_name}}",
-    bodyHtml: `<h1>Test Drive Status Updated</h1>
+    body_html: `<h1>Test Drive Status Updated</h1>
 <p>Dear {{customer_name}},</p>
 <p>Your test drive request for <strong>{{car_name}}</strong> has been updated.</p>
 <p><strong>Previous Status:</strong> {{old_status}}<br/>
@@ -69,12 +84,12 @@ const defaultTemplates: EmailTemplate[] = [
     variables: ["customer_name", "car_name", "old_status", "new_status", "preferred_date"]
   },
   {
-    id: "dealer_approval",
+    template_key: "dealer_approval",
     name: "Dealer Approval/Rejection",
     description: "Sent when a dealer application is approved or rejected",
     icon: UserCheck,
     subject: "{{status_emoji}} Dealer Registration {{status}} - CARBAZAAR",
-    bodyHtml: `<h1>Dealer Registration {{status}}</h1>
+    body_html: `<h1>Dealer Registration {{status}}</h1>
 <p>Dear {{dealership_name}},</p>
 <p>{{status_message}}</p>
 {{#if approved}}
@@ -86,12 +101,12 @@ const defaultTemplates: EmailTemplate[] = [
     variables: ["dealership_name", "status", "status_emoji", "status_message"]
   },
   {
-    id: "subscription_update",
+    template_key: "subscription_update",
     name: "Subscription Plan Update",
     description: "Sent when a dealer's subscription plan is changed",
     icon: ArrowUp,
     subject: "{{emoji}} Your Subscription Plan Has Been {{action}}",
-    bodyHtml: `<h1>Subscription Update</h1>
+    body_html: `<h1>Subscription Update</h1>
 <p>Dear {{dealership_name}},</p>
 <p>Your subscription plan has been {{action}}.</p>
 <p><strong>Previous Plan:</strong> {{old_plan}}<br/>
@@ -103,12 +118,12 @@ const defaultTemplates: EmailTemplate[] = [
     variables: ["dealership_name", "old_plan", "new_plan", "plan_price", "plan_limit", "action", "emoji"]
   },
   {
-    id: "price_alert",
+    template_key: "price_alert",
     name: "Price Drop Alert",
     description: "Sent when a car's price drops to user's target",
     icon: Tag,
     subject: "🎉 Price Drop Alert - {{car_name}}",
-    bodyHtml: `<h1>Great News! Price Dropped!</h1>
+    body_html: `<h1>Great News! Price Dropped!</h1>
 <p>Dear Customer,</p>
 <p>The price for <strong>{{car_name}}</strong> has dropped!</p>
 <p><strong>Original Price:</strong> {{original_price}}<br/>
@@ -120,61 +135,228 @@ const defaultTemplates: EmailTemplate[] = [
   }
 ];
 
-const brandingDefaults = {
-  primaryColor: "#b8860b",
-  secondaryColor: "#1a1a1a",
-  logoUrl: "",
-  companyName: "CARBAZAAR",
-  footerText: "This is an automated message from CARBAZAAR. Please do not reply directly to this email.",
-  socialLinks: {
-    facebook: "",
-    twitter: "",
-    instagram: ""
-  }
+const iconMap: Record<string, React.ElementType> = {
+  test_drive_confirmation: Car,
+  test_drive_status: Bell,
+  dealer_approval: UserCheck,
+  subscription_update: ArrowUp,
+  price_alert: Tag,
+};
+
+const brandingDefaults: Branding = {
+  primary_color: "#b8860b",
+  secondary_color: "#1a1a1a",
+  logo_url: "",
+  company_name: "CARBAZAAR",
+  footer_text: "This is an automated message from CARBAZAAR. Please do not reply directly to this email.",
+  facebook_url: "",
+  twitter_url: "",
+  instagram_url: ""
 };
 
 const AdminEmailTemplates = () => {
-  const [templates, setTemplates] = useState<EmailTemplate[]>(defaultTemplates);
+  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [editedSubject, setEditedSubject] = useState("");
   const [editedBody, setEditedBody] = useState("");
-  const [branding, setBranding] = useState(brandingDefaults);
+  const [branding, setBranding] = useState<Branding>(brandingDefaults);
   const [showPreview, setShowPreview] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingBranding, setIsSavingBranding] = useState(false);
+
+  useEffect(() => {
+    fetchTemplates();
+    fetchBranding();
+  }, []);
+
+  const fetchTemplates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("email_templates")
+        .select("*")
+        .order("name");
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const templatesWithIcons = data.map(t => ({
+          ...t,
+          icon: iconMap[t.template_key] || Mail,
+          description: defaultTemplates.find(dt => dt.template_key === t.template_key)?.description || ""
+        }));
+        setTemplates(templatesWithIcons);
+      } else {
+        // Initialize with default templates
+        const defaultsWithIds = defaultTemplates.map((t, i) => ({
+          ...t,
+          id: `default-${i}`
+        }));
+        setTemplates(defaultsWithIds as EmailTemplate[]);
+      }
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+      // Use defaults on error
+      const defaultsWithIds = defaultTemplates.map((t, i) => ({
+        ...t,
+        id: `default-${i}`
+      }));
+      setTemplates(defaultsWithIds as EmailTemplate[]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchBranding = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("email_branding")
+        .select("*")
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (data) {
+        setBranding({
+          id: data.id,
+          primary_color: data.primary_color,
+          secondary_color: data.secondary_color,
+          logo_url: data.logo_url || "",
+          company_name: data.company_name,
+          footer_text: data.footer_text,
+          facebook_url: data.facebook_url || "",
+          twitter_url: data.twitter_url || "",
+          instagram_url: data.instagram_url || ""
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching branding:", error);
+    }
+  };
 
   const selectTemplate = (template: EmailTemplate) => {
     setSelectedTemplate(template);
     setEditedSubject(template.subject);
-    setEditedBody(template.bodyHtml);
+    setEditedBody(template.body_html);
     setShowPreview(false);
   };
 
-  const saveTemplate = () => {
+  const saveTemplate = async () => {
     if (!selectedTemplate) return;
+    setIsSaving(true);
 
-    const updatedTemplates = templates.map(t => 
-      t.id === selectedTemplate.id 
-        ? { ...t, subject: editedSubject, bodyHtml: editedBody }
-        : t
-    );
-    setTemplates(updatedTemplates);
-    setSelectedTemplate({ ...selectedTemplate, subject: editedSubject, bodyHtml: editedBody });
-    
-    // In a real app, this would save to the database
-    toast.success("Template saved successfully!");
+    try {
+      const templateData = {
+        template_key: selectedTemplate.template_key,
+        name: selectedTemplate.name,
+        description: selectedTemplate.description,
+        subject: editedSubject,
+        body_html: editedBody,
+        variables: selectedTemplate.variables
+      };
+
+      // Check if template exists in database
+      const { data: existing } = await supabase
+        .from("email_templates")
+        .select("id")
+        .eq("template_key", selectedTemplate.template_key)
+        .single();
+
+      if (existing) {
+        // Update existing
+        const { error } = await supabase
+          .from("email_templates")
+          .update({
+            subject: editedSubject,
+            body_html: editedBody
+          })
+          .eq("id", existing.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new
+        const { error } = await supabase
+          .from("email_templates")
+          .insert(templateData);
+
+        if (error) throw error;
+      }
+
+      // Update local state
+      setTemplates(prev => prev.map(t =>
+        t.template_key === selectedTemplate.template_key
+          ? { ...t, subject: editedSubject, body_html: editedBody }
+          : t
+      ));
+      setSelectedTemplate({ ...selectedTemplate, subject: editedSubject, body_html: editedBody });
+
+      toast.success("Template saved successfully!");
+    } catch (error) {
+      console.error("Error saving template:", error);
+      toast.error("Failed to save template");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const resetTemplate = () => {
-    const original = defaultTemplates.find(t => t.id === selectedTemplate?.id);
+    const original = defaultTemplates.find(t => t.template_key === selectedTemplate?.template_key);
     if (original) {
       setEditedSubject(original.subject);
-      setEditedBody(original.bodyHtml);
+      setEditedBody(original.body_html);
       toast.info("Template reset to default");
     }
   };
 
+  const saveBranding = async () => {
+    setIsSavingBranding(true);
+
+    try {
+      const brandingData = {
+        primary_color: branding.primary_color,
+        secondary_color: branding.secondary_color,
+        logo_url: branding.logo_url || null,
+        company_name: branding.company_name,
+        footer_text: branding.footer_text,
+        facebook_url: branding.facebook_url || null,
+        twitter_url: branding.twitter_url || null,
+        instagram_url: branding.instagram_url || null
+      };
+
+      if (branding.id) {
+        // Update existing
+        const { error } = await supabase
+          .from("email_branding")
+          .update(brandingData)
+          .eq("id", branding.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new
+        const { data, error } = await supabase
+          .from("email_branding")
+          .insert(brandingData)
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setBranding(prev => ({ ...prev, id: data.id }));
+        }
+      }
+
+      toast.success("Branding saved successfully!");
+    } catch (error) {
+      console.error("Error saving branding:", error);
+      toast.error("Failed to save branding");
+    } finally {
+      setIsSavingBranding(false);
+    }
+  };
+
   const generatePreview = () => {
-    // Replace variables with sample data for preview
     const sampleData: Record<string, string> = {
       customer_name: "John Doe",
       car_name: "2024 Tesla Model 3",
@@ -204,7 +386,6 @@ const AdminEmailTemplates = () => {
       preview = preview.replace(new RegExp(`{{${key}}}`, 'g'), value);
     });
 
-    // Wrap in email wrapper
     setPreviewHtml(`
       <!DOCTYPE html>
       <html>
@@ -224,7 +405,7 @@ const AdminEmailTemplates = () => {
             overflow: hidden;
           }
           .header { 
-            background: linear-gradient(135deg, ${branding.primaryColor}, #daa520); 
+            background: linear-gradient(135deg, ${branding.primary_color}, #daa520); 
             padding: 30px; 
             text-align: center; 
             color: white;
@@ -232,26 +413,26 @@ const AdminEmailTemplates = () => {
           .header h2 { margin: 0; }
           .content { padding: 30px; }
           .footer { 
-            background: ${branding.secondaryColor}; 
+            background: ${branding.secondary_color}; 
             padding: 20px; 
             text-align: center; 
             color: #888;
             font-size: 12px;
           }
           h1 { color: #333; }
-          a { color: ${branding.primaryColor}; }
+          a { color: ${branding.primary_color}; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h2>🚗 ${branding.companyName}</h2>
+            <h2>🚗 ${branding.company_name}</h2>
           </div>
           <div class="content">
             ${preview}
           </div>
           <div class="footer">
-            <p>${branding.footerText}</p>
+            <p>${branding.footer_text}</p>
           </div>
         </div>
       </body>
@@ -259,6 +440,14 @@ const AdminEmailTemplates = () => {
     `);
     setShowPreview(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -293,19 +482,19 @@ const AdminEmailTemplates = () => {
                     const Icon = template.icon;
                     return (
                       <div
-                        key={template.id}
+                        key={template.template_key}
                         onClick={() => selectTemplate(template)}
                         className={`p-4 rounded-lg cursor-pointer transition-colors ${
-                          selectedTemplate?.id === template.id
+                          selectedTemplate?.template_key === template.template_key
                             ? "bg-primary/10 border border-primary"
                             : "bg-secondary/30 hover:bg-secondary/50 border border-transparent"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <Icon className={`w-5 h-5 ${selectedTemplate?.id === template.id ? "text-primary" : "text-muted-foreground"}`} />
-                          <div>
-                            <p className="font-medium text-sm">{template.name}</p>
-                            <p className="text-xs text-muted-foreground">{template.description}</p>
+                          <Icon className={`w-5 h-5 shrink-0 ${selectedTemplate?.template_key === template.template_key ? "text-primary" : "text-muted-foreground"}`} />
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm truncate">{template.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{template.description}</p>
                           </div>
                         </div>
                       </div>
@@ -372,7 +561,7 @@ const AdminEmailTemplates = () => {
                       </AccordionItem>
                     </Accordion>
 
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex flex-wrap gap-3 pt-4">
                       <Button onClick={generatePreview} variant="outline" className="gap-2">
                         <Eye className="w-4 h-4" />
                         Preview
@@ -381,13 +570,12 @@ const AdminEmailTemplates = () => {
                         <RotateCcw className="w-4 h-4" />
                         Reset
                       </Button>
-                      <Button onClick={saveTemplate} className="gap-2">
-                        <Save className="w-4 h-4" />
+                      <Button onClick={saveTemplate} className="gap-2" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Save Template
                       </Button>
                     </div>
 
-                    {/* Preview */}
                     {showPreview && (
                       <div className="mt-4">
                         <label className="text-sm font-medium mb-2 block">Preview</label>
@@ -424,8 +612,8 @@ const AdminEmailTemplates = () => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Company Name</label>
                     <Input
-                      value={branding.companyName}
-                      onChange={(e) => setBranding({ ...branding, companyName: e.target.value })}
+                      value={branding.company_name}
+                      onChange={(e) => setBranding({ ...branding, company_name: e.target.value })}
                       placeholder="Your company name"
                     />
                   </div>
@@ -435,13 +623,13 @@ const AdminEmailTemplates = () => {
                     <div className="flex gap-2">
                       <input
                         type="color"
-                        value={branding.primaryColor}
-                        onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
+                        value={branding.primary_color}
+                        onChange={(e) => setBranding({ ...branding, primary_color: e.target.value })}
                         className="w-12 h-10 rounded border cursor-pointer"
                       />
                       <Input
-                        value={branding.primaryColor}
-                        onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
+                        value={branding.primary_color}
+                        onChange={(e) => setBranding({ ...branding, primary_color: e.target.value })}
                         placeholder="#b8860b"
                       />
                     </div>
@@ -452,44 +640,72 @@ const AdminEmailTemplates = () => {
                     <div className="flex gap-2">
                       <input
                         type="color"
-                        value={branding.secondaryColor}
-                        onChange={(e) => setBranding({ ...branding, secondaryColor: e.target.value })}
+                        value={branding.secondary_color}
+                        onChange={(e) => setBranding({ ...branding, secondary_color: e.target.value })}
                         className="w-12 h-10 rounded border cursor-pointer"
                       />
                       <Input
-                        value={branding.secondaryColor}
-                        onChange={(e) => setBranding({ ...branding, secondaryColor: e.target.value })}
+                        value={branding.secondary_color}
+                        onChange={(e) => setBranding({ ...branding, secondary_color: e.target.value })}
                         placeholder="#1a1a1a"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Logo URL</label>
+                    <Input
+                      value={branding.logo_url}
+                      onChange={(e) => setBranding({ ...branding, logo_url: e.target.value })}
+                      placeholder="https://example.com/logo.png"
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Logo URL (Optional)</label>
-                    <Input
-                      value={branding.logoUrl}
-                      onChange={(e) => setBranding({ ...branding, logoUrl: e.target.value })}
-                      placeholder="https://example.com/logo.png"
+                    <label className="text-sm font-medium mb-2 block">Footer Text</label>
+                    <Textarea
+                      value={branding.footer_text}
+                      onChange={(e) => setBranding({ ...branding, footer_text: e.target.value })}
+                      rows={3}
+                      placeholder="Footer disclaimer text..."
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Footer Text</label>
-                    <Textarea
-                      value={branding.footerText}
-                      onChange={(e) => setBranding({ ...branding, footerText: e.target.value })}
-                      rows={3}
+                    <label className="text-sm font-medium mb-2 block">Facebook URL</label>
+                    <Input
+                      value={branding.facebook_url}
+                      onChange={(e) => setBranding({ ...branding, facebook_url: e.target.value })}
+                      placeholder="https://facebook.com/yourpage"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Twitter URL</label>
+                    <Input
+                      value={branding.twitter_url}
+                      onChange={(e) => setBranding({ ...branding, twitter_url: e.target.value })}
+                      placeholder="https://twitter.com/yourhandle"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Instagram URL</label>
+                    <Input
+                      value={branding.instagram_url}
+                      onChange={(e) => setBranding({ ...branding, instagram_url: e.target.value })}
+                      placeholder="https://instagram.com/yourhandle"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t">
-                <Button className="gap-2">
-                  <Save className="w-4 h-4" />
-                  Save Branding Settings
+              <div className="flex justify-end mt-6">
+                <Button onClick={saveBranding} className="gap-2" disabled={isSavingBranding}>
+                  {isSavingBranding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Save Branding
                 </Button>
               </div>
             </CardContent>
