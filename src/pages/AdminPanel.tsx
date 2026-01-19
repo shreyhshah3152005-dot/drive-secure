@@ -19,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server, Layers, FileText, LayoutDashboard } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server, Layers, FileText, LayoutDashboard, DollarSign } from "lucide-react";
 import AdminSubscriptionRequests from "@/components/AdminSubscriptionRequests";
 import AdminDealerVerification from "@/components/AdminDealerVerification";
 import AdminDealerPerformance from "@/components/AdminDealerPerformance";
@@ -28,6 +28,7 @@ import AdminCronSetup from "@/components/AdminCronSetup";
 import AdminBulkDealerActions from "@/components/AdminBulkDealerActions";
 import AdminDashboardWidget from "@/components/AdminDashboardWidget";
 import AdminEmailTemplates from "@/components/AdminEmailTemplates";
+import AdminRevenueDashboard from "@/components/AdminRevenueDashboard";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -377,63 +378,71 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 h-auto gap-2 p-2 bg-secondary/30">
-            <TabsTrigger value="dashboard" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <LayoutDashboard className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Dashboard</span>
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-secondary/30">
+            <TabsTrigger value="dashboard" className="gap-1.5 text-xs px-2 py-1.5">
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <BarChart3 className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Analytics</span>
+            <TabsTrigger value="revenue" className="gap-1.5 text-xs px-2 py-1.5">
+              <DollarSign className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Revenue</span>
             </TabsTrigger>
-            <TabsTrigger value="approvals" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <UserCheck className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Approvals</span>
+            <TabsTrigger value="analytics" className="gap-1.5 text-xs px-2 py-1.5">
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="bulk" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <Layers className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Bulk</span>
+            <TabsTrigger value="approvals" className="gap-1.5 text-xs px-2 py-1.5">
+              <UserCheck className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Approvals</span>
             </TabsTrigger>
-            <TabsTrigger value="upgrades" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <ArrowUp className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Upgrades</span>
+            <TabsTrigger value="bulk" className="gap-1.5 text-xs px-2 py-1.5">
+              <Layers className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Bulk</span>
             </TabsTrigger>
-            <TabsTrigger value="test-drives" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <Car className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Drives</span>
+            <TabsTrigger value="upgrades" className="gap-1.5 text-xs px-2 py-1.5">
+              <ArrowUp className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Upgrades</span>
             </TabsTrigger>
-            <TabsTrigger value="dealers" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <Store className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Dealers</span>
+            <TabsTrigger value="test-drives" className="gap-1.5 text-xs px-2 py-1.5">
+              <Car className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Drives</span>
             </TabsTrigger>
-            <TabsTrigger value="verification" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <BadgeCheck className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Verify</span>
+            <TabsTrigger value="dealers" className="gap-1.5 text-xs px-2 py-1.5">
+              <Store className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Dealers</span>
             </TabsTrigger>
-            <TabsTrigger value="performance" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <TrendingUp className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Metrics</span>
+            <TabsTrigger value="verification" className="gap-1.5 text-xs px-2 py-1.5">
+              <BadgeCheck className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Verify</span>
             </TabsTrigger>
-            <TabsTrigger value="alerts" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <Bell className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Alerts</span>
+            <TabsTrigger value="performance" className="gap-1.5 text-xs px-2 py-1.5">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Metrics</span>
             </TabsTrigger>
-            <TabsTrigger value="templates" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <FileText className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Emails</span>
+            <TabsTrigger value="alerts" className="gap-1.5 text-xs px-2 py-1.5">
+              <Bell className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Alerts</span>
             </TabsTrigger>
-            <TabsTrigger value="cron" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <Server className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Tasks</span>
+            <TabsTrigger value="templates" className="gap-1.5 text-xs px-2 py-1.5">
+              <FileText className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Emails</span>
             </TabsTrigger>
-            <TabsTrigger value="customers" className="gap-2 text-xs sm:text-sm px-2 py-2">
-              <Users className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Customers</span>
+            <TabsTrigger value="cron" className="gap-1.5 text-xs px-2 py-1.5">
+              <Server className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Tasks</span>
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="gap-1.5 text-xs px-2 py-1.5">
+              <Users className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Customers</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
             <AdminDashboardWidget />
+          </TabsContent>
+
+          <TabsContent value="revenue">
+            <AdminRevenueDashboard />
           </TabsContent>
 
           <TabsContent value="analytics">
