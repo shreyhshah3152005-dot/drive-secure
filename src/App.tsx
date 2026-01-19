@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CompareProvider } from "@/contexts/CompareContext";
 import CompareBar from "@/components/CompareBar";
+import LiveChat from "@/components/LiveChat";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import DealerAuth from "./pages/DealerAuth";
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareBar />
+            <LiveChat />
           </CompareProvider>
         </AuthProvider>
       </BrowserRouter>
