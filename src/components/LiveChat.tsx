@@ -7,9 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MessageCircle, Send, X, Loader2 } from "lucide-react";
+import { MessageCircle, Send, X, Loader2, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import StartNewChatDialog from "./StartNewChatDialog";
 
 interface Conversation {
   id: string;
@@ -389,9 +390,20 @@ const LiveChat = ({ dealerId, carId, dealerName, isDealer = false }: LiveChatPro
                     </Button>
                   )}
 
+                  {/* Start New Chat Button */}
+                  {!isDealer && (
+                    <div className="mb-3">
+                      <StartNewChatDialog 
+                        onChatStarted={() => {
+                          fetchConversations();
+                        }} 
+                      />
+                    </div>
+                  )}
+
                   {conversations.length === 0 && !dealerId && (
-                    <p className="text-center text-muted-foreground py-8">
-                      No conversations yet
+                    <p className="text-center text-muted-foreground py-4">
+                      No conversations yet. Start a chat with a dealer!
                     </p>
                   )}
 

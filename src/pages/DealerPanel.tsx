@@ -19,9 +19,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays } from "lucide-react";
 import DealerLiveChat from "@/components/DealerLiveChat";
 import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
+import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 
 interface DealerCar {
   id: string;
@@ -480,6 +481,10 @@ const DealerPanel = () => {
             <TabsTrigger value="testdrives" className="gap-2">
               <Calendar className="w-4 h-4" />
               Test Drives
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="gap-2">
+              <CalendarDays className="w-4 h-4" />
+              Calendar
             </TabsTrigger>
             <TabsTrigger value="messages" className="gap-2">
               <MessageCircle className="w-4 h-4" />
