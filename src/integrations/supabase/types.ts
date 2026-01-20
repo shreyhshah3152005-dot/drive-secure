@@ -222,6 +222,85 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_availability: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          dealer_id: string
+          end_time: string
+          id: string
+          is_active: boolean
+          slot_duration: number
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          dealer_id: string
+          end_time: string
+          id?: string
+          is_active?: boolean
+          slot_duration?: number
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          dealer_id?: string
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          slot_duration?: number
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_availability_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dealer_blocked_slots: {
+        Row: {
+          blocked_date: string
+          created_at: string
+          dealer_id: string
+          end_time: string | null
+          id: string
+          reason: string | null
+          start_time: string | null
+        }
+        Insert: {
+          blocked_date: string
+          created_at?: string
+          dealer_id: string
+          end_time?: string | null
+          id?: string
+          reason?: string | null
+          start_time?: string | null
+        }
+        Update: {
+          blocked_date?: string
+          created_at?: string
+          dealer_id?: string
+          end_time?: string | null
+          id?: string
+          reason?: string | null
+          start_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_blocked_slots_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealer_car_notifications: {
         Row: {
           car_id: string
@@ -597,6 +676,48 @@ export type Database = {
         }
         Relationships: []
       }
+      loan_preapprovals: {
+        Row: {
+          annual_income: number
+          approval_status: string
+          car_price: number
+          created_at: string
+          credit_score_range: string
+          down_payment: number
+          id: string
+          interest_rate: number
+          loan_term: number
+          monthly_payment: number
+          user_id: string | null
+        }
+        Insert: {
+          annual_income: number
+          approval_status?: string
+          car_price: number
+          created_at?: string
+          credit_score_range: string
+          down_payment: number
+          id?: string
+          interest_rate: number
+          loan_term: number
+          monthly_payment: number
+          user_id?: string | null
+        }
+        Update: {
+          annual_income?: number
+          approval_status?: string
+          car_price?: number
+          created_at?: string
+          credit_score_range?: string
+          down_payment?: number
+          id?: string
+          interest_rate?: number
+          loan_term?: number
+          monthly_payment?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       price_alerts: {
         Row: {
           car_id: string
@@ -774,6 +895,48 @@ export type Database = {
           },
         ]
       }
+      saved_searches: {
+        Row: {
+          brand: string | null
+          category: string | null
+          created_at: string
+          email_notifications: boolean
+          fuel_type: string | null
+          id: string
+          max_price: number | null
+          min_price: number | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          category?: string | null
+          created_at?: string
+          email_notifications?: boolean
+          fuel_type?: string | null
+          id?: string
+          max_price?: number | null
+          min_price?: number | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          category?: string | null
+          created_at?: string
+          email_notifications?: boolean
+          fuel_type?: string | null
+          id?: string
+          max_price?: number | null
+          min_price?: number | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_upgrade_requests: {
         Row: {
           admin_notes: string | null
@@ -876,6 +1039,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trade_in_valuations: {
+        Row: {
+          condition: string
+          created_at: string
+          estimated_value: number
+          id: string
+          make: string
+          mileage: number
+          model: string
+          user_id: string | null
+          year: number
+        }
+        Insert: {
+          condition: string
+          created_at?: string
+          estimated_value: number
+          id?: string
+          make: string
+          mileage: number
+          model: string
+          user_id?: string | null
+          year: number
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          estimated_value?: number
+          id?: string
+          make?: string
+          mileage?: number
+          model?: string
+          user_id?: string | null
+          year?: number
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

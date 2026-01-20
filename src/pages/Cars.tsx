@@ -3,6 +3,9 @@ import Navbar from "@/components/Navbar";
 import CarCard from "@/components/CarCard";
 import CarFilters from "@/components/CarFilters";
 import Footer from "@/components/Footer";
+import SavedSearches from "@/components/SavedSearches";
+import TradeInCalculator from "@/components/TradeInCalculator";
+import LoanPreapproval from "@/components/LoanPreapproval";
 import { cars } from "@/data/cars";
 
 const Cars = () => {
@@ -55,8 +58,21 @@ const Cars = () => {
       <Navbar />
       <main className="pt-20">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Our Collection</h1>
-          <p className="text-muted-foreground mb-8">Explore our curated selection of premium automobiles</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-4xl font-bold text-foreground mb-2">Our Collection</h1>
+              <p className="text-muted-foreground">Explore our curated selection of premium automobiles</p>
+            </div>
+            <div className="flex gap-2">
+              <TradeInCalculator />
+              <LoanPreapproval />
+            </div>
+          </div>
+
+          {/* Saved Searches Section */}
+          <div className="mb-8">
+            <SavedSearches />
+          </div>
 
           <CarFilters
             searchQuery={searchQuery}
