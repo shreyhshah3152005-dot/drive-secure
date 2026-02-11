@@ -200,7 +200,7 @@ const DealerPanel = () => {
 
     setIsAddingCar(true);
     try {
-      const { error } = await supabase.from("dealer_cars").insert({
+      const { data: insertedCar, error } = await supabase.from("dealer_cars").insert({
         dealer_id: dealerInfo.id,
         name: newCar.name,
         brand: newCar.brand,
@@ -214,9 +214,16 @@ const DealerPanel = () => {
         power: newCar.power || null,
         image_url: newCar.image_url || null,
         description: newCar.description || null,
-      });
+      }).select("id").single();
 
       if (error) throw error;
+
+      // Trigger saved search email notifications for matching users
+      if (insertedCar?.id) {
+        supabase.functions.invoke("send-saved-search-notification", {
+          body: { car_id: insertedCar.id },
+        }).catch((e) => console.error("Saved search notification error:", e));
+      }
 
       toast.success("Car added successfully!");
       setAddCarDialogOpen(false);

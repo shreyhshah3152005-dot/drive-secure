@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useDealerRole } from "@/hooks/useDealerRole";
-import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store } from "lucide-react";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell } from "lucide-react";
 import AdminNotificationBell from "./AdminNotificationBell";
 import NewCarNotificationBell from "./NewCarNotificationBell";
 import PriceAlertNotifications from "./PriceAlertNotifications";
@@ -50,6 +50,11 @@ const Navbar = () => {
                 <PriceAlertNotifications />
                 <NewCarNotificationBell />
                 {isAdmin && <AdminNotificationBell />}
+                <Link to="/notifications">
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Bell className="w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
               
               {/* Role-specific buttons */}
