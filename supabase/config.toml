@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.send-price-alert-notification]
 verify_jwt = false
+
+[functions.send-saved-search-notification]
+verify_jwt = false
