@@ -16,6 +16,7 @@ import EditProfileDialog from "@/components/EditProfileDialog";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useComparisonHistory } from "@/hooks/useComparisonHistory";
 import { cars } from "@/data/cars";
+import AICarRecommendations from "@/components/AICarRecommendations";
 
 interface TestDriveInquiry {
   id: string;
@@ -415,6 +416,11 @@ const Dashboard = () => {
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* AI Recommendations */}
+        <div className="mt-8">
+          <AICarRecommendations />
         </div>
       </div>
     </div>
