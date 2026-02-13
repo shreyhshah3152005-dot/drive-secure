@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.send-saved-search-notification]
 verify_jwt = false
+
+[functions.ai-car-recommendations]
+verify_jwt = false
