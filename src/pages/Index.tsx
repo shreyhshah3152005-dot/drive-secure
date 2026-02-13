@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FeaturedDealers from "@/components/FeaturedDealers";
 import Footer from "@/components/Footer";
+import AICarRecommendations from "@/components/AICarRecommendations";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -27,6 +28,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <div className="container mx-auto px-4 py-8">
+        <AICarRecommendations />
+      </div>
       <FeaturedDealers />
       <Footer />
     </div>

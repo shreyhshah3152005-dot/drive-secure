@@ -718,6 +718,48 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_enabled: boolean
+          id: string
+          new_car_alerts: boolean
+          phone_number: string | null
+          price_drop_alerts: boolean
+          sms_enabled: boolean
+          test_drive_reminders: boolean
+          updated_at: string
+          user_id: string
+          whatsapp_enabled: boolean
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          new_car_alerts?: boolean
+          phone_number?: string | null
+          price_drop_alerts?: boolean
+          sms_enabled?: boolean
+          test_drive_reminders?: boolean
+          updated_at?: string
+          user_id: string
+          whatsapp_enabled?: boolean
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          new_car_alerts?: boolean
+          phone_number?: string | null
+          price_drop_alerts?: boolean
+          sms_enabled?: boolean
+          test_drive_reminders?: boolean
+          updated_at?: string
+          user_id?: string
+          whatsapp_enabled?: boolean
+        }
+        Relationships: []
+      }
       price_alerts: {
         Row: {
           car_id: string
