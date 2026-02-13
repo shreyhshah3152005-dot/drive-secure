@@ -5,6 +5,7 @@ import { useDealerCarNotifications } from "@/hooks/useDealerCarNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NotificationPreferences from "@/components/NotificationPreferences";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -204,6 +205,10 @@ const NotificationCenter = () => {
               <Calendar className="w-4 h-4" />
               Test Drives
             </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Bell className="w-4 h-4" />
+              Settings
+            </TabsTrigger>
           </TabsList>
 
           {/* ALL tab */}
@@ -331,6 +336,11 @@ const NotificationCenter = () => {
                 ))
               )}
             </div>
+          </TabsContent>
+
+          {/* Settings tab */}
+          <TabsContent value="settings">
+            <NotificationPreferences />
           </TabsContent>
         </Tabs>
       </main>
