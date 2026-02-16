@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DealerReviews from "@/components/DealerReviews";
 import DealerRatingBadge from "@/components/DealerRatingBadge";
+import DealerVerificationBadge, { type VerificationStatus } from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ interface Dealer {
   city: string;
   phone: string | null;
   address: string | null;
+  verification_status: string;
 }
 
 interface DealerCar {
@@ -55,7 +57,7 @@ const DealerDetail = () => {
         // Fetch dealer info
         const { data: dealerData, error: dealerError } = await supabase
           .from("dealers")
-          .select("id, dealership_name, city, phone, address")
+          .select("id, dealership_name, city, phone, address, verification_status")
           .eq("id", id)
           .eq("is_active", true)
           .single();
@@ -134,6 +136,7 @@ const DealerDetail = () => {
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-3xl font-bold">{dealer.dealership_name}</h1>
+                <DealerVerificationBadge status={dealer.verification_status as VerificationStatus} />
                 <DealerRatingBadge dealerId={dealer.id} showCount />
               </div>
               <div className="flex flex-wrap gap-4 text-muted-foreground">

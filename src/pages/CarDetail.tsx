@@ -9,6 +9,8 @@ import EMICalculator from "@/components/EMICalculator";
 import TestDriveForm from "@/components/TestDriveForm";
 import CarReviews from "@/components/CarReviews";
 import VirtualCarTour from "@/components/VirtualCarTour";
+import SocialShareButtons from "@/components/SocialShareButtons";
+import TradeInCalculator from "@/components/TradeInCalculator";
 import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -142,9 +144,14 @@ const CarDetail = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <TestDriveForm car={car} />
                 <VirtualCarTour carName={car.model} carBrand={car.brand} mainImage={car.image} />
+                <TradeInCalculator />
+                <SocialShareButtons
+                  title={`${car.brand} ${car.model} - ${formatPrice(car.price)}`}
+                  description={car.description}
+                />
               </div>
             </div>
           </div>
