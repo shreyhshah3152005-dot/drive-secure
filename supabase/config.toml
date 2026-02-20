@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.ai-car-recommendations]
 verify_jwt = false
+
+[functions.car-recommendation-chat]
+verify_jwt = false
