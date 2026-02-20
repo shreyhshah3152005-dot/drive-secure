@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CompareProvider } from "@/contexts/CompareContext";
 import CompareBar from "@/components/CompareBar";
 import LiveChat from "@/components/LiveChat";
+import AICarChatbot from "@/components/AICarChatbot";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import DealerAuth from "./pages/DealerAuth";
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareBar />
+            <AICarChatbot />
             <LiveChat />
           </CompareProvider>
         </AuthProvider>
