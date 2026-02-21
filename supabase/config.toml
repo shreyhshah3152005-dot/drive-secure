@@ -29,3 +29,12 @@ verify_jwt = false
 
 [functions.car-recommendation-chat]
 verify_jwt = false
+
+[functions.ai-car-comparison]
+verify_jwt = false
+
+[functions.send-bulk-dealer-notification]
+verify_jwt = false
+
+[functions.send-test-email]
+verify_jwt = false

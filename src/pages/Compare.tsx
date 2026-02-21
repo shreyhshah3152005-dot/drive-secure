@@ -5,6 +5,7 @@ import { useComparisonHistory } from "@/hooks/useComparisonHistory";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AIComparisonReport from "@/components/AIComparisonReport";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, GitCompare, X, Zap, Gauge, Fuel, Settings, Calendar, Star } from "lucide-react";
 
@@ -250,6 +251,9 @@ const Compare = () => {
               </div>
             </div>
           </div>
+
+          {/* AI Comparison Report */}
+          <AIComparisonReport cars={selectedCars} />
         </div>
       </main>
 
