@@ -25,6 +25,8 @@ import Dealers from "./pages/Dealers";
 import DealerDetail from "./pages/DealerDetail";
 import DealerCarDetail from "./pages/DealerCarDetail";
 import NotFound from "./pages/NotFound";
+import DealerLeaderboard from "./pages/DealerLeaderboard";
+import FinanceCalculator from "./pages/FinanceCalculator";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,8 @@ const App = () => (
               <Route path="/dealers" element={<Dealers />} />
               <Route path="/dealer/:id" element={<DealerDetail />} />
               <Route path="/dealer-car/:id" element={<DealerCarDetail />} />
+              <Route path="/dealer-leaderboard" element={<DealerLeaderboard />} />
+              <Route path="/finance-calculator" element={<FinanceCalculator />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareBar />

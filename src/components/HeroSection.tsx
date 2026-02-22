@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Shield, Award, Headphones, Sparkles, Store, GitCompare } from "lucide-react";
+import { ChevronRight, Shield, Award, Headphones, Sparkles, Car, ShoppingBag } from "lucide-react";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -55,27 +55,13 @@ const HeroSection = () => {
             style={{ animationDelay: "300ms" }}
           >
             <Button variant="hero" size="xl" onClick={() => navigate("/cars")} className="shadow-primary">
-              Explore Collection
+              <Car className="w-5 h-5 mr-2" />
+              New Cars
               <ChevronRight className="w-5 h-5" />
             </Button>
             <Button variant="glass" size="xl" onClick={() => navigate("/dealers")}>
-              <Store className="w-5 h-5 mr-2" />
-              Browse Dealers
-            </Button>
-          </div>
-
-          <div 
-            className="flex justify-center mt-4 animate-slide-up"
-            style={{ animationDelay: "350ms" }}
-          >
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={() => navigate("/compare-dealers")}
-              className="border-primary/30 hover:bg-primary/10"
-            >
-              <GitCompare className="w-4 h-4 mr-2" />
-              Compare Dealer Prices
+              <ShoppingBag className="w-5 h-5 mr-2" />
+              Second Hand Cars
             </Button>
           </div>
 
