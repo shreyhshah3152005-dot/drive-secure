@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import AICarRecommendations from "@/components/AICarRecommendations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, ShoppingBag, Trophy, Calculator, ChevronRight, GitCompare } from "lucide-react";
+import { Car, ShoppingBag, Trophy, Calculator, ChevronRight } from "lucide-react";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -54,27 +54,20 @@ const Index = () => {
                 </CardContent>
               </Card>
             </Link>
-            <Card className="group hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 h-full">
-              <CardContent className="p-8 text-center flex flex-col items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <ShoppingBag className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Second Hand Cars</h3>
-                  <p className="text-sm text-muted-foreground">Quality pre-owned cars from verified dealers near you</p>
-                </div>
-                <div className="flex flex-wrap justify-center gap-2 mt-2">
-                  <Link to="/dealers">
-                    <Button variant="outline" size="sm" className="gap-1">Browse <ChevronRight className="w-4 h-4" /></Button>
-                  </Link>
-                  <Link to="/compare-dealer-cars">
-                    <Button variant="outline" size="sm" className="gap-1 border-primary/30 hover:bg-primary/10">
-                      <GitCompare className="w-4 h-4" /> Compare Prices
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+            <Link to="/dealers">
+              <Card className="group hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full">
+                <CardContent className="p-8 text-center flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <ShoppingBag className="w-8 h-8 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Second Hand Cars</h3>
+                    <p className="text-sm text-muted-foreground">Quality pre-owned cars from verified dealers near you</p>
+                  </div>
+                  <Button variant="outline" size="sm" className="gap-1 mt-2">Browse <ChevronRight className="w-4 h-4" /></Button>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
 
           {/* Quick Links */}
