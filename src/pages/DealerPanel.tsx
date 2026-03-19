@@ -711,7 +711,7 @@ const DealerPanel = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-wrap">
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -720,6 +720,17 @@ const DealerPanel = () => {
                                 <Edit className="w-3 h-3 mr-1" />
                                 Edit
                               </Button>
+                              {car.is_active && (
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  className="text-orange-600 border-orange-300"
+                                  onClick={() => handleToggleCarStatus(car)}
+                                >
+                                  <ShoppingCart className="w-3 h-3 mr-1" />
+                                  Mark Sold
+                                </Button>
+                              )}
                               <Button
                                 size="sm"
                                 variant={car.is_active ? "destructive" : "default"}
