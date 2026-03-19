@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import DealerAuth from "./pages/DealerAuth";
 import AdminAuth from "./pages/AdminAuth";
 import Cars from "./pages/Cars";
+import UsedCars from "./pages/UsedCars";
 import CarDetail from "./pages/CarDetail";
 import NotificationCenter from "./pages/NotificationCenter";
 import Compare from "./pages/Compare";
