@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import DealerAuth from "./pages/DealerAuth";
 import AdminAuth from "./pages/AdminAuth";
 import Cars from "./pages/Cars";
+import UsedCars from "./pages/UsedCars";
 import CarDetail from "./pages/CarDetail";
 import NotificationCenter from "./pages/NotificationCenter";
 import Compare from "./pages/Compare";
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/dealer-auth" element={<DealerAuth />} />
               <Route path="/admin-auth" element={<AdminAuth />} />
               <Route path="/cars" element={<Cars />} />
+              <Route path="/used-cars" element={<UsedCars />} />
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/notifications" element={<NotificationCenter />} />
               <Route path="/compare" element={<Compare />} />

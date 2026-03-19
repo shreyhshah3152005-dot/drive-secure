@@ -85,6 +85,12 @@ Your role:
 - Suggest alternatives when a preferred car is unavailable
 - Be conversational, warm, and helpful
 
+IMPORTANT - IMAGE REQUESTS:
+- If the user asks you to "show", "generate", "create", or "display" an image/photo/picture of a car, respond with EXACTLY this format on its own line:
+  [GENERATE_IMAGE: description of the car image]
+  For example: [GENERATE_IMAGE: A sleek red 2024 Tata Nexon XZ+ SUV from a front 3/4 angle, studio lighting, showroom setting]
+- After the image tag, continue with your text response about the car.
+
 Guidelines:
 - When asked about new cars, provide current market information for brand new models in India
 - When asked about used/second hand cars, recommend from the dealer inventory above
@@ -93,6 +99,55 @@ Guidelines:
 - Keep responses concise but informative (2-4 paragraphs max)
 - Use emojis sparingly for friendliness 🚗
 - When recommending used cars, mention the dealer name and city`;
+
+    // Check if last user message is asking for an image
+    const lastUserMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
+    const isImageRequest = /\b(show|generate|create|display|image|photo|picture|pic|look|looks like|visual)\b/.test(lastUserMsg) &&
+      /\b(car|vehicle|model|suv|sedan|hatchback)\b/.test(lastUserMsg);
+
+    if (isImageRequest) {
+      // Use image generation model
+      const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3.1-flash-image-preview",
+          messages: [
+            { role: "system", content: "You are a helpful car image generator. Generate a high-quality, realistic image of the car the user describes. Also provide a short description." },
+            ...messages,
+          ],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (!imageResponse.ok) {
+        const errText = await imageResponse.text();
+        console.error("Image gen error:", imageResponse.status, errText);
+        // Fall through to text response
+      } else {
+        const imageData = await imageResponse.json();
+        const choice = imageData.choices?.[0]?.message;
+        const imageUrl = choice?.images?.[0]?.image_url?.url;
+        const textContent = choice?.content || "Here's the car image!";
+
+        let responseContent = textContent;
+        if (imageUrl) {
+          responseContent = `![Car Image](${imageUrl})\n\n${textContent}`;
+        }
+
+        // Return as a non-streaming response formatted as SSE for compatibility
+        const sseData = `data: ${JSON.stringify({
+          choices: [{ delta: { content: responseContent } }]
+        })}\n\ndata: [DONE]\n\n`;
+
+        return new Response(sseData, {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        });
+      }
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

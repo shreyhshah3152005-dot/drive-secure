@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import SimilarCarsSection from "@/components/SimilarCarsSection";
+import CrossDealerComparison from "@/components/CrossDealerComparison";
 import PriceAlertButton from "@/components/PriceAlertButton";
 import DealerVerificationBadge from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -357,6 +358,13 @@ const DealerCarDetail = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Cross Dealer Comparison */}
+            <CrossDealerComparison
+              currentCarId={car.id}
+              carName={car.name}
+              brand={car.brand}
+            />
 
             {/* Price History */}
             <PriceHistoryChart carId={car.id} carName={`${car.brand} ${car.name}`} />
