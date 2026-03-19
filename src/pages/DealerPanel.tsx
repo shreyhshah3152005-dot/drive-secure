@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays, ShoppingCart } from "lucide-react";
 import DealerLiveChat from "@/components/DealerLiveChat";
 import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
 import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
