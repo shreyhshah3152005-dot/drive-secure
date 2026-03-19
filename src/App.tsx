@@ -45,6 +45,7 @@ const App = () => (
               <Route path="/dealer-auth" element={<DealerAuth />} />
               <Route path="/admin-auth" element={<AdminAuth />} />
               <Route path="/cars" element={<Cars />} />
+              <Route path="/used-cars" element={<UsedCars />} />
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/notifications" element={<NotificationCenter />} />
               <Route path="/compare" element={<Compare />} />

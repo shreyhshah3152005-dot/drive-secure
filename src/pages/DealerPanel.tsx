@@ -533,135 +533,108 @@ const DealerPanel = () => {
                     <DialogHeader>
                       <DialogTitle>Add New Car</DialogTitle>
                     </DialogHeader>
-                    <div className="grid grid-cols-2 gap-4 py-4">
+                    <div className="space-y-4 py-4">
+                      {/* Essential Info */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Car Name *</Label>
+                          <Input
+                            id="name"
+                            value={newCar.name}
+                            onChange={(e) => setNewCar({ ...newCar, name: e.target.value })}
+                            placeholder="e.g., Nexon XZ+"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="brand">Brand *</Label>
+                          <Input
+                            id="brand"
+                            value={newCar.brand}
+                            onChange={(e) => setNewCar({ ...newCar, brand: e.target.value })}
+                            placeholder="e.g., Tata"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="price">Price (₹ Lakhs) *</Label>
+                          <Input
+                            id="price"
+                            type="number"
+                            value={newCar.price}
+                            onChange={(e) => setNewCar({ ...newCar, price: e.target.value })}
+                            placeholder="12.5"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Category</Label>
+                          <Select value={newCar.category} onValueChange={(v) => setNewCar({ ...newCar, category: v })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="sedan">Sedan</SelectItem>
+                              <SelectItem value="suv">SUV</SelectItem>
+                              <SelectItem value="hatchback">Hatchback</SelectItem>
+                              <SelectItem value="mpv">MPV</SelectItem>
+                              <SelectItem value="crossover">Crossover</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Fuel Type</Label>
+                          <Select value={newCar.fuel_type} onValueChange={(v) => setNewCar({ ...newCar, fuel_type: v })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="petrol">Petrol</SelectItem>
+                              <SelectItem value="diesel">Diesel</SelectItem>
+                              <SelectItem value="electric">Electric</SelectItem>
+                              <SelectItem value="hybrid">Hybrid</SelectItem>
+                              <SelectItem value="cng">CNG</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Transmission</Label>
+                          <Select value={newCar.transmission} onValueChange={(v) => setNewCar({ ...newCar, transmission: v })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="manual">Manual</SelectItem>
+                              <SelectItem value="automatic">Automatic</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Seating</Label>
+                          <Select value={newCar.seating_capacity} onValueChange={(v) => setNewCar({ ...newCar, seating_capacity: v })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="4">4</SelectItem>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="7">7</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Image Upload */}
+                      <CarImageUpload
+                        imageUrl={newCar.image_url}
+                        onImageChange={(url) => setNewCar({ ...newCar, image_url: url })}
+                        dealerId={dealerInfo?.id || ""}
+                      />
+
+                      {/* Optional Description */}
                       <div className="space-y-2">
-                        <Label htmlFor="name">Car Name *</Label>
-                        <Input
-                          id="name"
-                          value={newCar.name}
-                          onChange={(e) => setNewCar({ ...newCar, name: e.target.value })}
-                          placeholder="e.g., Tata Nexon"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="brand">Brand *</Label>
-                        <Input
-                          id="brand"
-                          value={newCar.brand}
-                          onChange={(e) => setNewCar({ ...newCar, brand: e.target.value })}
-                          placeholder="e.g., Tata"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="price">Price (₹ Lakhs) *</Label>
-                        <Input
-                          id="price"
-                          type="number"
-                          value={newCar.price}
-                          onChange={(e) => setNewCar({ ...newCar, price: e.target.value })}
-                          placeholder="e.g., 12.5"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="category">Category</Label>
-                        <Select value={newCar.category} onValueChange={(v) => setNewCar({ ...newCar, category: v })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="sedan">Sedan</SelectItem>
-                            <SelectItem value="suv">SUV</SelectItem>
-                            <SelectItem value="hatchback">Hatchback</SelectItem>
-                            <SelectItem value="mpv">MPV</SelectItem>
-                            <SelectItem value="crossover">Crossover</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="fuel_type">Fuel Type</Label>
-                        <Select value={newCar.fuel_type} onValueChange={(v) => setNewCar({ ...newCar, fuel_type: v })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="petrol">Petrol</SelectItem>
-                            <SelectItem value="diesel">Diesel</SelectItem>
-                            <SelectItem value="electric">Electric</SelectItem>
-                            <SelectItem value="hybrid">Hybrid</SelectItem>
-                            <SelectItem value="cng">CNG</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="transmission">Transmission</Label>
-                        <Select value={newCar.transmission} onValueChange={(v) => setNewCar({ ...newCar, transmission: v })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="manual">Manual</SelectItem>
-                            <SelectItem value="automatic">Automatic</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="seating">Seating Capacity</Label>
-                        <Select value={newCar.seating_capacity} onValueChange={(v) => setNewCar({ ...newCar, seating_capacity: v })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="2">2 Seater</SelectItem>
-                            <SelectItem value="4">4 Seater</SelectItem>
-                            <SelectItem value="5">5 Seater</SelectItem>
-                            <SelectItem value="6">6 Seater</SelectItem>
-                            <SelectItem value="7">7 Seater</SelectItem>
-                            <SelectItem value="8">8 Seater</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="mileage">Mileage</Label>
-                        <Input
-                          id="mileage"
-                          value={newCar.mileage}
-                          onChange={(e) => setNewCar({ ...newCar, mileage: e.target.value })}
-                          placeholder="e.g., 18.5 km/l"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="engine">Engine</Label>
-                        <Input
-                          id="engine"
-                          value={newCar.engine}
-                          onChange={(e) => setNewCar({ ...newCar, engine: e.target.value })}
-                          placeholder="e.g., 1.5L Turbo Petrol"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="power">Power</Label>
-                        <Input
-                          id="power"
-                          value={newCar.power}
-                          onChange={(e) => setNewCar({ ...newCar, power: e.target.value })}
-                          placeholder="e.g., 118 bhp"
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <CarImageUpload
-                          imageUrl={newCar.image_url}
-                          onImageChange={(url) => setNewCar({ ...newCar, image_url: url })}
-                          dealerId={dealerInfo?.id || ""}
-                        />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">Description (optional)</Label>
                         <Textarea
                           id="description"
                           value={newCar.description}
                           onChange={(e) => setNewCar({ ...newCar, description: e.target.value })}
-                          placeholder="Car description..."
-                          rows={3}
+                          placeholder="Brief description..."
+                          rows={2}
                         />
                       </div>
                     </div>

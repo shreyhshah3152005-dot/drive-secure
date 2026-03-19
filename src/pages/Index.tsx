@@ -54,7 +54,7 @@ const Index = () => {
                 </CardContent>
               </Card>
             </Link>
-            <Link to="/dealers">
+            <Link to="/used-cars">
               <Card className="group hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full">
                 <CardContent className="p-8 text-center flex flex-col items-center gap-4">
                   <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">

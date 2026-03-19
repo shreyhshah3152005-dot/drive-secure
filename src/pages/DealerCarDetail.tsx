@@ -359,6 +359,13 @@ const DealerCarDetail = () => {
               </Card>
             )}
 
+            {/* Cross Dealer Comparison */}
+            <CrossDealerComparison
+              currentCarId={car.id}
+              carName={car.name}
+              brand={car.brand}
+            />
+
             {/* Price History */}
             <PriceHistoryChart carId={car.id} carName={`${car.brand} ${car.name}`} />
 
