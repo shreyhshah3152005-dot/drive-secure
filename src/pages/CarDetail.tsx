@@ -30,6 +30,7 @@ const formatPrice = (price: number): string => {
 const CarDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addCar } = useRecentlyViewedCars();
   const car = cars.find((c) => c.id === id);
 
   if (!car) {
