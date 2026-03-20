@@ -46,6 +46,19 @@ const CarDetail = () => {
     );
   }
 
+  useEffect(() => {
+    if (car) {
+      addCar({
+        id: car.id,
+        name: car.name,
+        brand: car.brand,
+        image: car.image,
+        price: car.price,
+        type: "new",
+      });
+    }
+  }, [car?.id]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

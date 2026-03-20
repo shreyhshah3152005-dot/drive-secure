@@ -87,6 +87,8 @@ const Index = () => {
         </div>
       </section>
 
+      <RecentlyViewedCars />
+
       <div className="container mx-auto px-4 py-8">
         <AICarRecommendations />
       </div>

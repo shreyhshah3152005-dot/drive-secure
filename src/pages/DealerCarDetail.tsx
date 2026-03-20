@@ -111,6 +111,19 @@ const DealerCarDetail = () => {
     fetchCarAndDealer();
   }, [id]);
 
+  useEffect(() => {
+    if (car) {
+      addCar({
+        id: car.id,
+        name: car.name,
+        brand: car.brand,
+        image: car.image_url || "/placeholder.svg",
+        price: car.price * 100000,
+        type: "used",
+      });
+    }
+  }, [car?.id]);
+
   const handleTestDriveSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
