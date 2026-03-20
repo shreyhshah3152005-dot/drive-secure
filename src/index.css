@@ -6,53 +6,53 @@
 
 @layer base {
   :root {
-    --background: 210 20% 6%;
-    --foreground: 180 15% 95%;
+    --background: 48 33% 98%;
+    --foreground: 210 24% 12%;
 
-    --card: 210 20% 10%;
-    --card-foreground: 180 15% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 24% 12%;
 
-    --popover: 210 20% 8%;
-    --popover-foreground: 180 15% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 24% 12%;
 
-    --primary: 175 85% 45%;
-    --primary-foreground: 210 20% 6%;
+    --primary: 175 85% 36%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 15%;
-    --secondary-foreground: 180 15% 95%;
+    --secondary: 180 18% 93%;
+    --secondary-foreground: 210 24% 16%;
 
-    --muted: 210 20% 18%;
-    --muted-foreground: 210 15% 55%;
+    --muted: 180 16% 94%;
+    --muted-foreground: 210 12% 42%;
 
-    --accent: 175 85% 45%;
-    --accent-foreground: 210 20% 6%;
+    --accent: 175 36% 90%;
+    --accent-foreground: 175 72% 18%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 180 15% 95%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 18%;
-    --input: 210 20% 15%;
-    --ring: 175 85% 45%;
+    --border: 200 18% 86%;
+    --input: 200 18% 90%;
+    --ring: 175 85% 36%;
 
     --radius: 0.75rem;
 
     /* Custom tokens - Modern Teal Theme */
-    --gradient-primary: linear-gradient(135deg, hsl(175, 85%, 45%) 0%, hsl(190, 90%, 40%) 100%);
-    --gradient-dark: linear-gradient(180deg, hsl(210, 20%, 6%) 0%, hsl(210, 25%, 3%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(210, 20%, 12%) 0%, hsl(210, 20%, 8%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(175, 85%, 50%, 0.3) 0%, hsl(190, 90%, 45%, 0.1) 100%);
-    --shadow-primary: 0 0 50px hsl(175, 85%, 45%, 0.25);
-    --shadow-card: 0 25px 60px -15px hsl(0, 0%, 0%, 0.6);
-    --shadow-glow: 0 0 80px hsl(175, 85%, 45%, 0.15);
+    --gradient-primary: linear-gradient(135deg, hsl(175, 85%, 38%) 0%, hsl(190, 90%, 32%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(48, 33%, 99%) 0%, hsl(180, 24%, 95%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%) 0%, hsl(180, 20%, 96%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(175, 85%, 45%, 0.18) 0%, hsl(190, 90%, 40%, 0.06) 100%);
+    --shadow-primary: 0 0 50px hsl(175, 85%, 35%, 0.12);
+    --shadow-card: 0 25px 60px -20px hsl(210, 30%, 20%, 0.16);
+    --shadow-glow: 0 0 80px hsl(175, 85%, 40%, 0.08);
 
-    --sidebar-background: 210 20% 8%;
-    --sidebar-foreground: 180 15% 95%;
-    --sidebar-primary: 175 85% 45%;
-    --sidebar-primary-foreground: 210 20% 6%;
-    --sidebar-accent: 210 20% 15%;
-    --sidebar-accent-foreground: 180 15% 95%;
-    --sidebar-border: 210 20% 18%;
-    --sidebar-ring: 175 85% 45%;
+    --sidebar-background: 48 33% 98%;
+    --sidebar-foreground: 210 24% 12%;
+    --sidebar-primary: 175 85% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 180 16% 94%;
+    --sidebar-accent-foreground: 210 24% 16%;
+    --sidebar-border: 200 18% 86%;
+    --sidebar-ring: 175 85% 36%;
   }
 
   .dark {
@@ -75,6 +75,23 @@
     --border: 210 20% 18%;
     --input: 210 20% 15%;
     --ring: 175 85% 45%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(175, 85%, 45%) 0%, hsl(190, 90%, 40%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(210, 20%, 6%) 0%, hsl(210, 25%, 3%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(210, 20%, 12%) 0%, hsl(210, 20%, 8%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(175, 85%, 50%, 0.3) 0%, hsl(190, 90%, 45%, 0.1) 100%);
+    --shadow-primary: 0 0 50px hsl(175, 85%, 45%, 0.25);
+    --shadow-card: 0 25px 60px -15px hsl(0, 0%, 0%, 0.6);
+    --shadow-glow: 0 0 80px hsl(175, 85%, 45%, 0.15);
+
+    --sidebar-background: 210 20% 8%;
+    --sidebar-foreground: 180 15% 95%;
+    --sidebar-primary: 175 85% 45%;
+    --sidebar-primary-foreground: 210 20% 6%;
+    --sidebar-accent: 210 20% 15%;
+    --sidebar-accent-foreground: 180 15% 95%;
+    --sidebar-border: 210 20% 18%;
+    --sidebar-ring: 175 85% 45%;
   }
 }
 
@@ -84,7 +101,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-300;
     font-family: 'Space Grotesk', sans-serif;
   }
 

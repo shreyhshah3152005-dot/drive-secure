@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CompareProvider } from "@/contexts/CompareContext";
@@ -33,41 +34,43 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <CompareProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dealer-auth" element={<DealerAuth />} />
-              <Route path="/admin-auth" element={<AdminAuth />} />
-              <Route path="/cars" element={<Cars />} />
-              <Route path="/used-cars" element={<UsedCars />} />
-              <Route path="/car/:id" element={<CarDetail />} />
-              <Route path="/notifications" element={<NotificationCenter />} />
-              <Route path="/compare" element={<Compare />} />
-              <Route path="/compare-dealers" element={<CompareDealerCars />} />
-              <Route path="/compare-dealers-detail" element={<CompareDealersDetail />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/dealer" element={<DealerPanel />} />
-              <Route path="/dealers" element={<Dealers />} />
-              <Route path="/dealer/:id" element={<DealerDetail />} />
-              <Route path="/dealer-car/:id" element={<DealerCarDetail />} />
-              <Route path="/dealer-leaderboard" element={<DealerLeaderboard />} />
-              <Route path="/finance-calculator" element={<FinanceCalculator />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <CompareBar />
-            <AICarChatbot />
-            <LiveChat />
-          </CompareProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <CompareProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/dealer-auth" element={<DealerAuth />} />
+                <Route path="/admin-auth" element={<AdminAuth />} />
+                <Route path="/cars" element={<Cars />} />
+                <Route path="/used-cars" element={<UsedCars />} />
+                <Route path="/car/:id" element={<CarDetail />} />
+                <Route path="/notifications" element={<NotificationCenter />} />
+                <Route path="/compare" element={<Compare />} />
+                <Route path="/compare-dealers" element={<CompareDealerCars />} />
+                <Route path="/compare-dealers-detail" element={<CompareDealersDetail />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/dealer" element={<DealerPanel />} />
+                <Route path="/dealers" element={<Dealers />} />
+                <Route path="/dealer/:id" element={<DealerDetail />} />
+                <Route path="/dealer-car/:id" element={<DealerCarDetail />} />
+                <Route path="/dealer-leaderboard" element={<DealerLeaderboard />} />
+                <Route path="/finance-calculator" element={<FinanceCalculator />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <CompareBar />
+              <AICarChatbot />
+              <LiveChat />
+            </CompareProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
