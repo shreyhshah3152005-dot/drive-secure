@@ -5,6 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import FeaturedDealers from "@/components/FeaturedDealers";
 import Footer from "@/components/Footer";
 import AICarRecommendations from "@/components/AICarRecommendations";
+import RecentlyViewedCars from "@/components/RecentlyViewedCars";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, ShoppingBag, Trophy, Calculator, ChevronRight } from "lucide-react";
