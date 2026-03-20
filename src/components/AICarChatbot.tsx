@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, forwardRef, type ImgHTMLAttributes } from "react";
+import type { Element } from "hast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,7 +12,7 @@ import ReactMarkdown from "react-markdown";
 type Msg = { role: "user" | "assistant"; content: string };
 
 type MarkdownImageProps = ImgHTMLAttributes<HTMLImageElement> & {
-  node?: unknown;
+  node?: Element;
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/car-recommendation-chat`;
