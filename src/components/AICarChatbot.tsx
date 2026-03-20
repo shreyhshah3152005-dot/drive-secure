@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef, type ImgHTMLAttributes } from "react";
+import type { Element } from "hast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +11,10 @@ import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+type MarkdownImageProps = ImgHTMLAttributes<HTMLImageElement> & {
+  node?: Element;
+};
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/car-recommendation-chat`;
 
 const QUICK_PROMPTS = [
@@ -18,6 +23,20 @@ const QUICK_PROMPTS = [
   "Most fuel-efficient cars?",
   "Best electric cars available?",
 ];
+
+const MarkdownImage = forwardRef<HTMLImageElement, MarkdownImageProps>(
+  ({ node: _node, alt, className, ...props }, ref) => (
+    <img
+      ref={ref}
+      alt={alt || "AI generated car image"}
+      className={cn("my-2 max-w-full rounded-lg border border-border/60", className)}
+      style={{ maxHeight: 280 }}
+      {...props}
+    />
+  ),
+);
+
+MarkdownImage.displayName = "MarkdownImage";
 
 const AICarChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -177,14 +196,7 @@ const AICarChatbot = () => {
                           <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2">
                             <ReactMarkdown
                               components={{
-                                img: ({ src, alt }) => (
-                                  <img
-                                    src={src}
-                                    alt={alt || "AI Generated"}
-                                    className="rounded-lg max-w-full my-2"
-                                    style={{ maxHeight: 280 }}
-                                  />
-                                ),
+                                img: MarkdownImage,
                               }}
                             >
                               {msg.content}

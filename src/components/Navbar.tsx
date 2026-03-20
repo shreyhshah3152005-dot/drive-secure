@@ -7,6 +7,7 @@ import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell } from "l
 import AdminNotificationBell from "./AdminNotificationBell";
 import NewCarNotificationBell from "./NewCarNotificationBell";
 import PriceAlertNotifications from "./PriceAlertNotifications";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -43,6 +44,7 @@ const Navbar = () => {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1 sm:gap-2">
+          <ThemeToggle />
           {user ? (
             <>
               {/* Notification bells - compact on mobile */}
@@ -68,7 +70,7 @@ const Navbar = () => {
               )}
               {isDealer && (
                 <Link to="/dealer">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-orange-500">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-accent-foreground">
                     <Store className="w-4 h-4" />
                     <span className="hidden md:inline ml-2">Dealer</span>
                   </Button>

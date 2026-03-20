@@ -86,10 +86,8 @@ Your role:
 - Be conversational, warm, and helpful
 
 IMPORTANT - IMAGE REQUESTS:
-- If the user asks you to "show", "generate", "create", or "display" an image/photo/picture of a car, respond with EXACTLY this format on its own line:
-  [GENERATE_IMAGE: description of the car image]
-  For example: [GENERATE_IMAGE: A sleek red 2024 Tata Nexon XZ+ SUV from a front 3/4 angle, studio lighting, showroom setting]
-- After the image tag, continue with your text response about the car.
+- If the user asks to see an image/photo/picture/rendering of a car, do NOT output placeholder tags like [GENERATE_IMAGE: ...].
+- The backend handles image generation separately, so just answer naturally about the car itself.
 
 Guidelines:
 - When asked about new cars, provide current market information for brand new models in India
@@ -102,8 +100,9 @@ Guidelines:
 
     // Check if last user message is asking for an image
     const lastUserMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
-    const isImageRequest = /\b(show|generate|create|display|image|photo|picture|pic|look|looks like|visual)\b/.test(lastUserMsg) &&
-      /\b(car|vehicle|model|suv|sedan|hatchback)\b/.test(lastUserMsg);
+    const isImageRequest =
+      /\b(show|generate|create|display|image|photo|picture|pic|render|visual(?:ize)?|illustrate)\b/.test(lastUserMsg) ||
+      /what does .+ look like/.test(lastUserMsg);
 
     if (isImageRequest) {
       const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -113,9 +112,12 @@ Guidelines:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3.1-flash-image-preview",
+          model: "google/gemini-2.5-flash-image",
           messages: [
-            { role: "system", content: "You are a helpful car image generator. Generate a high-quality, realistic image of the car the user describes. Also provide a brief description of the car." },
+            {
+              role: "system",
+              content: "You generate realistic automotive images. Return one clean, high-quality image that matches the requested car and a short caption about what is shown.",
+            },
             ...messages,
           ],
           modalities: ["image", "text"],
@@ -125,22 +127,36 @@ Guidelines:
       if (imageResponse.ok) {
         const imageData = await imageResponse.json();
         const choice = imageData.choices?.[0]?.message;
+        const rawContent = choice?.content;
         
         // Extract image from the response
         let imageUrl = "";
         if (choice?.images && choice.images.length > 0) {
           imageUrl = choice.images[0]?.image_url?.url || "";
         }
-        
-        const textContent = choice?.content || "Here's the car image!";
-        
-        let responseContent = textContent;
-        if (imageUrl) {
-          responseContent = `![Car Image](${imageUrl})\n\n${textContent}`;
+        if (!imageUrl && Array.isArray(rawContent)) {
+          imageUrl = rawContent.find((part: any) => part?.type === "image_url")?.image_url?.url || "";
         }
+        
+        const textContent = typeof rawContent === "string"
+          ? rawContent
+          : Array.isArray(rawContent)
+            ? rawContent
+                .filter((part: any) => part?.type === "text")
+                .map((part: any) => part?.text || "")
+                .join("\n")
+                .trim()
+            : "Here's the car image!";
+        
+        const responseContent = [
+          imageUrl ? `![Generated car image](${imageUrl})` : "",
+          textContent,
+        ]
+          .filter(Boolean)
+          .join("\n\n");
 
         const sseData = `data: ${JSON.stringify({
-          choices: [{ delta: { content: responseContent } }]
+          choices: [{ delta: { content: responseContent || "I couldn't generate the image right now, but I can still help with car details." } }]
         })}\n\ndata: [DONE]\n\n`;
 
         return new Response(sseData, {
