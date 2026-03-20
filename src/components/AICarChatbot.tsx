@@ -175,7 +175,20 @@ const AICarChatbot = () => {
                       >
                         {msg.role === "assistant" ? (
                           <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            <ReactMarkdown
+                              components={{
+                                img: ({ src, alt }) => (
+                                  <img
+                                    src={src}
+                                    alt={alt || "AI Generated"}
+                                    className="rounded-lg max-w-full my-2"
+                                    style={{ maxHeight: 280 }}
+                                  />
+                                ),
+                              }}
+                            >
+                              {msg.content}
+                            </ReactMarkdown>
                           </div>
                         ) : (
                           <p className="whitespace-pre-wrap">{msg.content}</p>
