@@ -16,6 +16,7 @@ import TradeInCalculator from "@/components/TradeInCalculator";
 import StaticSimilarCars from "@/components/StaticSimilarCars";
 import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRecentlyViewedCars } from "@/hooks/useRecentlyViewedCars";
 
 const formatPrice = (price: number): string => {
   if (price >= 10000000) {
