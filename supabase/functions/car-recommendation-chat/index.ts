@@ -106,7 +106,6 @@ Guidelines:
       /\b(car|vehicle|model|suv|sedan|hatchback)\b/.test(lastUserMsg);
 
     if (isImageRequest) {
-      // Use image generation model
       const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -116,29 +115,30 @@ Guidelines:
         body: JSON.stringify({
           model: "google/gemini-3.1-flash-image-preview",
           messages: [
-            { role: "system", content: "You are a helpful car image generator. Generate a high-quality, realistic image of the car the user describes. Also provide a short description." },
+            { role: "system", content: "You are a helpful car image generator. Generate a high-quality, realistic image of the car the user describes. Also provide a brief description of the car." },
             ...messages,
           ],
           modalities: ["image", "text"],
         }),
       });
 
-      if (!imageResponse.ok) {
-        const errText = await imageResponse.text();
-        console.error("Image gen error:", imageResponse.status, errText);
-        // Fall through to text response
-      } else {
+      if (imageResponse.ok) {
         const imageData = await imageResponse.json();
         const choice = imageData.choices?.[0]?.message;
-        const imageUrl = choice?.images?.[0]?.image_url?.url;
+        
+        // Extract image from the response
+        let imageUrl = "";
+        if (choice?.images && choice.images.length > 0) {
+          imageUrl = choice.images[0]?.image_url?.url || "";
+        }
+        
         const textContent = choice?.content || "Here's the car image!";
-
+        
         let responseContent = textContent;
         if (imageUrl) {
           responseContent = `![Car Image](${imageUrl})\n\n${textContent}`;
         }
 
-        // Return as a non-streaming response formatted as SSE for compatibility
         const sseData = `data: ${JSON.stringify({
           choices: [{ delta: { content: responseContent } }]
         })}\n\ndata: [DONE]\n\n`;
@@ -146,6 +146,10 @@ Guidelines:
         return new Response(sseData, {
           headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
         });
+      } else {
+        const errText = await imageResponse.text();
+        console.error("Image gen error:", imageResponse.status, errText);
+        // Fall through to text response
       }
     }
 
