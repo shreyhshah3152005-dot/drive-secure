@@ -59,6 +59,7 @@ const formatPrice = (price: number) => {
 const DealerCarDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const { addCar } = useRecentlyViewedCars();
   const [car, setCar] = useState<DealerCar | null>(null);
   const [dealer, setDealer] = useState<Dealer | null>(null);
   const [loading, setLoading] = useState(true);
