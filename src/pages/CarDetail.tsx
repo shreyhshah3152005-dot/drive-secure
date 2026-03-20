@@ -33,19 +33,6 @@ const CarDetail = () => {
   const { addCar } = useRecentlyViewedCars();
   const car = cars.find((c) => c.id === id);
 
-  if (!car) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Car not found</h1>
-          <Button onClick={() => navigate("/")} variant="hero">
-            Go Back Home
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (car) {
       addCar({
@@ -58,6 +45,19 @@ const CarDetail = () => {
       });
     }
   }, [car?.id]);
+
+  if (!car) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Car not found</h1>
+          <Button onClick={() => navigate("/")} variant="hero">
+            Go Back Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
