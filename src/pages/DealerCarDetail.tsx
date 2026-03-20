@@ -21,6 +21,7 @@ import {
   ArrowLeft, Car, Fuel, Settings2, Users, Gauge, 
   Phone, MapPin, Store, Calendar, Clock, Zap, Cog
 } from "lucide-react";
+import { useRecentlyViewedCars } from "@/hooks/useRecentlyViewedCars";
 
 interface DealerCar {
   id: string;
