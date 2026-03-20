@@ -36,7 +36,7 @@ const VirtualCarTour = ({ carName, carBrand, mainImage }: VirtualCarTourProps) =
   const [currentInteriorIndex, setCurrentInteriorIndex] = useState(0);
   const [viewMode, setViewMode] = useState<"exterior" | "interior">("exterior");
   const [isAutoRotating, setIsAutoRotating] = useState(false);
-  const [autoRotateInterval, setAutoRotateInterval] = useState<NodeJS.Timeout | null>(null);
+  const [autoRotateInterval, setAutoRotateInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   // Generate varied images based on the main image
   const generateViewImage = (baseImage: string, viewId: string) => {

@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { cars } from "@/data/cars";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -15,6 +16,7 @@ import TradeInCalculator from "@/components/TradeInCalculator";
 import StaticSimilarCars from "@/components/StaticSimilarCars";
 import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRecentlyViewedCars } from "@/hooks/useRecentlyViewedCars";
 
 const formatPrice = (price: number): string => {
   if (price >= 10000000) {
@@ -28,7 +30,21 @@ const formatPrice = (price: number): string => {
 const CarDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addCar } = useRecentlyViewedCars();
   const car = cars.find((c) => c.id === id);
+
+  useEffect(() => {
+    if (car) {
+      addCar({
+        id: car.id,
+        name: car.name,
+        brand: car.brand,
+        image: car.image,
+        price: car.price,
+        type: "new",
+      });
+    }
+  }, [car?.id]);
 
   if (!car) {
     return (

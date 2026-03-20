@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -21,6 +21,7 @@ import {
   ArrowLeft, Car, Fuel, Settings2, Users, Gauge, 
   Phone, MapPin, Store, Calendar, Clock, Zap, Cog
 } from "lucide-react";
+import { useRecentlyViewedCars } from "@/hooks/useRecentlyViewedCars";
 
 interface DealerCar {
   id: string;
@@ -58,6 +59,7 @@ const formatPrice = (price: number) => {
 const DealerCarDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const { addCar } = useRecentlyViewedCars();
   const [car, setCar] = useState<DealerCar | null>(null);
   const [dealer, setDealer] = useState<Dealer | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,6 +110,19 @@ const DealerCarDetail = () => {
 
     fetchCarAndDealer();
   }, [id]);
+
+  useEffect(() => {
+    if (car) {
+      addCar({
+        id: car.id,
+        name: car.name,
+        brand: car.brand,
+        image: car.image_url || "/placeholder.svg",
+        price: car.price * 100000,
+        type: "used",
+      });
+    }
+  }, [car?.id]);
 
   const handleTestDriveSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
