@@ -9,6 +9,7 @@ import { CompareProvider } from "@/contexts/CompareContext";
 import CompareBar from "@/components/CompareBar";
 import LiveChat from "@/components/LiveChat";
 import AICarChatbot from "@/components/AICarChatbot";
+import ThemePreferenceSync from "@/components/ThemePreferenceSync";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import DealerAuth from "./pages/DealerAuth";
@@ -40,6 +41,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <ThemePreferenceSync />
             <CompareProvider>
               <Routes>
                 <Route path="/" element={<Index />} />

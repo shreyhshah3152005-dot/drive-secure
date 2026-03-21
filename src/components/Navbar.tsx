@@ -70,7 +70,11 @@ const Navbar = () => {
               )}
               {isDealer && (
                 <Link to="/dealer">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-accent-foreground">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary sm:h-9 sm:w-auto sm:px-3"
+                  >
                     <Store className="w-4 h-4" />
                     <span className="hidden md:inline ml-2">Dealer</span>
                   </Button>

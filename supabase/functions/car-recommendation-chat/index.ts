@@ -7,6 +7,94 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const buildStreamResponse = (content: string) => {
+  const sseData = `data: ${JSON.stringify({
+    choices: [{ delta: { content } }],
+  })}\n\ndata: [DONE]\n\n`;
+
+  return new Response(sseData, {
+    headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+  });
+};
+
+const extractImageUrl = (message: any) => {
+  const directImageUrl = message?.images?.[0]?.image_url?.url;
+  if (typeof directImageUrl === "string" && directImageUrl.length > 0) {
+    return directImageUrl;
+  }
+
+  if (Array.isArray(message?.content)) {
+    const imagePart = message.content.find((part: any) => part?.type === "image_url");
+    const nestedUrl = imagePart?.image_url?.url;
+
+    if (typeof nestedUrl === "string" && nestedUrl.length > 0) {
+      return nestedUrl;
+    }
+  }
+
+  return "";
+};
+
+const extractTextContent = (rawContent: unknown) => {
+  if (typeof rawContent === "string") {
+    return rawContent.trim();
+  }
+
+  if (Array.isArray(rawContent)) {
+    return rawContent
+      .filter((part: any) => part?.type === "text")
+      .map((part: any) => part?.text || "")
+      .join("\n")
+      .trim();
+  }
+
+  return "";
+};
+
+const normalizeImageSearchQuery = (input: string) =>
+  input
+    .replace(/\b(show|generate|create|display|image|photo|picture|pic|render|visual(?:ize)?|illustrate|me|please|can|you)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim() || input.trim();
+
+const fetchWikimediaImage = async (query: string) => {
+  const searchQuery = normalizeImageSearchQuery(query);
+  const url = new URL("https://commons.wikimedia.org/w/api.php");
+  url.searchParams.set("action", "query");
+  url.searchParams.set("generator", "search");
+  url.searchParams.set("gsrsearch", searchQuery);
+  url.searchParams.set("gsrnamespace", "6");
+  url.searchParams.set("prop", "imageinfo");
+  url.searchParams.set("iiprop", "url");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("origin", "*");
+
+  try {
+    const response = await fetch(url.toString(), {
+      headers: {
+        "User-Agent": "CARBAZAAR/1.0 (Lovable Cloud image fallback)",
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Wikimedia fallback error:", response.status, await response.text());
+      return "";
+    }
+
+    const data = await response.json();
+    const pages = Object.values(data?.query?.pages ?? {}) as Array<any>;
+
+    return (
+      pages
+        .map((page) => page?.imageinfo?.[0]?.url)
+        .find((imageUrl) => typeof imageUrl === "string" && imageUrl.length > 0) || ""
+    );
+  } catch (error) {
+    console.error("Wikimedia image lookup failed:", error);
+    return "";
+  }
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -99,7 +187,8 @@ Guidelines:
 - When recommending used cars, mention the dealer name and city`;
 
     // Check if last user message is asking for an image
-    const lastUserMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
+    const lastUserMessage = messages[messages.length - 1]?.content || "";
+    const lastUserMsg = lastUserMessage.toLowerCase();
     const isImageRequest =
       /\b(show|generate|create|display|image|photo|picture|pic|render|visual(?:ize)?|illustrate)\b/.test(lastUserMsg) ||
       /what does .+ look like/.test(lastUserMsg);
@@ -112,13 +201,12 @@ Guidelines:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image",
+          model: "google/gemini-3.1-flash-image-preview",
           messages: [
             {
-              role: "system",
-              content: "You generate realistic automotive images. Return one clean, high-quality image that matches the requested car and a short caption about what is shown.",
+              role: "user",
+              content: `Generate exactly one photorealistic car image for this request: ${lastUserMessage}. Show the full car clearly, realistic automotive photography, no UI, no watermarks, no text overlays.`,
             },
-            ...messages,
           ],
           modalities: ["image", "text"],
         }),
@@ -128,44 +216,24 @@ Guidelines:
         const imageData = await imageResponse.json();
         const choice = imageData.choices?.[0]?.message;
         const rawContent = choice?.content;
-        
-        // Extract image from the response
-        let imageUrl = "";
-        if (choice?.images && choice.images.length > 0) {
-          imageUrl = choice.images[0]?.image_url?.url || "";
-        }
-        if (!imageUrl && Array.isArray(rawContent)) {
-          imageUrl = rawContent.find((part: any) => part?.type === "image_url")?.image_url?.url || "";
-        }
-        
-        const textContent = typeof rawContent === "string"
-          ? rawContent
-          : Array.isArray(rawContent)
-            ? rawContent
-                .filter((part: any) => part?.type === "text")
-                .map((part: any) => part?.text || "")
-                .join("\n")
-                .trim()
-            : "Here's the car image!";
-        
-        const responseContent = [
-          imageUrl ? `![Generated car image](${imageUrl})` : "",
-          textContent,
-        ]
-          .filter(Boolean)
-          .join("\n\n");
 
-        const sseData = `data: ${JSON.stringify({
-          choices: [{ delta: { content: responseContent || "I couldn't generate the image right now, but I can still help with car details." } }]
-        })}\n\ndata: [DONE]\n\n`;
+        let imageUrl = extractImageUrl(choice);
+        if (!imageUrl) {
+          imageUrl = await fetchWikimediaImage(lastUserMessage);
+        }
 
-        return new Response(sseData, {
-          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-        });
+        const textContent = extractTextContent(rawContent) || "Here is the requested car image.";
+
+        if (imageUrl) {
+          return buildStreamResponse(`![Generated car image](${imageUrl})\n\n${textContent}`);
+        }
       } else {
         const errText = await imageResponse.text();
         console.error("Image gen error:", imageResponse.status, errText);
-        // Fall through to text response
+        const fallbackImageUrl = await fetchWikimediaImage(lastUserMessage);
+        if (fallbackImageUrl) {
+          return buildStreamResponse(`![Car image](${fallbackImageUrl})\n\nHere is a matching car image from a public web source.`);
+        }
       }
     }
 
