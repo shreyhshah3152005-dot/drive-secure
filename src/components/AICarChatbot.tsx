@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect, forwardRef, type ImgHTMLAttributes } from "react";
-import type { Element } from "hast";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,13 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bot, Send, X, Sparkles, Loader2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
+
+import ChatbotGeneratedImage from "@/components/ChatbotGeneratedImage";
 
 type Msg = { role: "user" | "assistant"; content: string };
-
-type MarkdownImageProps = ImgHTMLAttributes<HTMLImageElement> & {
-  node?: Element;
-};
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/car-recommendation-chat`;
 
@@ -24,19 +21,8 @@ const QUICK_PROMPTS = [
   "Best electric cars available?",
 ];
 
-const MarkdownImage = forwardRef<HTMLImageElement, MarkdownImageProps>(
-  ({ node: _node, alt, className, ...props }, ref) => (
-    <img
-      ref={ref}
-      alt={alt || "AI generated car image"}
-      className={cn("my-2 max-w-full rounded-lg border border-border/60", className)}
-      style={{ maxHeight: 280 }}
-      {...props}
-    />
-  ),
-);
-
-MarkdownImage.displayName = "MarkdownImage";
+const allowImageDataUrl = (url: string) =>
+  url.startsWith("data:image/") ? url : defaultUrlTransform(url);
 
 const AICarChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -195,8 +181,9 @@ const AICarChatbot = () => {
                         {msg.role === "assistant" ? (
                           <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2">
                             <ReactMarkdown
+                              urlTransform={allowImageDataUrl}
                               components={{
-                                img: MarkdownImage,
+                                img: ChatbotGeneratedImage,
                               }}
                             >
                               {msg.content}
