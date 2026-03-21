@@ -4,9 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useDealerRole } from "@/hooks/useDealerRole";
 import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell } from "lucide-react";
-import AdminNotificationBell from "./AdminNotificationBell";
-import NewCarNotificationBell from "./NewCarNotificationBell";
-import PriceAlertNotifications from "./PriceAlertNotifications";
 import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
@@ -47,17 +44,12 @@ const Navbar = () => {
           <ThemeToggle />
           {user ? (
             <>
-              {/* Notification bells - compact on mobile */}
-              <div className="flex items-center gap-1">
-                <PriceAlertNotifications />
-                <NewCarNotificationBell />
-                {isAdmin && <AdminNotificationBell />}
-                <Link to="/notifications">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Bell className="w-4 h-4" />
-                  </Button>
-                </Link>
-              </div>
+              {/* Single unified notification bell */}
+              <Link to="/notifications">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Bell className="w-4 h-4" />
+                </Button>
+              </Link>
               
               {/* Role-specific buttons */}
               {isAdmin && (
