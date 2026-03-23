@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "next-themes";
 import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, MapPin, Camera, Upload, X, Save, Calendar } from "lucide-react";
+import { User, Mail, Phone, MapPin, Camera, Upload, X, Save, Calendar, Sun, Moon, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -28,12 +30,17 @@ interface ProfileData {
 
 const UserProfile = () => {
   const { user, loading, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [previewTheme, setPreviewTheme] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", phone: "", city: "" });
 
   useEffect(() => {
@@ -64,6 +71,17 @@ const UserProfile = () => {
   };
 
   useEffect(() => { fetchProfile(); }, [user]);
+
+  // Theme preview: temporarily switch theme, revert after 3 seconds
+  const handleThemePreview = (previewMode: string) => {
+    const currentTheme = theme;
+    setPreviewTheme(previewMode);
+    setTheme(previewMode);
+    setTimeout(() => {
+      setTheme(currentTheme || "dark");
+      setPreviewTheme(null);
+    }, 3000);
+  };
 
   const handleSave = async () => {
     const validation = profileSchema.safeParse(formData);
@@ -105,7 +123,6 @@ const UserProfile = () => {
 
     setIsUploading(true);
     try {
-      // Delete old image
       if (profile?.profile_image_url) {
         const oldPath = profile.profile_image_url.split("/user-profile-images/")[1];
         if (oldPath) await supabase.storage.from("user-profile-images").remove([oldPath]);
@@ -148,6 +165,31 @@ const UserProfile = () => {
       fetchProfile();
     } catch {
       toast.error("Failed to remove image.");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== "DELETE") return;
+    setIsDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session");
+
+      const response = await supabase.functions.invoke("delete-account", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (response.error) throw response.error;
+
+      toast.success("Account deleted successfully. Goodbye!");
+      await signOut();
+      navigate("/");
+    } catch (err) {
+      console.error("Delete account error:", err);
+      toast.error("Failed to delete account. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmOpen(false);
     }
   };
 
@@ -217,6 +259,95 @@ const UserProfile = () => {
               />
               <p className="text-xs text-muted-foreground mt-2">JPEG, PNG or WebP, max 2MB</p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Theme Preview */}
+        <Card className="gradient-card border-border/50 mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Sun className="w-5 h-5 text-primary" />
+              Theme Preview
+            </CardTitle>
+            <CardDescription>
+              Preview how your profile looks in different themes. Click to preview for 3 seconds.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {/* Light Preview */}
+              <button
+                onClick={() => handleThemePreview("light")}
+                disabled={previewTheme !== null}
+                className={`relative p-4 rounded-xl border-2 transition-all ${
+                  theme === "light"
+                    ? "border-primary ring-2 ring-primary/20"
+                    : "border-border/50 hover:border-primary/50"
+                } ${previewTheme === "light" ? "animate-pulse" : ""}`}
+              >
+                <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-200" />
+                    <div className="space-y-1 flex-1">
+                      <div className="h-2 bg-gray-800 rounded w-3/4" />
+                      <div className="h-1.5 bg-gray-400 rounded w-1/2" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="h-2 bg-gray-100 rounded" />
+                    <div className="h-2 bg-gray-100 rounded w-5/6" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <Sun className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm font-medium text-foreground">Light</span>
+                </div>
+                {theme === "light" && (
+                  <span className="absolute top-2 right-2 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                )}
+              </button>
+
+              {/* Dark Preview */}
+              <button
+                onClick={() => handleThemePreview("dark")}
+                disabled={previewTheme !== null}
+                className={`relative p-4 rounded-xl border-2 transition-all ${
+                  theme === "dark"
+                    ? "border-primary ring-2 ring-primary/20"
+                    : "border-border/50 hover:border-primary/50"
+                } ${previewTheme === "dark" ? "animate-pulse" : ""}`}
+              >
+                <div className="bg-gray-900 rounded-lg p-3 shadow-sm border border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-700" />
+                    <div className="space-y-1 flex-1">
+                      <div className="h-2 bg-gray-200 rounded w-3/4" />
+                      <div className="h-1.5 bg-gray-500 rounded w-1/2" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="h-2 bg-gray-800 rounded" />
+                    <div className="h-2 bg-gray-800 rounded w-5/6" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <Moon className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm font-medium text-foreground">Dark</span>
+                </div>
+                {theme === "dark" && (
+                  <span className="absolute top-2 right-2 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                )}
+              </button>
+            </div>
+            {previewTheme && (
+              <p className="text-sm text-primary text-center mt-3 animate-pulse">
+                Previewing {previewTheme} mode... reverting in 3 seconds
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -332,12 +463,69 @@ const UserProfile = () => {
           </CardContent>
         </Card>
 
-        {/* Sign Out */}
-        <div className="mt-6 text-center">
+        {/* Actions */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button variant="destructive" onClick={async () => { await signOut(); navigate("/"); }}>
             Sign Out
           </Button>
+          <Button
+            variant="outline"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
+            onClick={() => setDeleteConfirmOpen(true)}
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete Account
+          </Button>
         </div>
+
+        {/* Delete Account Confirmation Dialog */}
+        <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+          <DialogContent className="gradient-card border-border/50">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="w-5 h-5" />
+                Delete Account Permanently
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                This action is <strong className="text-foreground">irreversible</strong>. All your data including profile, favorites, test drive history, reviews, and saved searches will be permanently deleted.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                <p className="text-sm text-destructive font-medium">⚠️ You will lose:</p>
+                <ul className="text-sm text-muted-foreground mt-2 space-y-1 list-disc list-inside">
+                  <li>Your profile and personal data</li>
+                  <li>All favorites and saved searches</li>
+                  <li>Test drive booking history</li>
+                  <li>Reviews and comparison history</li>
+                </ul>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Type <span className="text-destructive font-bold">DELETE</span> to confirm
+                </label>
+                <Input
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type DELETE"
+                  className="bg-secondary/50 border-border"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => { setDeleteConfirmOpen(false); setDeleteConfirmText(""); }}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={deleteConfirmText !== "DELETE" || isDeleting}
+                onClick={handleDeleteAccount}
+              >
+                {isDeleting ? "Deleting..." : "Delete My Account"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
