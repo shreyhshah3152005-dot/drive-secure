@@ -64,6 +64,7 @@ const App = () => (
                 <Route path="/dealer-car/:id" element={<DealerCarDetail />} />
                 <Route path="/dealer-leaderboard" element={<DealerLeaderboard />} />
                 <Route path="/finance-calculator" element={<FinanceCalculator />} />
+                <Route path="/profile" element={<UserProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <CompareBar />
