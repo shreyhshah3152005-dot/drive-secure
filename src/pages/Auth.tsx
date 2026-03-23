@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
-import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import { Lock, Mail, Eye, EyeOff, Phone, User, MapPin, ArrowLeft } from "lucide-react";
 import { z } from "zod";
