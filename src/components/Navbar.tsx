@@ -80,11 +80,12 @@ const Navbar = () => {
                 </Button>
               </Link>
               
-              {/* User email - hide on small screens */}
-              <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground px-2">
-                <User className="w-4 h-4 shrink-0" />
-                <span className="max-w-[120px] truncate">{user.email}</span>
-              </div>
+              <Link to="/profile">
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3">
+                  <User className="w-4 h-4" />
+                  <span className="hidden md:inline ml-2">Profile</span>
+                </Button>
+              </Link>
               
               <Button
                 variant="ghost"
