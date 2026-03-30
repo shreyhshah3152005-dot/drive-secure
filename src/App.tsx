@@ -31,6 +31,7 @@ import NotFound from "./pages/NotFound";
 import DealerLeaderboard from "./pages/DealerLeaderboard";
 import FinanceCalculator from "./pages/FinanceCalculator";
 import UserProfile from "./pages/UserProfile";
+import SharedWishlist from "./pages/SharedWishlist";
 
 const queryClient = new QueryClient();
 
