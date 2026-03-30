@@ -463,6 +463,25 @@ const UserProfile = () => {
           </CardContent>
         </Card>
 
+        {/* Data Export */}
+        <Card className="gradient-card border-border/50 mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Download className="w-5 h-5 text-primary" />
+              Export My Data
+            </CardTitle>
+            <CardDescription>Download all your data including favorites, reviews, and history.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-3">
+            <Button variant="outline" className="gap-2" onClick={() => handleExportData("json")}>
+              <Download className="w-4 h-4" /> Export as JSON
+            </Button>
+            <Button variant="outline" className="gap-2" onClick={() => handleExportData("csv")}>
+              <Download className="w-4 h-4" /> Export as CSV
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Actions */}
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button variant="destructive" onClick={async () => { await signOut(); navigate("/"); }}>
