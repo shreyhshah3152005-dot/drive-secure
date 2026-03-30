@@ -520,6 +520,10 @@ const DealerPanel = () => {
             <DealerLiveChat />
           </TabsContent>
 
+          <TabsContent value="negotiations">
+            {dealerInfo?.id && <DealerNegotiations dealerId={dealerInfo.id} />}
+          </TabsContent>
+
           <TabsContent value="cars">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">

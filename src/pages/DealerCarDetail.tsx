@@ -518,6 +518,14 @@ const DealerCarDetail = () => {
                 </form>
               </CardContent>
             </Card>
+
+            {/* Price Negotiation */}
+            <PriceNegotiationForm
+              carId={car.id}
+              dealerId={dealer.id}
+              currentPrice={car.price}
+              carName={`${car.brand} ${car.name}`}
+            />
           </div>
         </div>
       </main>

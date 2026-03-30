@@ -383,9 +383,12 @@ const Dashboard = () => {
                 <Heart className="w-5 h-5 text-primary" />
                 Your Wishlist
               </CardTitle>
-              <CardDescription>
-                {favoriteCars.length === 0 ? "No cars in wishlist" : `${favoriteCars.length} car(s) saved`}
-              </CardDescription>
+              <div className="flex items-center gap-2">
+                <WishlistShare carIds={favorites} />
+                <CardDescription>
+                  {favoriteCars.length === 0 ? "No cars in wishlist" : `${favoriteCars.length} car(s) saved`}
+                </CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               {favoriteCars.length === 0 ? (
