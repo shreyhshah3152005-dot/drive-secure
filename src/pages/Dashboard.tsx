@@ -18,6 +18,7 @@ import { useComparisonHistory } from "@/hooks/useComparisonHistory";
 import { cars } from "@/data/cars";
 import AICarRecommendations from "@/components/AICarRecommendations";
 import SavedSearches from "@/components/SavedSearches";
+import WishlistShare from "@/components/WishlistShare";
 
 interface TestDriveInquiry {
   id: string;
