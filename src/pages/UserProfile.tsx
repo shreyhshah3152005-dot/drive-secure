@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, MapPin, Camera, Upload, X, Save, Calendar, Sun, Moon, Trash2, AlertTriangle } from "lucide-react";
+import { User, Mail, Phone, MapPin, Camera, Upload, X, Save, Calendar, Sun, Moon, Trash2, AlertTriangle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -165,6 +165,60 @@ const UserProfile = () => {
       fetchProfile();
     } catch {
       toast.error("Failed to remove image.");
+    }
+  };
+
+  const handleExportData = async (format: "json" | "csv") => {
+    if (!user) return;
+    try {
+      toast.info("Preparing your data export...");
+      const [favoritesRes, reviewsRes, comparisonsRes, savedSearchesRes, testDrivesRes] = await Promise.all([
+        supabase.from("favorites").select("*").eq("user_id", user.id),
+        supabase.from("car_reviews").select("*").eq("user_id", user.id),
+        supabase.from("comparison_history").select("*").eq("user_id", user.id),
+        supabase.from("saved_searches").select("*").eq("user_id", user.id),
+        supabase.from("test_drive_inquiries").select("*").eq("user_id", user.id),
+      ]);
+
+      const exportData = {
+        profile: { name: profile?.name, email: profile?.email, phone: profile?.phone, city: profile?.city },
+        favorites: favoritesRes.data || [],
+        reviews: reviewsRes.data || [],
+        comparisons: comparisonsRes.data || [],
+        saved_searches: savedSearchesRes.data || [],
+        test_drives: testDrivesRes.data || [],
+        exported_at: new Date().toISOString(),
+      };
+
+      let blob: Blob;
+      let filename: string;
+
+      if (format === "json") {
+        blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+        filename = `carbazaar-data-${Date.now()}.json`;
+      } else {
+        const rows: string[] = [];
+        for (const [section, data] of Object.entries(exportData)) {
+          if (Array.isArray(data) && data.length > 0) {
+            rows.push(`\n--- ${section.toUpperCase()} ---`);
+            rows.push(Object.keys(data[0]).join(","));
+            data.forEach((item: Record<string, unknown>) => rows.push(Object.values(item).map(v => `"${String(v ?? "")}"`).join(",")));
+          }
+        }
+        rows.unshift("CARBAZAAR Data Export");
+        blob = new Blob([rows.join("\n")], { type: "text/csv" });
+        filename = `carbazaar-data-${Date.now()}.csv`;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`Data exported as ${format.toUpperCase()}!`);
+    } catch {
+      toast.error("Failed to export data.");
     }
   };
 
@@ -460,6 +514,25 @@ const UserProfile = () => {
                 </div>
               </>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Data Export */}
+        <Card className="gradient-card border-border/50 mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Download className="w-5 h-5 text-primary" />
+              Export My Data
+            </CardTitle>
+            <CardDescription>Download all your data including favorites, reviews, and history.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-3">
+            <Button variant="outline" className="gap-2" onClick={() => handleExportData("json")}>
+              <Download className="w-4 h-4" /> Export as JSON
+            </Button>
+            <Button variant="outline" className="gap-2" onClick={() => handleExportData("csv")}>
+              <Download className="w-4 h-4" /> Export as CSV
+            </Button>
           </CardContent>
         </Card>
 
