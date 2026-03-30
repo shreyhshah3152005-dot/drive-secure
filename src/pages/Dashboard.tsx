@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play, Star } from "lucide-react";
+import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play, Star, Share2 } from "lucide-react";
 import { format } from "date-fns";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import { useFavorites } from "@/hooks/useFavorites";
