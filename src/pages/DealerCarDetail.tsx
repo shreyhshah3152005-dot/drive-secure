@@ -7,6 +7,7 @@ import SocialShareButtons from "@/components/SocialShareButtons";
 import SimilarCarsSection from "@/components/SimilarCarsSection";
 import CrossDealerComparison from "@/components/CrossDealerComparison";
 import PriceAlertButton from "@/components/PriceAlertButton";
+import PriceNegotiationForm from "@/components/PriceNegotiationForm";
 import DealerVerificationBadge from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -517,6 +518,14 @@ const DealerCarDetail = () => {
                 </form>
               </CardContent>
             </Card>
+
+            {/* Price Negotiation */}
+            <PriceNegotiationForm
+              carId={car.id}
+              dealerId={dealer.id}
+              currentPrice={car.price}
+              carName={`${car.brand} ${car.name}`}
+            />
           </div>
         </div>
       </main>

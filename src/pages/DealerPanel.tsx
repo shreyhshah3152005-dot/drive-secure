@@ -19,10 +19,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays, ShoppingCart } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays, ShoppingCart, HandCoins } from "lucide-react";
 import DealerLiveChat from "@/components/DealerLiveChat";
 import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
 import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
+import DealerNegotiations from "@/components/DealerNegotiations";
 
 interface DealerCar {
   id: string;
@@ -497,6 +498,10 @@ const DealerPanel = () => {
               <MessageCircle className="w-4 h-4" />
               Messages
             </TabsTrigger>
+            <TabsTrigger value="negotiations" className="gap-2">
+              <HandCoins className="w-4 h-4" />
+              Negotiations
+            </TabsTrigger>
             <TabsTrigger value="subscription" className="gap-2">
               <Package className="w-4 h-4" />
               Subscription
@@ -513,6 +518,10 @@ const DealerPanel = () => {
 
           <TabsContent value="messages">
             <DealerLiveChat />
+          </TabsContent>
+
+          <TabsContent value="negotiations">
+            {dealerInfo?.id && <DealerNegotiations dealerId={dealerInfo.id} />}
           </TabsContent>
 
           <TabsContent value="cars">

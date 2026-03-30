@@ -837,6 +837,60 @@ export type Database = {
           },
         ]
       }
+      price_negotiations: {
+        Row: {
+          car_id: string
+          created_at: string
+          dealer_id: string
+          dealer_response: string | null
+          id: string
+          message: string | null
+          offer_price: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          dealer_id: string
+          dealer_response?: string | null
+          id?: string
+          message?: string | null
+          offer_price: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          dealer_id?: string
+          dealer_response?: string | null
+          id?: string
+          message?: string | null
+          offer_price?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_negotiations_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_negotiations_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           city: string | null
@@ -1138,6 +1192,30 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wishlist_shares: {
+        Row: {
+          car_ids: string[]
+          created_at: string
+          id: string
+          share_code: string
+          user_id: string
+        }
+        Insert: {
+          car_ids?: string[]
+          created_at?: string
+          id?: string
+          share_code?: string
+          user_id: string
+        }
+        Update: {
+          car_ids?: string[]
+          created_at?: string
+          id?: string
+          share_code?: string
           user_id?: string
         }
         Relationships: []

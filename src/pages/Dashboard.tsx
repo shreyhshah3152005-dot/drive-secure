@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play, Star } from "lucide-react";
+import { User, Mail, Phone, Calendar, Car, Clock, Heart, MapPin, GitCompare, Trash2, Play, Star, Share2 } from "lucide-react";
 import { format } from "date-fns";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -18,6 +18,7 @@ import { useComparisonHistory } from "@/hooks/useComparisonHistory";
 import { cars } from "@/data/cars";
 import AICarRecommendations from "@/components/AICarRecommendations";
 import SavedSearches from "@/components/SavedSearches";
+import WishlistShare from "@/components/WishlistShare";
 
 interface TestDriveInquiry {
   id: string;
@@ -382,9 +383,12 @@ const Dashboard = () => {
                 <Heart className="w-5 h-5 text-primary" />
                 Your Wishlist
               </CardTitle>
-              <CardDescription>
-                {favoriteCars.length === 0 ? "No cars in wishlist" : `${favoriteCars.length} car(s) saved`}
-              </CardDescription>
+              <div className="flex items-center gap-2">
+                <WishlistShare carIds={favorites} />
+                <CardDescription>
+                  {favoriteCars.length === 0 ? "No cars in wishlist" : `${favoriteCars.length} car(s) saved`}
+                </CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               {favoriteCars.length === 0 ? (
