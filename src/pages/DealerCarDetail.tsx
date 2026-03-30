@@ -7,6 +7,7 @@ import SocialShareButtons from "@/components/SocialShareButtons";
 import SimilarCarsSection from "@/components/SimilarCarsSection";
 import CrossDealerComparison from "@/components/CrossDealerComparison";
 import PriceAlertButton from "@/components/PriceAlertButton";
+import PriceNegotiationForm from "@/components/PriceNegotiationForm";
 import DealerVerificationBadge from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
