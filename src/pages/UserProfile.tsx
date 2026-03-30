@@ -168,6 +168,60 @@ const UserProfile = () => {
     }
   };
 
+  const handleExportData = async (format: "json" | "csv") => {
+    if (!user) return;
+    try {
+      toast.info("Preparing your data export...");
+      const [favoritesRes, reviewsRes, comparisonsRes, savedSearchesRes, testDrivesRes] = await Promise.all([
+        supabase.from("favorites").select("*").eq("user_id", user.id),
+        supabase.from("car_reviews").select("*").eq("user_id", user.id),
+        supabase.from("comparison_history").select("*").eq("user_id", user.id),
+        supabase.from("saved_searches").select("*").eq("user_id", user.id),
+        supabase.from("test_drive_inquiries").select("*").eq("user_id", user.id),
+      ]);
+
+      const exportData = {
+        profile: { name: profile?.name, email: profile?.email, phone: profile?.phone, city: profile?.city },
+        favorites: favoritesRes.data || [],
+        reviews: reviewsRes.data || [],
+        comparisons: comparisonsRes.data || [],
+        saved_searches: savedSearchesRes.data || [],
+        test_drives: testDrivesRes.data || [],
+        exported_at: new Date().toISOString(),
+      };
+
+      let blob: Blob;
+      let filename: string;
+
+      if (format === "json") {
+        blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+        filename = `carbazaar-data-${Date.now()}.json`;
+      } else {
+        const rows: string[] = [];
+        for (const [section, data] of Object.entries(exportData)) {
+          if (Array.isArray(data) && data.length > 0) {
+            rows.push(`\n--- ${section.toUpperCase()} ---`);
+            rows.push(Object.keys(data[0]).join(","));
+            data.forEach((item: Record<string, unknown>) => rows.push(Object.values(item).map(v => `"${String(v ?? "")}"`).join(",")));
+          }
+        }
+        rows.unshift("CARBAZAAR Data Export");
+        blob = new Blob([rows.join("\n")], { type: "text/csv" });
+        filename = `carbazaar-data-${Date.now()}.csv`;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`Data exported as ${format.toUpperCase()}!`);
+    } catch {
+      toast.error("Failed to export data.");
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") return;
     setIsDeleting(true);
