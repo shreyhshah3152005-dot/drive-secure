@@ -521,6 +521,14 @@ const DealerCarDetail = () => {
               </CardContent>
             </Card>
 
+            {/* Chat with Dealer */}
+            <ChatWithDealer
+              dealerId={dealer.id}
+              carId={car.id}
+              carName={`${car.brand} ${car.name}`}
+              dealerName={dealer.dealership_name}
+            />
+
             {/* Price Negotiation */}
             <PriceNegotiationForm
               carId={car.id}
@@ -528,6 +536,9 @@ const DealerCarDetail = () => {
               currentPrice={car.price}
               carName={`${car.brand} ${car.name}`}
             />
+
+            {/* Insurance Calculator */}
+            <InsuranceQuoteCalculator />
           </div>
         </div>
       </main>
