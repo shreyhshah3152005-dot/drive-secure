@@ -11,6 +11,8 @@ import PriceNegotiationForm from "@/components/PriceNegotiationForm";
 import DealerVerificationBadge from "@/components/DealerVerificationBadge";
 import InsuranceQuoteCalculator from "@/components/InsuranceQuoteCalculator";
 import ChatWithDealer from "@/components/ChatWithDealer";
+import ServiceHistoryViewer from "@/components/ServiceHistoryViewer";
+import CarFinanceCalculator from "@/components/CarFinanceCalculator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
