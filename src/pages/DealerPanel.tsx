@@ -529,6 +529,15 @@ const DealerPanel = () => {
             {dealerInfo?.id && <DealerNegotiations dealerId={dealerInfo.id} />}
           </TabsContent>
 
+          <TabsContent value="service">
+            {dealerInfo?.id && (
+              <ServiceHistoryManager
+                dealerId={dealerInfo.id}
+                cars={cars.map(c => ({ id: c.id, name: c.name, brand: c.brand }))}
+              />
+            )}
+          </TabsContent>
+
           <TabsContent value="cars">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">

@@ -389,6 +389,12 @@ const DealerCarDetail = () => {
             {/* Price History */}
             <PriceHistoryChart carId={car.id} carName={`${car.brand} ${car.name}`} />
 
+            {/* Service History */}
+            <ServiceHistoryViewer carId={car.id} />
+
+            {/* Finance Calculator */}
+            <CarFinanceCalculator carPrice={car.price * 100000} carName={`${car.brand} ${car.name}`} />
+
             {/* Similar Cars */}
             <SimilarCarsSection 
               currentCarId={car.id}
