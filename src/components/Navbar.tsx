@@ -70,9 +70,18 @@ const Navbar = () => {
         </Link>
 
         <Link to="/profile" onClick={handleClick}>
-          <Button variant="ghost" className={btnClass}>
-            <User className="w-4 h-4" />
-            {(mobile || !isMobile) && <span className={mobile ? "ml-2" : "hidden md:inline ml-2"}>Profile</span>}
+          <Button variant="ghost" className={mobile ? btnClass : "h-8 w-8 sm:h-9 sm:w-9 p-0"}>
+            {mobile ? (
+              <>
+                <User className="w-4 h-4" />
+                <span className="ml-2">Profile</span>
+              </>
+            ) : (
+              <Avatar className="h-7 w-7 border-2 border-primary/30 hover:border-primary transition-colors">
+                {profileImageUrl ? <AvatarImage src={profileImageUrl} alt="Profile" /> : null}
+                <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">{userInitial}</AvatarFallback>
+              </Avatar>
+            )}
           </Button>
         </Link>
 
@@ -109,18 +118,6 @@ const Navbar = () => {
           <ThemeToggle />
           {user ? (
             <>
-              {/* Profile avatar */}
-              <Link to="/profile">
-                <Avatar className="h-8 w-8 border-2 border-primary/30 cursor-pointer hover:border-primary transition-colors">
-                  {profileImageUrl ? (
-                    <AvatarImage src={profileImageUrl} alt="Profile" />
-                  ) : null}
-                  <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">
-                    {userInitial}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-
               {/* Desktop nav */}
               {!isMobile && (
                 <div className="flex items-center gap-1">

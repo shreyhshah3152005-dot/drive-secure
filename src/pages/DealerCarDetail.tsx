@@ -9,6 +9,8 @@ import CrossDealerComparison from "@/components/CrossDealerComparison";
 import PriceAlertButton from "@/components/PriceAlertButton";
 import PriceNegotiationForm from "@/components/PriceNegotiationForm";
 import DealerVerificationBadge from "@/components/DealerVerificationBadge";
+import InsuranceQuoteCalculator from "@/components/InsuranceQuoteCalculator";
+import ChatWithDealer from "@/components/ChatWithDealer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -519,6 +521,14 @@ const DealerCarDetail = () => {
               </CardContent>
             </Card>
 
+            {/* Chat with Dealer */}
+            <ChatWithDealer
+              dealerId={dealer.id}
+              carId={car.id}
+              carName={`${car.brand} ${car.name}`}
+              dealerName={dealer.dealership_name}
+            />
+
             {/* Price Negotiation */}
             <PriceNegotiationForm
               carId={car.id}
@@ -526,6 +536,9 @@ const DealerCarDetail = () => {
               currentPrice={car.price}
               carName={`${car.brand} ${car.name}`}
             />
+
+            {/* Insurance Calculator */}
+            <InsuranceQuoteCalculator />
           </div>
         </div>
       </main>
