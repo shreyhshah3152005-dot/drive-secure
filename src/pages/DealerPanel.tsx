@@ -24,6 +24,7 @@ import DealerLiveChat from "@/components/DealerLiveChat";
 import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
 import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 import DealerNegotiations from "@/components/DealerNegotiations";
+import ServiceHistoryManager from "@/components/ServiceHistoryManager";
 
 interface DealerCar {
   id: string;
