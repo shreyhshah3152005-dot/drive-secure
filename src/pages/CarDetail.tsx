@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import CarImageGallery from "@/components/CarImageGallery";
 import CarSpecifications from "@/components/CarSpecifications";
 import CarInquiryForm from "@/components/CarInquiryForm";
-import EMICalculator from "@/components/EMICalculator";
+import CarFinanceCalculator from "@/components/CarFinanceCalculator";
 import TestDriveForm from "@/components/TestDriveForm";
 import CarReviews from "@/components/CarReviews";
 import VirtualCarTour from "@/components/VirtualCarTour";
