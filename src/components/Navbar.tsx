@@ -118,18 +118,6 @@ const Navbar = () => {
           <ThemeToggle />
           {user ? (
             <>
-              {/* Profile avatar */}
-              <Link to="/profile">
-                <Avatar className="h-8 w-8 border-2 border-primary/30 cursor-pointer hover:border-primary transition-colors">
-                  {profileImageUrl ? (
-                    <AvatarImage src={profileImageUrl} alt="Profile" />
-                  ) : null}
-                  <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">
-                    {userInitial}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-
               {/* Desktop nav */}
               {!isMobile && (
                 <div className="flex items-center gap-1">
