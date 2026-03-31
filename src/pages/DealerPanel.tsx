@@ -503,6 +503,10 @@ const DealerPanel = () => {
               <HandCoins className="w-4 h-4" />
               Negotiations
             </TabsTrigger>
+            <TabsTrigger value="service" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Service History
+            </TabsTrigger>
             <TabsTrigger value="subscription" className="gap-2">
               <Package className="w-4 h-4" />
               Subscription
