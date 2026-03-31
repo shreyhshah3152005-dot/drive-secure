@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import CarImageGallery from "@/components/CarImageGallery";
 import CarSpecifications from "@/components/CarSpecifications";
 import CarInquiryForm from "@/components/CarInquiryForm";
-import EMICalculator from "@/components/EMICalculator";
+import CarFinanceCalculator from "@/components/CarFinanceCalculator";
 import TestDriveForm from "@/components/TestDriveForm";
 import CarReviews from "@/components/CarReviews";
 import VirtualCarTour from "@/components/VirtualCarTour";
@@ -176,10 +176,10 @@ const CarDetail = () => {
           </div>
         </section>
 
-        {/* EMI Calculator Section */}
+        {/* Finance Calculator Section */}
         <section className="container mx-auto px-4 py-12">
-          <div className="max-w-2xl mx-auto">
-            <EMICalculator carPrice={car.price} />
+          <div className="max-w-4xl mx-auto">
+            <CarFinanceCalculator carPrice={car.price} carName={`${car.brand} ${car.model}`} />
           </div>
         </section>
 

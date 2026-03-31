@@ -1036,6 +1036,57 @@ export type Database = {
         }
         Relationships: []
       }
+      service_history: {
+        Row: {
+          car_id: string
+          cost: number | null
+          created_at: string
+          dealer_id: string
+          description: string | null
+          id: string
+          mileage_at_service: number | null
+          service_date: string
+          service_type: string
+        }
+        Insert: {
+          car_id: string
+          cost?: number | null
+          created_at?: string
+          dealer_id: string
+          description?: string | null
+          id?: string
+          mileage_at_service?: number | null
+          service_date: string
+          service_type: string
+        }
+        Update: {
+          car_id?: string
+          cost?: number | null
+          created_at?: string
+          dealer_id?: string
+          description?: string | null
+          id?: string
+          mileage_at_service?: number | null
+          service_date?: string
+          service_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_history_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_history_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_upgrade_requests: {
         Row: {
           admin_notes: string | null

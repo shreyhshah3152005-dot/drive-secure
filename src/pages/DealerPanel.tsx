@@ -24,6 +24,7 @@ import DealerLiveChat from "@/components/DealerLiveChat";
 import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
 import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 import DealerNegotiations from "@/components/DealerNegotiations";
+import ServiceHistoryManager from "@/components/ServiceHistoryManager";
 
 interface DealerCar {
   id: string;
@@ -502,6 +503,10 @@ const DealerPanel = () => {
               <HandCoins className="w-4 h-4" />
               Negotiations
             </TabsTrigger>
+            <TabsTrigger value="service" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Service History
+            </TabsTrigger>
             <TabsTrigger value="subscription" className="gap-2">
               <Package className="w-4 h-4" />
               Subscription
@@ -522,6 +527,15 @@ const DealerPanel = () => {
 
           <TabsContent value="negotiations">
             {dealerInfo?.id && <DealerNegotiations dealerId={dealerInfo.id} />}
+          </TabsContent>
+
+          <TabsContent value="service">
+            {dealerInfo?.id && (
+              <ServiceHistoryManager
+                dealerId={dealerInfo.id}
+                cars={cars.map(c => ({ id: c.id, name: c.name, brand: c.brand }))}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="cars">
