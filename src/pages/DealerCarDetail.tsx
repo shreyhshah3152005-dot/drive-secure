@@ -545,8 +545,15 @@ const DealerCarDetail = () => {
               carName={`${car.brand} ${car.name}`}
             />
 
+            {/* Loan Pre-Approval */}
+            <LoanPreapproval carPrice={car.price * 100000} carName={`${car.brand} ${car.name}`} />
+
             {/* Insurance Calculator */}
-            <InsuranceQuoteCalculator />
+            <InsuranceQuoteCalculator
+              carValue={car.price * 100000}
+              carFuelType={car.fuel_type}
+              carAge={2}
+            />
           </div>
         </div>
       </main>
