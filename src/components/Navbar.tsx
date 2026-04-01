@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useDealerRole } from "@/hooks/useDealerRole";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell, Menu } from "lucide-react";
+import { useChatNotifications } from "@/hooks/useChatNotifications";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell, Menu, MessageCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "./ThemeToggle";
 
@@ -20,6 +22,7 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const showBackButton = location.pathname !== "/";
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { unreadCount: chatUnread } = useChatNotifications();
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,9 +40,14 @@ const Navbar = () => {
     return (
       <>
         <Link to="/notifications" onClick={handleClick}>
-          <Button variant="ghost" className={btnClass}>
+          <Button variant="ghost" className={`${btnClass} relative`}>
             <Bell className="w-4 h-4" />
-            {mobile && <span className="ml-2">Notifications</span>}
+            {chatUnread > 0 && (
+              <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] sm:right-0">
+                {chatUnread > 9 ? "9+" : chatUnread}
+              </Badge>
+            )}
+            {mobile && <span className="ml-2">Notifications {chatUnread > 0 ? `(${chatUnread})` : ""}</span>}
             {!mobile && <span className="hidden md:inline ml-2">Alerts</span>}
           </Button>
         </Link>

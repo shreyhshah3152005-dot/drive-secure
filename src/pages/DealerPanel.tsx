@@ -19,12 +19,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays, ShoppingCart, HandCoins } from "lucide-react";
+import { Car, Plus, Package, Calendar, CheckCircle, XCircle, Clock, Star, Edit, Power, Settings, BarChart3, ArrowUp, MessageCircle, CalendarDays, ShoppingCart, HandCoins, Layers } from "lucide-react";
 import DealerLiveChat from "@/components/DealerLiveChat";
 import SubscriptionUpgradeRequest from "@/components/SubscriptionUpgradeRequest";
 import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 import DealerNegotiations from "@/components/DealerNegotiations";
 import ServiceHistoryManager from "@/components/ServiceHistoryManager";
+import DealerBulkInventory from "@/components/DealerBulkInventory";
 
 interface DealerCar {
   id: string;
@@ -511,6 +512,10 @@ const DealerPanel = () => {
               <Package className="w-4 h-4" />
               Subscription
             </TabsTrigger>
+            <TabsTrigger value="bulk" className="gap-2">
+              <Layers className="w-4 h-4" />
+              Bulk Actions
+            </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
               Settings
@@ -900,6 +905,10 @@ const DealerPanel = () => {
                 </div>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="bulk">
+            <DealerBulkInventory cars={cars} onRefresh={fetchCars} />
           </TabsContent>
 
           <TabsContent value="settings">
