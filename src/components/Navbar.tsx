@@ -22,6 +22,7 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const showBackButton = location.pathname !== "/";
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { unreadCount: chatUnread } = useChatNotifications();
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
