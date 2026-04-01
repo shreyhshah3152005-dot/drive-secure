@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useDealerRole } from "@/hooks/useDealerRole";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell, Menu } from "lucide-react";
+import { useChatNotifications } from "@/hooks/useChatNotifications";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell, Menu, MessageCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "./ThemeToggle";
 
