@@ -512,6 +512,10 @@ const DealerPanel = () => {
               <Package className="w-4 h-4" />
               Subscription
             </TabsTrigger>
+            <TabsTrigger value="bulk" className="gap-2">
+              <Layers className="w-4 h-4" />
+              Bulk Actions
+            </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
               Settings
