@@ -907,6 +907,10 @@ const DealerPanel = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="bulk">
+            <DealerBulkInventory cars={cars} onRefresh={fetchCars} />
+          </TabsContent>
+
           <TabsContent value="settings">
             <Card>
               <CardHeader>
