@@ -240,9 +240,9 @@ const DealerCarDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
-      <main className="container mx-auto px-4 py-24">
+      <main className="container mx-auto px-4 py-24 min-w-0 max-w-full">
         {/* Back button */}
         <Link 
           to={`/dealer/${dealer.id}`} 
