@@ -13,6 +13,7 @@ import InsuranceQuoteCalculator from "@/components/InsuranceQuoteCalculator";
 import ChatWithDealer from "@/components/ChatWithDealer";
 import ServiceHistoryViewer from "@/components/ServiceHistoryViewer";
 import CarFinanceCalculator from "@/components/CarFinanceCalculator";
+import LoanPreapproval from "@/components/LoanPreapproval";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
