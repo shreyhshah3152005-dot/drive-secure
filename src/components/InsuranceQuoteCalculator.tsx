@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,18 +16,32 @@ interface InsuranceQuote {
   recommended?: boolean;
 }
 
-const InsuranceQuoteCalculator = () => {
-  const [carValue, setCarValue] = useState("");
-  const [carAge, setCarAge] = useState("");
-  const [fuelType, setFuelType] = useState("");
+interface InsuranceQuoteCalculatorProps {
+  carValue?: number; // in rupees
+  carFuelType?: string;
+  carAge?: number; // years
+}
+
+const InsuranceQuoteCalculator = ({ carValue, carFuelType, carAge }: InsuranceQuoteCalculatorProps) => {
+  const [localCarValue, setLocalCarValue] = useState(carValue ? String(carValue) : "");
+  const [localCarAge, setLocalCarAge] = useState(carAge !== undefined ? String(carAge) : "");
+  const [fuelType, setFuelType] = useState(carFuelType?.toLowerCase() || "");
   const [city, setCity] = useState("");
   const [quotes, setQuotes] = useState<InsuranceQuote[]>([]);
 
-  const calculateQuotes = () => {
-    const value = parseFloat(carValue);
-    if (!value || !carAge || !fuelType || !city) return;
+  const isPreFilled = !!carValue;
 
-    const age = parseInt(carAge);
+  useEffect(() => {
+    if (carValue) setLocalCarValue(String(carValue));
+    if (carFuelType) setFuelType(carFuelType.toLowerCase());
+    if (carAge !== undefined) setLocalCarAge(String(carAge));
+  }, [carValue, carFuelType, carAge]);
+
+  const calculateQuotes = () => {
+    const value = parseFloat(localCarValue);
+    if (!value || localCarAge === "" || !fuelType || !city) return;
+
+    const age = parseInt(localCarAge);
     const depreciation = Math.max(0.5, 1 - age * 0.1);
     const idv = value * depreciation;
     const cityFactor = city === "metro" ? 1.15 : city === "tier2" ? 1.05 : 1.0;
@@ -94,32 +108,42 @@ const InsuranceQuoteCalculator = () => {
             <Input
               type="number"
               placeholder="e.g. 1200000"
-              value={carValue}
-              onChange={(e) => setCarValue(e.target.value)}
+              value={localCarValue}
+              onChange={(e) => setLocalCarValue(e.target.value)}
+              readOnly={isPreFilled}
+              className={isPreFilled ? "bg-secondary/30" : ""}
             />
           </div>
           <div className="space-y-2">
             <Label>Car Age (Years)</Label>
-            <Select value={carAge} onValueChange={setCarAge}>
-              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-              <SelectContent>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((y) => (
-                  <SelectItem key={y} value={String(y)}>{y === 0 ? "New" : `${y} year${y > 1 ? "s" : ""}`}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isPreFilled && carAge !== undefined ? (
+              <Input value={localCarAge} readOnly className="bg-secondary/30" />
+            ) : (
+              <Select value={localCarAge} onValueChange={setLocalCarAge}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((y) => (
+                    <SelectItem key={y} value={String(y)}>{y === 0 ? "New" : `${y} year${y > 1 ? "s" : ""}`}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Fuel Type</Label>
-            <Select value={fuelType} onValueChange={setFuelType}>
-              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="petrol">Petrol</SelectItem>
-                <SelectItem value="diesel">Diesel</SelectItem>
-                <SelectItem value="cng">CNG</SelectItem>
-                <SelectItem value="electric">Electric</SelectItem>
-              </SelectContent>
-            </Select>
+            {isPreFilled && carFuelType ? (
+              <Input value={fuelType.charAt(0).toUpperCase() + fuelType.slice(1)} readOnly className="bg-secondary/30" />
+            ) : (
+              <Select value={fuelType} onValueChange={setFuelType}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="petrol">Petrol</SelectItem>
+                  <SelectItem value="diesel">Diesel</SelectItem>
+                  <SelectItem value="cng">CNG</SelectItem>
+                  <SelectItem value="electric">Electric</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="space-y-2">
             <Label>City Type</Label>
@@ -134,7 +158,7 @@ const InsuranceQuoteCalculator = () => {
           </div>
         </div>
 
-        <Button onClick={calculateQuotes} className="w-full" disabled={!carValue || !carAge || !fuelType || !city}>
+        <Button onClick={calculateQuotes} className="w-full" disabled={!localCarValue || localCarAge === "" || !fuelType || !city}>
           Get Insurance Quotes
         </Button>
 
@@ -145,8 +169,8 @@ const InsuranceQuoteCalculator = () => {
               <Card key={q.provider} className={q.recommended ? "border-primary/50 bg-primary/5" : ""}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between flex-wrap gap-2 mb-3">
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-semibold">{q.provider}</p>
                         {q.recommended && <Badge className="text-xs">Recommended</Badge>}
                       </div>
