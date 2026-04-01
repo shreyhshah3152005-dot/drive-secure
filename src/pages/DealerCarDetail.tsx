@@ -13,6 +13,7 @@ import InsuranceQuoteCalculator from "@/components/InsuranceQuoteCalculator";
 import ChatWithDealer from "@/components/ChatWithDealer";
 import ServiceHistoryViewer from "@/components/ServiceHistoryViewer";
 import CarFinanceCalculator from "@/components/CarFinanceCalculator";
+import LoanPreapproval from "@/components/LoanPreapproval";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -239,9 +240,9 @@ const DealerCarDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
-      <main className="container mx-auto px-4 py-24">
+      <main className="container mx-auto px-4 py-24 min-w-0 max-w-full">
         {/* Back button */}
         <Link 
           to={`/dealer/${dealer.id}`} 
@@ -545,8 +546,15 @@ const DealerCarDetail = () => {
               carName={`${car.brand} ${car.name}`}
             />
 
+            {/* Loan Pre-Approval */}
+            <LoanPreapproval carPrice={car.price * 100000} carName={`${car.brand} ${car.name}`} />
+
             {/* Insurance Calculator */}
-            <InsuranceQuoteCalculator />
+            <InsuranceQuoteCalculator
+              carValue={car.price * 100000}
+              carFuelType={car.fuel_type}
+              carAge={2}
+            />
           </div>
         </div>
       </main>

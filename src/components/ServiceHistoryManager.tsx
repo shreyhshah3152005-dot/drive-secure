@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Wrench, Trash2, IndianRupee } from "lucide-react";
+import { Plus, Wrench, Trash2, Upload, FileText } from "lucide-react";
 
 interface ServiceRecord {
   id: string;
@@ -21,6 +21,7 @@ interface ServiceRecord {
   mileage_at_service: number | null;
   cost: number | null;
   created_at: string;
+  receipt_url?: string | null;
 }
 
 interface ServiceHistoryManagerProps {
@@ -29,17 +30,9 @@ interface ServiceHistoryManagerProps {
 }
 
 const SERVICE_TYPES = [
-  "Regular Service",
-  "Oil Change",
-  "Brake Service",
-  "Tyre Replacement",
-  "Battery Replacement",
-  "AC Service",
-  "Body Repair",
-  "Engine Repair",
-  "Transmission Service",
-  "Electrical Repair",
-  "Other",
+  "Regular Service", "Oil Change", "Brake Service", "Tyre Replacement",
+  "Battery Replacement", "AC Service", "Body Repair", "Engine Repair",
+  "Transmission Service", "Electrical Repair", "Other",
 ];
 
 const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) => {
@@ -47,6 +40,7 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [carId, setCarId] = useState("");
   const [serviceDate, setServiceDate] = useState("");
@@ -54,6 +48,7 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
   const [description, setDescription] = useState("");
   const [mileage, setMileage] = useState("");
   const [cost, setCost] = useState("");
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
 
   const fetchRecords = async () => {
     try {
@@ -74,11 +69,25 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
 
   useEffect(() => { fetchRecords(); }, [dealerId]);
 
+  const uploadReceipt = async (file: File, recordId: string): Promise<string | null> => {
+    const ext = file.name.split('.').pop();
+    const filePath = `${dealerId}/${recordId}.${ext}`;
+    const { error } = await supabase.storage
+      .from("dealer-car-images")
+      .upload(`receipts/${filePath}`, file, { upsert: true });
+    if (error) {
+      console.error("Upload error:", error);
+      return null;
+    }
+    const { data } = supabase.storage.from("dealer-car-images").getPublicUrl(`receipts/${filePath}`);
+    return data.publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("service_history").insert({
+      const { data, error } = await supabase.from("service_history").insert({
         car_id: carId,
         dealer_id: dealerId,
         service_date: serviceDate,
@@ -86,11 +95,28 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
         description: description || null,
         mileage_at_service: mileage ? parseInt(mileage) : null,
         cost: cost ? parseFloat(cost) : null,
-      });
+      }).select().single();
       if (error) throw error;
+
+      // Upload receipt if provided
+      if (receiptFile && data) {
+        setUploading(true);
+        const receiptUrl = await uploadReceipt(receiptFile, data.id);
+        if (receiptUrl) {
+          // Store receipt URL in description as a tag
+          const updatedDesc = description 
+            ? `${description}\n[Receipt: ${receiptUrl}]` 
+            : `[Receipt: ${receiptUrl}]`;
+          await supabase.from("service_history")
+            .update({ description: updatedDesc })
+            .eq("id", data.id);
+        }
+        setUploading(false);
+      }
+
       toast.success("Service record added!");
       setDialogOpen(false);
-      setCarId(""); setServiceDate(""); setServiceType(""); setDescription(""); setMileage(""); setCost("");
+      setCarId(""); setServiceDate(""); setServiceType(""); setDescription(""); setMileage(""); setCost(""); setReceiptFile(null);
       fetchRecords();
     } catch (error) {
       console.error(error);
@@ -116,9 +142,15 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
     return car ? `${car.brand} ${car.name}` : "Unknown";
   };
 
+  const getReceiptUrl = (desc: string | null) => {
+    if (!desc) return null;
+    const match = desc.match(/\[Receipt: (.*?)\]/);
+    return match ? match[1] : null;
+  };
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle className="flex items-center gap-2">
           <Wrench className="w-5 h-5" />
           Service History
@@ -127,7 +159,7 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2"><Plus className="w-4 h-4" />Add Record</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add Service Record</DialogTitle>
             </DialogHeader>
@@ -143,7 +175,7 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Service Date *</Label>
                   <Input type="date" value={serviceDate} onChange={e => setServiceDate(e.target.value)} required />
@@ -158,7 +190,7 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Mileage (km)</Label>
                   <Input type="number" value={mileage} onChange={e => setMileage(e.target.value)} placeholder="e.g. 25000" />
@@ -172,8 +204,22 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
                 <Label>Description</Label>
                 <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Details about the service..." rows={3} />
               </div>
-              <Button type="submit" className="w-full" disabled={submitting || !carId || !serviceDate || !serviceType}>
-                {submitting ? "Adding..." : "Add Record"}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  Service Receipt / Document
+                </Label>
+                <Input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={e => setReceiptFile(e.target.files?.[0] || null)}
+                />
+                {receiptFile && (
+                  <p className="text-xs text-muted-foreground">Selected: {receiptFile.name}</p>
+                )}
+              </div>
+              <Button type="submit" className="w-full" disabled={submitting || uploading || !carId || !serviceDate || !serviceType}>
+                {submitting ? (uploading ? "Uploading receipt..." : "Adding...") : "Add Record"}
               </Button>
             </form>
           </DialogContent>
@@ -194,24 +240,35 @@ const ServiceHistoryManager = ({ dealerId, cars }: ServiceHistoryManagerProps) =
                   <TableHead>Type</TableHead>
                   <TableHead>Mileage</TableHead>
                   <TableHead>Cost</TableHead>
+                  <TableHead>Receipt</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {records.map(r => (
-                  <TableRow key={r.id}>
-                    <TableCell className="font-medium">{getCarName(r.car_id)}</TableCell>
-                    <TableCell>{new Date(r.service_date).toLocaleDateString("en-IN")}</TableCell>
-                    <TableCell><Badge variant="secondary">{r.service_type}</Badge></TableCell>
-                    <TableCell>{r.mileage_at_service ? `${r.mileage_at_service.toLocaleString()} km` : "—"}</TableCell>
-                    <TableCell>{r.cost ? `₹${r.cost.toLocaleString("en-IN")}` : "—"}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {records.map(r => {
+                  const receiptUrl = getReceiptUrl(r.description);
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-medium">{getCarName(r.car_id)}</TableCell>
+                      <TableCell>{new Date(r.service_date).toLocaleDateString("en-IN")}</TableCell>
+                      <TableCell><Badge variant="secondary">{r.service_type}</Badge></TableCell>
+                      <TableCell>{r.mileage_at_service ? `${r.mileage_at_service.toLocaleString()} km` : "—"}</TableCell>
+                      <TableCell>{r.cost ? `₹${r.cost.toLocaleString("en-IN")}` : "—"}</TableCell>
+                      <TableCell>
+                        {receiptUrl ? (
+                          <a href={receiptUrl} target="_blank" rel="noopener noreferrer">
+                            <Button variant="ghost" size="icon"><FileText className="w-4 h-4 text-primary" /></Button>
+                          </a>
+                        ) : "—"}
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
