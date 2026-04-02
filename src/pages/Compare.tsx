@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompare } from "@/contexts/CompareContext";
 import { useComparisonHistory } from "@/hooks/useComparisonHistory";
@@ -6,8 +6,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIComparisonReport from "@/components/AIComparisonReport";
+import GeneralTestDriveForm from "@/components/GeneralTestDriveForm";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, GitCompare, X, Zap, Gauge, Fuel, Settings, Calendar, Star } from "lucide-react";
+import { ArrowLeft, GitCompare, X, Zap, Gauge, Fuel, Settings, Calendar, Star, CarFront } from "lucide-react";
 
 const formatPrice = (price: number): string => {
   if (price >= 10000000) {
@@ -148,6 +149,18 @@ const Compare = () => {
                     >
                       View Details
                     </Button>
+                    <GeneralTestDriveForm
+                      trigger={
+                        <Button
+                          variant="hero"
+                          size="sm"
+                          className="w-full mt-2"
+                        >
+                          <CarFront className="w-4 h-4 mr-1" />
+                          Schedule Test Drive
+                        </Button>
+                      }
+                    />
                   </div>
                 ))}
               </div>
