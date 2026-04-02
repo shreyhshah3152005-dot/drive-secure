@@ -149,6 +149,18 @@ const Compare = () => {
                     >
                       View Details
                     </Button>
+                    <GeneralTestDriveForm
+                      trigger={
+                        <Button
+                          variant="hero"
+                          size="sm"
+                          className="w-full mt-2"
+                        >
+                          <CarFront className="w-4 h-4 mr-1" />
+                          Schedule Test Drive
+                        </Button>
+                      }
+                    />
                   </div>
                 ))}
               </div>
