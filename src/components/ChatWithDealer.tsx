@@ -63,6 +63,26 @@ const ChatWithDealer = ({ dealerId, carId, carName, dealerName }: ChatWithDealer
 
       if (msgError) throw msgError;
 
+      // Send email notification to dealer
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("name")
+          .eq("user_id", user.id)
+          .single();
+
+        await supabase.functions.invoke("send-chat-notification", {
+          body: {
+            dealerId,
+            messagePreview: message.trim().slice(0, 200),
+            customerName: profile?.name || user.email || "A customer",
+            carName,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send email notification:", emailErr);
+      }
+
       toast.success("Message sent to dealer!");
       setMessage("");
       setSent(true);
