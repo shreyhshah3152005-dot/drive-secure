@@ -32,6 +32,7 @@ import DealerLeaderboard from "./pages/DealerLeaderboard";
 import FinanceCalculator from "./pages/FinanceCalculator";
 import UserProfile from "./pages/UserProfile";
 import SharedWishlist from "./pages/SharedWishlist";
+import CarServices from "./pages/CarServices";
 
 const queryClient = new QueryClient();
 
