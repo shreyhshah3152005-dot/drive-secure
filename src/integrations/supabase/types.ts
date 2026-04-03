@@ -1036,6 +1036,57 @@ export type Database = {
         }
         Relationships: []
       }
+      service_bookings: {
+        Row: {
+          booking_date: string
+          booking_time: string
+          car_brand: string
+          car_model: string
+          car_registration: string
+          car_year: number
+          created_at: string
+          id: string
+          notes: string | null
+          package_id: string
+          package_name: string
+          package_price: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          booking_date: string
+          booking_time: string
+          car_brand: string
+          car_model: string
+          car_registration: string
+          car_year: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          package_id: string
+          package_name: string
+          package_price: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          booking_time?: string
+          car_brand?: string
+          car_model?: string
+          car_registration?: string
+          car_year?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          package_id?: string
+          package_name?: string
+          package_price?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_history: {
         Row: {
           car_id: string
