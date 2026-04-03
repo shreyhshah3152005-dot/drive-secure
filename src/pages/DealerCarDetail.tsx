@@ -394,6 +394,9 @@ const DealerCarDetail = () => {
             {/* Service History */}
             <ServiceHistoryViewer carId={car.id} />
 
+            {/* Car History Report */}
+            <CarHistoryReport carId={car.id} carName={`${car.brand} ${car.name}`} />
+
             {/* Finance Calculator */}
             <CarFinanceCalculator carPrice={car.price * 100000} carName={`${car.brand} ${car.name}`} />
 
