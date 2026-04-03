@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DealerReviews from "@/components/DealerReviews";
 import DealerRatingBadge from "@/components/DealerRatingBadge";
+import DealerResponseTime from "@/components/DealerResponseTime";
+import DealerSoldCars from "@/components/DealerSoldCars";
 import DealerVerificationBadge, { type VerificationStatus } from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
