@@ -276,19 +276,12 @@ const Auth = () => {
                   {mode === "login" ? "Sign Up" : "Sign In"}
                 </span>
               </button>
-              <div className="flex items-center justify-center gap-4 text-sm">
-                <button
-                  onClick={() => navigate("/admin-auth")}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Admin Login
-                </button>
-                <span className="text-muted-foreground">•</span>
+              <div className="flex items-center justify-center text-sm">
                 <button
                   onClick={() => navigate("/dealer-auth")}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Dealer Login
+                  Are you a dealer? <span className="font-semibold text-primary">Dealer Login</span>
                 </button>
               </div>
             </div>

@@ -32,6 +32,7 @@ import DealerLeaderboard from "./pages/DealerLeaderboard";
 import FinanceCalculator from "./pages/FinanceCalculator";
 import UserProfile from "./pages/UserProfile";
 import SharedWishlist from "./pages/SharedWishlist";
+import CarServices from "./pages/CarServices";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => (
                 <Route path="/finance-calculator" element={<FinanceCalculator />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/shared-wishlist/:code" element={<SharedWishlist />} />
+                <Route path="/car-services" element={<CarServices />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <CompareBar />

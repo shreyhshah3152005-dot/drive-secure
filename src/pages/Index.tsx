@@ -8,7 +8,7 @@ import AICarRecommendations from "@/components/AICarRecommendations";
 import RecentlyViewedCars from "@/components/RecentlyViewedCars";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, ShoppingBag, Trophy, Calculator, ChevronRight } from "lucide-react";
+import { Car, ShoppingBag, Trophy, Calculator, ChevronRight, Wrench } from "lucide-react";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -81,6 +81,11 @@ const Index = () => {
             <Link to="/finance-calculator">
               <Button variant="outline" className="gap-2 border-primary/30 hover:bg-primary/10">
                 <Calculator className="w-4 h-4" /> EMI Calculator
+              </Button>
+            </Link>
+            <Link to="/car-services">
+              <Button variant="outline" className="gap-2 border-primary/30 hover:bg-primary/10">
+                <Wrench className="w-4 h-4" /> Car Service & Wash
               </Button>
             </Link>
           </div>
