@@ -171,6 +171,9 @@ const DealerDetail = () => {
           <div className="mb-8">
             <DealerReviews dealerId={dealer.id} />
           </div>
+
+          {/* Rating Breakdown */}
+          <DealerRatingBreakdown dealerId={dealer.id} />
         </div>
 
         {/* Cars Grid */}
