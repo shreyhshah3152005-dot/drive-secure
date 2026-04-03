@@ -83,6 +83,11 @@ const Index = () => {
                 <Calculator className="w-4 h-4" /> EMI Calculator
               </Button>
             </Link>
+            <Link to="/car-services">
+              <Button variant="outline" className="gap-2 border-primary/30 hover:bg-primary/10">
+                <Wrench className="w-4 h-4" /> Car Service & Wash
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

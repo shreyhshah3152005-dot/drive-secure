@@ -235,6 +235,9 @@ const DealerDetail = () => {
             ))}
           </div>
         )}
+
+        {/* Sold Cars Section */}
+        <DealerSoldCars dealerId={dealer.id} />
       </main>
       <Footer />
     </div>
