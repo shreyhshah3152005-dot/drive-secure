@@ -140,6 +140,7 @@ const DealerDetail = () => {
                 <h1 className="text-3xl font-bold">{dealer.dealership_name}</h1>
                 <DealerVerificationBadge status={dealer.verification_status as VerificationStatus} />
                 <DealerRatingBadge dealerId={dealer.id} showCount />
+                <DealerResponseTime dealerId={dealer.id} />
               </div>
               <div className="flex flex-wrap gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
