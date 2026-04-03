@@ -182,14 +182,19 @@ const CarServices = () => {
                   ))}
                 </ul>
 
-                <Button
-                  variant={pkg.popular ? "hero" : "outline"}
-                  className="w-full"
-                  onClick={() => handleSubscribe(pkg)}
-                  disabled={selectedPackage === pkg.id}
-                >
-                  {selectedPackage === pkg.id ? "Selected ✓" : "Subscribe Now"}
-                </Button>
+                <ServiceBookingDialog
+                  packageId={pkg.id}
+                  packageName={pkg.name}
+                  packagePrice={pkg.price}
+                  trigger={
+                    <Button
+                      variant={pkg.popular ? "hero" : "outline"}
+                      className="w-full"
+                    >
+                      Book Now
+                    </Button>
+                  }
+                />
               </CardContent>
             </Card>
           ))}
