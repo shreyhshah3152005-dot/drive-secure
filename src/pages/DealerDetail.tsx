@@ -6,6 +6,7 @@ import DealerReviews from "@/components/DealerReviews";
 import DealerRatingBadge from "@/components/DealerRatingBadge";
 import DealerResponseTime from "@/components/DealerResponseTime";
 import DealerSoldCars from "@/components/DealerSoldCars";
+import DealerRatingBreakdown from "@/components/DealerRatingBreakdown";
 import DealerVerificationBadge, { type VerificationStatus } from "@/components/DealerVerificationBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -170,6 +171,9 @@ const DealerDetail = () => {
           <div className="mb-8">
             <DealerReviews dealerId={dealer.id} />
           </div>
+
+          {/* Rating Breakdown */}
+          <DealerRatingBreakdown dealerId={dealer.id} />
         </div>
 
         {/* Cars Grid */}

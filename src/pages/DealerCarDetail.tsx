@@ -12,6 +12,7 @@ import DealerVerificationBadge from "@/components/DealerVerificationBadge";
 import InsuranceQuoteCalculator from "@/components/InsuranceQuoteCalculator";
 import ChatWithDealer from "@/components/ChatWithDealer";
 import ServiceHistoryViewer from "@/components/ServiceHistoryViewer";
+import CarHistoryReport from "@/components/CarHistoryReport";
 import CarFinanceCalculator from "@/components/CarFinanceCalculator";
 import LoanPreapproval from "@/components/LoanPreapproval";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -392,6 +393,9 @@ const DealerCarDetail = () => {
 
             {/* Service History */}
             <ServiceHistoryViewer carId={car.id} />
+
+            {/* Car History Report */}
+            <CarHistoryReport carId={car.id} carName={`${car.brand} ${car.name}`} />
 
             {/* Finance Calculator */}
             <CarFinanceCalculator carPrice={car.price * 100000} carName={`${car.brand} ${car.name}`} />

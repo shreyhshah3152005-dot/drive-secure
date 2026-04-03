@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Sparkles, Shield, Crown, Star, Droplets, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import ServiceBookingDialog from "@/components/ServiceBookingDialog";
 
 interface ServicePackage {
   id: string;
@@ -181,14 +182,19 @@ const CarServices = () => {
                   ))}
                 </ul>
 
-                <Button
-                  variant={pkg.popular ? "hero" : "outline"}
-                  className="w-full"
-                  onClick={() => handleSubscribe(pkg)}
-                  disabled={selectedPackage === pkg.id}
-                >
-                  {selectedPackage === pkg.id ? "Selected ✓" : "Subscribe Now"}
-                </Button>
+                <ServiceBookingDialog
+                  packageId={pkg.id}
+                  packageName={pkg.name}
+                  packagePrice={pkg.price}
+                  trigger={
+                    <Button
+                      variant={pkg.popular ? "hero" : "outline"}
+                      className="w-full"
+                    >
+                      Book Now
+                    </Button>
+                  }
+                />
               </CardContent>
             </Card>
           ))}
