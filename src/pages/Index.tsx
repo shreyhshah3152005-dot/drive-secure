@@ -8,7 +8,7 @@ import AICarRecommendations from "@/components/AICarRecommendations";
 import RecentlyViewedCars from "@/components/RecentlyViewedCars";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, ShoppingBag, Trophy, Calculator, ChevronRight } from "lucide-react";
+import { Car, ShoppingBag, Trophy, Calculator, ChevronRight, Wrench } from "lucide-react";
 
 const Index = () => {
   const { user, loading } = useAuth();
