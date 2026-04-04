@@ -15,10 +15,22 @@ interface CarHistoryReportProps {
 
 interface VinReport {
   vin: string;
-  manufacturerCountry: string;
+  make: string;
+  model: string;
   modelYear: number;
+  manufacturer: string;
+  manufacturerCountry: string;
+  vehicleType: string;
+  bodyClass: string;
+  driveType: string;
+  fuelType: string;
+  engineCylinders: string;
+  engineDisplacement: string;
+  transmission: string;
+  doors: string;
   owners: { ownerNumber: number; duration: string; location: string; type: string }[];
   accidents: { date: string; severity: string; description: string; repaired: boolean; estimatedCost: number }[];
+  recalls: { nhtsaCampaignNumber: string; component: string; summary: string; consequence: string; remedy: string; reportDate: string }[];
   titleStatus: string;
   floodDamage: boolean;
   theftRecord: boolean;
