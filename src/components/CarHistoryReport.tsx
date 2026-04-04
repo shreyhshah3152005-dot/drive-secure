@@ -15,10 +15,22 @@ interface CarHistoryReportProps {
 
 interface VinReport {
   vin: string;
-  manufacturerCountry: string;
+  make: string;
+  model: string;
   modelYear: number;
+  manufacturer: string;
+  manufacturerCountry: string;
+  vehicleType: string;
+  bodyClass: string;
+  driveType: string;
+  fuelType: string;
+  engineCylinders: string;
+  engineDisplacement: string;
+  transmission: string;
+  doors: string;
   owners: { ownerNumber: number; duration: string; location: string; type: string }[];
   accidents: { date: string; severity: string; description: string; repaired: boolean; estimatedCost: number }[];
+  recalls: { nhtsaCampaignNumber: string; component: string; summary: string; consequence: string; remedy: string; reportDate: string }[];
   titleStatus: string;
   floodDamage: boolean;
   theftRecord: boolean;
@@ -165,6 +177,63 @@ const CarHistoryReport = ({ carId, carName }: CarHistoryReportProps) => {
                 {vinReport.odometerTampering ? "⚠️ Odometer Tampered" : "✅ Odometer OK"}
               </Badge>
             </div>
+
+            {/* NHTSA Vehicle Specs */}
+            <Separator />
+            <div>
+              <h3 className="font-semibold flex items-center gap-2 mb-3">
+                <Car className="w-4 h-4 text-primary" />
+                Vehicle Specifications (NHTSA)
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {[
+                  ["Make", vinReport.make],
+                  ["Model", vinReport.model],
+                  ["Year", vinReport.modelYear],
+                  ["Manufacturer", vinReport.manufacturer],
+                  ["Country", vinReport.manufacturerCountry],
+                  ["Body", vinReport.bodyClass],
+                  ["Drive Type", vinReport.driveType],
+                  ["Fuel", vinReport.fuelType],
+                  ["Engine", `${vinReport.engineDisplacement} ${vinReport.engineCylinders} cyl`],
+                  ["Transmission", vinReport.transmission],
+                ].map(([label, value]) => (
+                  <div key={String(label)} className="flex justify-between p-2 bg-secondary/20 rounded">
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className="font-medium text-foreground">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* NHTSA Recalls */}
+            {vinReport.recalls && vinReport.recalls.length > 0 && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    NHTSA Recalls ({vinReport.recalls.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {vinReport.recalls.map((r, i) => (
+                      <div key={i} className="p-3 bg-destructive/5 border border-destructive/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-sm font-medium text-foreground">{r.component}</p>
+                          <Badge variant="outline" className="text-xs text-destructive border-destructive/30">
+                            {r.nhtsaCampaignNumber}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{r.summary}</p>
+                        {r.remedy && (
+                          <p className="text-xs text-primary mt-1">Remedy: {r.remedy}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
 
