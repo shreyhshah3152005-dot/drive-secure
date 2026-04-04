@@ -517,6 +517,11 @@ const UserProfile = () => {
           </CardContent>
         </Card>
 
+        {/* My Bookings */}
+        <div className="mt-6">
+          <MyBookings />
+        </div>
+
         {/* Data Export */}
         <Card className="gradient-card border-border/50 mt-6">
           <CardHeader>
