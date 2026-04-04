@@ -81,6 +81,30 @@ const ServiceBookingDialog = ({ packageId, packageName, packagePrice, trigger }:
       if (error) throw error;
 
       toast.success("Service booked successfully! We'll send you a confirmation shortly.");
+
+      // Send email confirmation
+      try {
+        const userEmail = user.email;
+        const profileRes = await supabase.from("profiles").select("name").eq("user_id", user.id).single();
+        const userName = profileRes.data?.name || "Customer";
+
+        await supabase.functions.invoke("send-service-booking-email", {
+          body: {
+            email: userEmail,
+            name: userName,
+            packageName,
+            packagePrice,
+            carBrand,
+            carModel,
+            carRegistration: carRegistration.toUpperCase(),
+            bookingDate: format(date, "dd MMM yyyy"),
+            bookingTime: timeSlot,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send confirmation email:", emailErr);
+      }
+
       setOpen(false);
       // Reset form
       setDate(undefined);

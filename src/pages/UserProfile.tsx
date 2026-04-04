@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Phone, MapPin, Camera, Upload, X, Save, Calendar, Sun, Moon, Trash2, AlertTriangle, Download } from "lucide-react";
+import MyBookings from "@/components/MyBookings";
 import { toast } from "sonner";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -516,6 +517,11 @@ const UserProfile = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* My Bookings */}
+        <div className="mt-6">
+          <MyBookings />
+        </div>
 
         {/* Data Export */}
         <Card className="gradient-card border-border/50 mt-6">
