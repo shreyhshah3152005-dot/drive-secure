@@ -18,6 +18,9 @@ interface ServiceBookingDialogProps {
   packageId: string;
   packageName: string;
   packagePrice: number;
+  packageDurationMonths: number;
+  totalServices: number;
+  totalWashes: number;
   trigger: React.ReactNode;
 }
 
@@ -34,7 +37,7 @@ const carBrands = [
   "BMW", "Mercedes-Benz", "Audi", "Jeep", "Renault",
 ];
 
-const ServiceBookingDialog = ({ packageId, packageName, packagePrice, trigger }: ServiceBookingDialogProps) => {
+const ServiceBookingDialog = ({ packageId, packageName, packagePrice, packageDurationMonths, totalServices, totalWashes, trigger }: ServiceBookingDialogProps) => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>();
