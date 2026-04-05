@@ -26,6 +26,7 @@ import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 import DealerNegotiations from "@/components/DealerNegotiations";
 import ServiceHistoryManager from "@/components/ServiceHistoryManager";
 import DealerBulkInventory from "@/components/DealerBulkInventory";
+import DealerServiceBookings from "@/components/DealerServiceBookings";
 
 interface DealerCar {
   id: string;
@@ -511,6 +512,10 @@ const DealerPanel = () => {
             <TabsTrigger value="subscription" className="gap-2">
               <Package className="w-4 h-4" />
               Subscription
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="gap-2">
+              <ShoppingCart className="w-4 h-4" />
+              Bookings
             </TabsTrigger>
             <TabsTrigger value="bulk" className="gap-2">
               <Layers className="w-4 h-4" />
