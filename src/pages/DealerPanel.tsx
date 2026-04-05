@@ -548,6 +548,10 @@ const DealerPanel = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="bookings">
+            <DealerServiceBookings />
+          </TabsContent>
+
           <TabsContent value="cars">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
