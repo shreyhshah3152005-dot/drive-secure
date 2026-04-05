@@ -16,6 +16,7 @@ const BookingSchema = z.object({
   carRegistration: z.string().min(1),
   bookingDate: z.string().min(1),
   bookingTime: z.string().min(1),
+  statusUpdate: z.string().optional(),
 });
 
 Deno.serve(async (req) => {
@@ -39,17 +40,47 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, name, packageName, packagePrice, carBrand, carModel, carRegistration, bookingDate, bookingTime } = parsed.data;
+    const { email, name, packageName, packagePrice, carBrand, carModel, carRegistration, bookingDate, bookingTime, statusUpdate } = parsed.data;
+
+    const isCancel = statusUpdate === "cancelled";
+    const isReschedule = statusUpdate === "rescheduled";
+    const isStatusChange = !!statusUpdate && !isCancel && !isReschedule;
+
+    let headerBg = "linear-gradient(135deg, #b8860b, #d4a017)";
+    let headerIcon = "🔧";
+    let headerTitle = "Booking Confirmed!";
+    let subjectLine = `✅ Booking Confirmed - ${packageName} | CARBAZAAR`;
+    let bodyMessage = "Your car service booking has been confirmed. Here are the details:";
+
+    if (isCancel) {
+      headerBg = "linear-gradient(135deg, #dc2626, #ef4444)";
+      headerIcon = "❌";
+      headerTitle = "Booking Cancelled";
+      subjectLine = `❌ Booking Cancelled - ${packageName} | CARBAZAAR`;
+      bodyMessage = "Your car service booking has been cancelled. Here were the details:";
+    } else if (isReschedule) {
+      headerBg = "linear-gradient(135deg, #2563eb, #3b82f6)";
+      headerIcon = "📅";
+      headerTitle = "Booking Rescheduled";
+      subjectLine = `📅 Booking Rescheduled - ${packageName} | CARBAZAAR`;
+      bodyMessage = "Your car service booking has been rescheduled. Here are the updated details:";
+    } else if (isStatusChange) {
+      headerBg = "linear-gradient(135deg, #7c3aed, #8b5cf6)";
+      headerIcon = "🔄";
+      headerTitle = `Booking ${statusUpdate.charAt(0).toUpperCase() + statusUpdate.slice(1).replace("_", " ")}`;
+      subjectLine = `🔄 Booking Update - ${packageName} | CARBAZAAR`;
+      bodyMessage = `Your car service booking status has been updated to "${statusUpdate.replace("_", " ")}". Here are the details:`;
+    }
 
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a2e; color: #e0e0e0; border-radius: 12px; overflow: hidden;">
-        <div style="background: linear-gradient(135deg, #b8860b, #d4a017); padding: 30px; text-align: center;">
-          <h1 style="margin: 0; color: #1a1a2e; font-size: 24px;">🔧 Booking Confirmed!</h1>
-          <p style="margin: 8px 0 0; color: #1a1a2e; font-size: 14px;">CARBAZAAR Car Services</p>
+        <div style="background: ${headerBg}; padding: 30px; text-align: center;">
+          <h1 style="margin: 0; color: #fff; font-size: 24px;">${headerIcon} ${headerTitle}</h1>
+          <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">CARBAZAAR Car Services</p>
         </div>
         <div style="padding: 30px;">
           <p style="margin-top: 0;">Hi <strong style="color: #d4a017;">${name}</strong>,</p>
-          <p>Your car service booking has been confirmed. Here are the details:</p>
+          <p>${bodyMessage}</p>
           
           <div style="background: #16213e; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #b8860b;">
             <h3 style="margin-top: 0; color: #d4a017;">📋 Booking Details</h3>
@@ -81,7 +112,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: "CARBAZAAR Services <onboarding@resend.dev>",
         to: [email],
-        subject: `✅ Booking Confirmed - ${packageName} | CARBAZAAR`,
+        subject: subjectLine,
         html,
       }),
     });

@@ -62,12 +62,33 @@ const MyBookings = () => {
     if (!cancelId) return;
     setActionLoading(true);
     try {
+      const booking = bookings.find((b) => b.id === cancelId);
       const { error } = await supabase
         .from("service_bookings")
         .update({ status: "cancelled" })
         .eq("id", cancelId);
       if (error) throw error;
       toast.success("Booking cancelled successfully");
+
+      // Send cancellation email
+      if (booking && user?.email) {
+        const { data: profile } = await supabase.from("profiles").select("name").eq("user_id", user.id).single();
+        supabase.functions.invoke("send-service-booking-email", {
+          body: {
+            email: user.email,
+            name: profile?.name || "Customer",
+            packageName: booking.package_name,
+            packagePrice: booking.package_price,
+            carBrand: booking.car_brand,
+            carModel: booking.car_model,
+            carRegistration: booking.car_registration,
+            bookingDate: format(new Date(booking.booking_date), "dd MMM yyyy"),
+            bookingTime: booking.booking_time,
+            statusUpdate: "cancelled",
+          },
+        }).catch((e) => console.error("Cancel email error:", e));
+      }
+
       setCancelId(null);
       fetchBookings();
     } catch {
@@ -94,6 +115,26 @@ const MyBookings = () => {
         .eq("id", rescheduleBooking.id);
       if (error) throw error;
       toast.success("Booking rescheduled successfully");
+
+      // Send reschedule email
+      if (user?.email) {
+        const { data: profile } = await supabase.from("profiles").select("name").eq("user_id", user.id).single();
+        supabase.functions.invoke("send-service-booking-email", {
+          body: {
+            email: user.email,
+            name: profile?.name || "Customer",
+            packageName: rescheduleBooking.package_name,
+            packagePrice: rescheduleBooking.package_price,
+            carBrand: rescheduleBooking.car_brand,
+            carModel: rescheduleBooking.car_model,
+            carRegistration: rescheduleBooking.car_registration,
+            bookingDate: format(newDate, "dd MMM yyyy"),
+            bookingTime: newTime,
+            statusUpdate: "rescheduled",
+          },
+        }).catch((e) => console.error("Reschedule email error:", e));
+      }
+
       setRescheduleBooking(null);
       setNewDate(undefined);
       setNewTime("");
