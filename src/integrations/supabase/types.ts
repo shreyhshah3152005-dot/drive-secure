@@ -1047,11 +1047,16 @@ export type Database = {
           created_at: string
           id: string
           notes: string | null
+          package_duration_months: number
           package_id: string
           package_name: string
           package_price: number
+          services_used: number
           status: string
+          total_services: number
+          total_washes: number
           user_id: string
+          washes_used: number
         }
         Insert: {
           booking_date: string
@@ -1063,11 +1068,16 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          package_duration_months?: number
           package_id: string
           package_name: string
           package_price: number
+          services_used?: number
           status?: string
+          total_services?: number
+          total_washes?: number
           user_id: string
+          washes_used?: number
         }
         Update: {
           booking_date?: string
@@ -1079,11 +1089,16 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          package_duration_months?: number
           package_id?: string
           package_name?: string
           package_price?: number
+          services_used?: number
           status?: string
+          total_services?: number
+          total_washes?: number
           user_id?: string
+          washes_used?: number
         }
         Relationships: []
       }
