@@ -167,6 +167,36 @@ const MyBookings = () => {
   const isUpcoming = (date: string, status: string) =>
     new Date(date) >= new Date() && status !== "cancelled";
 
+  const getNextServiceDate = (b: Booking) => {
+    if (b.status === "cancelled") return null;
+    const startDate = new Date(b.booking_date);
+    const endDate = addMonths(startDate, b.package_duration_months);
+    const now = new Date();
+    if (now > endDate) return null; // subscription expired
+
+    const remainingServices = b.total_services - b.services_used;
+    if (remainingServices <= 0) return null;
+
+    // Spread remaining services evenly across remaining duration
+    const daysLeft = differenceInDays(endDate, now);
+    const intervalDays = Math.floor(daysLeft / remainingServices);
+    const nextDate = new Date(now.getTime() + intervalDays * 24 * 60 * 60 * 1000);
+    return nextDate > endDate ? null : nextDate;
+  };
+
+  const getSubscriptionExpiry = (b: Booking) => {
+    return addMonths(new Date(b.booking_date), b.package_duration_months);
+  };
+
+  const getSubscriptionProgress = (b: Booking) => {
+    const start = new Date(b.booking_date);
+    const end = addMonths(start, b.package_duration_months);
+    const now = new Date();
+    const total = differenceInDays(end, start);
+    const elapsed = differenceInDays(now, start);
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  };
+
   return (
     <>
       <Card className="gradient-card border-border/50">
@@ -176,58 +206,112 @@ const MyBookings = () => {
             My Service Bookings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {bookings.map((b) => (
-            <div key={b.id} className="p-3 rounded-lg bg-secondary/30 border border-border/30">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-sm text-foreground">{b.package_name}</span>
-                <div className="flex items-center gap-2">
-                  {isUpcoming(b.booking_date, b.status) && (
-                    <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">Upcoming</Badge>
-                  )}
-                  <Badge variant="outline" className={`text-xs capitalize ${getStatusColor(b.status)}`}>
-                    {b.status}
-                  </Badge>
+        <CardContent className="space-y-4">
+          {bookings.map((b) => {
+            const nextService = getNextServiceDate(b);
+            const expiry = getSubscriptionExpiry(b);
+            const progress = getSubscriptionProgress(b);
+            const isExpired = new Date() > expiry;
+            const remainingServices = b.total_services - b.services_used;
+            const remainingWashes = b.total_washes - b.washes_used;
+
+            return (
+              <div key={b.id} className="p-4 rounded-lg bg-secondary/30 border border-border/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-sm text-foreground">{b.package_name}</span>
+                  <div className="flex items-center gap-2">
+                    {isExpired && b.status !== "cancelled" && (
+                      <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">Expired</Badge>
+                    )}
+                    {!isExpired && isUpcoming(b.booking_date, b.status) && (
+                      <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">Active</Badge>
+                    )}
+                    <Badge variant="outline" className={`text-xs capitalize ${getStatusColor(b.status)}`}>
+                      {b.status}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Car className="w-3 h-3" /> {b.car_brand} {b.car_model} ({b.car_registration})
-                </span>
-                <span className="flex items-center gap-1">
-                  <CalendarDays className="w-3 h-3" /> {format(new Date(b.booking_date), "dd MMM yyyy")}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {b.booking_time}
-                </span>
-                <span className="font-medium text-primary">₹{b.package_price.toLocaleString("en-IN")}</span>
-              </div>
-              {isUpcoming(b.booking_date, b.status) && (
-                <div className="flex gap-2 mt-3">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-xs gap-1"
-                    onClick={() => {
-                      setRescheduleBooking(b);
-                      setNewDate(new Date(b.booking_date));
-                      setNewTime(b.booking_time);
-                    }}
-                  >
-                    <RefreshCw className="w-3 h-3" /> Reschedule
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-xs gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
-                    onClick={() => setCancelId(b.id)}
-                  >
-                    <XCircle className="w-3 h-3" /> Cancel
-                  </Button>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Car className="w-3 h-3" /> {b.car_brand} {b.car_model} ({b.car_registration})
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CalendarDays className="w-3 h-3" /> Started {format(new Date(b.booking_date), "dd MMM yyyy")}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" /> {b.package_duration_months} month plan
+                  </span>
+                  <span className="font-medium text-primary">₹{b.package_price.toLocaleString("en-IN")}</span>
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* Subscription Progress */}
+                {b.status !== "cancelled" && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Plan Progress</span>
+                      <span>{isExpired ? "Expired" : `Expires ${format(expiry, "dd MMM yyyy")}`}</span>
+                    </div>
+                    <Progress value={progress} className="h-1.5" />
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 p-2 rounded-md bg-background/50 border border-border/20">
+                        <Wrench className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs font-semibold text-foreground">{remainingServices}/{b.total_services}</p>
+                          <p className="text-[10px] text-muted-foreground">Services left</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-md bg-background/50 border border-border/20">
+                        <Droplets className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs font-semibold text-foreground">{remainingWashes}/{b.total_washes}</p>
+                          <p className="text-[10px] text-muted-foreground">Washes left</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {nextService && !isExpired && remainingServices > 0 && (
+                      <div className="flex items-center gap-2 p-2 rounded-md bg-primary/5 border border-primary/20">
+                        <CalendarDays className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs font-semibold text-primary">Next Service Due</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(nextService, "dd MMM yyyy")} ({differenceInDays(nextService, new Date())} days away)
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {isUpcoming(b.booking_date, b.status) && !isExpired && (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs gap-1"
+                      onClick={() => {
+                        setRescheduleBooking(b);
+                        setNewDate(new Date(b.booking_date));
+                        setNewTime(b.booking_time);
+                      }}
+                    >
+                      <RefreshCw className="w-3 h-3" /> Reschedule
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
+                      onClick={() => setCancelId(b.id)}
+                    >
+                      <XCircle className="w-3 h-3" /> Cancel
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
 
