@@ -186,6 +186,9 @@ const CarServices = () => {
                   packageId={pkg.id}
                   packageName={pkg.name}
                   packagePrice={pkg.price}
+                  packageDurationMonths={pkg.duration === "6 Months" ? 6 : 12}
+                  totalServices={pkg.services}
+                  totalWashes={pkg.washes}
                   trigger={
                     <Button
                       variant={pkg.popular ? "hero" : "outline"}

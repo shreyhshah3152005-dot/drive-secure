@@ -8,8 +8,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { CalendarDays, Car, Clock, Package, XCircle, CalendarIcon, RefreshCw } from "lucide-react";
-import { format } from "date-fns";
+import { Progress } from "@/components/ui/progress";
+import { CalendarDays, Car, Clock, Package, XCircle, CalendarIcon, RefreshCw, Droplets, Wrench } from "lucide-react";
+import { format, addMonths, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -24,6 +25,11 @@ interface Booking {
   booking_time: string;
   status: string;
   created_at: string;
+  package_duration_months: number;
+  total_services: number;
+  total_washes: number;
+  services_used: number;
+  washes_used: number;
 }
 
 const timeSlots = [
