@@ -513,10 +513,6 @@ const DealerPanel = () => {
               <Package className="w-4 h-4" />
               Subscription
             </TabsTrigger>
-            <TabsTrigger value="bookings" className="gap-2">
-              <ShoppingCart className="w-4 h-4" />
-              Bookings
-            </TabsTrigger>
             <TabsTrigger value="bulk" className="gap-2">
               <Layers className="w-4 h-4" />
               Bulk Actions
@@ -548,9 +544,6 @@ const DealerPanel = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="bookings">
-            <DealerServiceBookings />
-          </TabsContent>
 
           <TabsContent value="cars">
             <Card>

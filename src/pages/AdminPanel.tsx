@@ -29,6 +29,7 @@ import AdminBulkDealerActions from "@/components/AdminBulkDealerActions";
 import AdminDashboardWidget from "@/components/AdminDashboardWidget";
 import AdminEmailTemplates from "@/components/AdminEmailTemplates";
 import AdminRevenueDashboard from "@/components/AdminRevenueDashboard";
+import AdminServiceProviders from "@/components/AdminServiceProviders";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -434,6 +435,10 @@ const AdminPanel = () => {
             <TabsTrigger value="customers" className="gap-1.5 text-xs px-2 py-1.5">
               <Users className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Customers</span>
+            </TabsTrigger>
+            <TabsTrigger value="service-providers" className="gap-1.5 text-xs px-2 py-1.5">
+              <Wrench className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Services</span>
             </TabsTrigger>
           </TabsList>
 
