@@ -26,7 +26,7 @@ import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 import DealerNegotiations from "@/components/DealerNegotiations";
 import ServiceHistoryManager from "@/components/ServiceHistoryManager";
 import DealerBulkInventory from "@/components/DealerBulkInventory";
-import DealerServiceBookings from "@/components/DealerServiceBookings";
+
 
 interface DealerCar {
   id: string;
