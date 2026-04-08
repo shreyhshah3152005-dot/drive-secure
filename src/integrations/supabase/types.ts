@@ -1153,6 +1153,42 @@ export type Database = {
           },
         ]
       }
+      service_providers: {
+        Row: {
+          address: string | null
+          business_name: string
+          city: string
+          created_at: string
+          id: string
+          is_active: boolean
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          business_name: string
+          city: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          business_name?: string
+          city?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_upgrade_requests: {
         Row: {
           admin_notes: string | null
@@ -1353,9 +1389,10 @@ export type Database = {
         Returns: boolean
       }
       is_dealer: { Args: { _user_id: string }; Returns: boolean }
+      is_service_provider: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "dealer"
+      app_role: "admin" | "moderator" | "user" | "dealer" | "service_provider"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1483,7 +1520,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "dealer"],
+      app_role: ["admin", "moderator", "user", "dealer", "service_provider"],
     },
   },
 } as const
