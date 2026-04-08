@@ -670,6 +670,10 @@ const AdminPanel = () => {
           <TabsContent value="customers">
             <AdminCustomers />
           </TabsContent>
+
+          <TabsContent value="service-providers">
+            <AdminServiceProviders />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
