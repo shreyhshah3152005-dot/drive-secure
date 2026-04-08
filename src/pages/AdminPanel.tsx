@@ -19,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server, Layers, FileText, LayoutDashboard, DollarSign } from "lucide-react";
+import { Shield, Car, Calendar, Clock, Mail, Phone, User, AlertCircle, Store, Package, Users, UserCheck, BarChart3, ArrowUp, BadgeCheck, TrendingUp, Bell, Server, Layers, FileText, LayoutDashboard, DollarSign, Wrench } from "lucide-react";
 import AdminSubscriptionRequests from "@/components/AdminSubscriptionRequests";
 import AdminDealerVerification from "@/components/AdminDealerVerification";
 import AdminDealerPerformance from "@/components/AdminDealerPerformance";
