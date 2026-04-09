@@ -107,6 +107,20 @@ const ServiceBookingDialog = ({ packageId, packageName, packagePrice, packageDur
             bookingTime: timeSlot,
           },
         });
+
+        // Notify service providers
+        await supabase.functions.invoke("send-service-provider-notification", {
+          body: {
+            packageName,
+            packagePrice,
+            carBrand,
+            carModel,
+            carRegistration: carRegistration.toUpperCase(),
+            bookingDate: format(date, "dd MMM yyyy"),
+            bookingTime: timeSlot,
+            customerName: userName,
+          },
+        });
       } catch (emailErr) {
         console.error("Failed to send confirmation email:", emailErr);
       }

@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useDealerRole } from "@/hooks/useDealerRole";
+import { useServiceProviderRole } from "@/hooks/useServiceProviderRole";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useChatNotifications } from "@/hooks/useChatNotifications";
-import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell, Menu, MessageCircle } from "lucide-react";
+import { LogOut, User, ArrowLeft, LayoutDashboard, Shield, Store, Bell, Menu, MessageCircle, Wrench } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
   const { isDealer } = useDealerRole();
+  const { isServiceProvider } = useServiceProviderRole();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -66,6 +68,15 @@ const Navbar = () => {
             <Button variant="ghost" className={`${btnClass} text-primary`}>
               <Store className="w-4 h-4" />
               {(mobile || !isMobile) && <span className={mobile ? "ml-2" : "hidden md:inline ml-2"}>Dealer</span>}
+            </Button>
+          </Link>
+        )}
+
+        {isServiceProvider && (
+          <Link to="/service-provider" onClick={handleClick}>
+            <Button variant="ghost" className={`${btnClass} text-primary`}>
+              <Wrench className="w-4 h-4" />
+              {(mobile || !isMobile) && <span className={mobile ? "ml-2" : "hidden md:inline ml-2"}>Services</span>}
             </Button>
           </Link>
         )}
