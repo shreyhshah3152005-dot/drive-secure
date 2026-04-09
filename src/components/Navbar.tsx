@@ -18,6 +18,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
   const { isDealer } = useDealerRole();
+  const { isServiceProvider } = useServiceProviderRole();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -67,6 +68,15 @@ const Navbar = () => {
             <Button variant="ghost" className={`${btnClass} text-primary`}>
               <Store className="w-4 h-4" />
               {(mobile || !isMobile) && <span className={mobile ? "ml-2" : "hidden md:inline ml-2"}>Dealer</span>}
+            </Button>
+          </Link>
+        )}
+
+        {isServiceProvider && (
+          <Link to="/service-provider" onClick={handleClick}>
+            <Button variant="ghost" className={`${btnClass} text-primary`}>
+              <Wrench className="w-4 h-4" />
+              {(mobile || !isMobile) && <span className={mobile ? "ml-2" : "hidden md:inline ml-2"}>Services</span>}
             </Button>
           </Link>
         )}
