@@ -370,6 +370,19 @@ const ServiceProviderPanel = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <ServiceInvoiceDialog
+          booking={invoiceBooking}
+          providerName={providerInfo?.business_name || "Service Provider"}
+          providerCity={providerInfo?.city}
+          providerPhone={providerInfo?.phone}
+          onClose={() => setInvoiceBooking(null)}
+        />
+
+        <VehicleHistoryDialog
+          registration={historyReg}
+          onClose={() => setHistoryReg(null)}
+        />
       </main>
       <Footer />
     </div>
