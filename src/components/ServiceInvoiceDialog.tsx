@@ -60,7 +60,7 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
     setSaving(true);
     try {
       const cleanParts = parts.filter((p) => p.name.trim());
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("service_invoices")
         .insert({
           booking_id: booking.id,
