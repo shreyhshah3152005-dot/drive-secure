@@ -13,9 +13,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle } from "lucide-react";
+import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import ServiceInvoiceDialog from "@/components/ServiceInvoiceDialog";
+import VehicleHistoryDialog from "@/components/VehicleHistoryDialog";
 
 interface ServiceBooking {
   id: string;
@@ -51,6 +53,8 @@ const ServiceProviderPanel = () => {
   const [updateDialog, setUpdateDialog] = useState<ServiceBooking | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [invoiceBooking, setInvoiceBooking] = useState<ServiceBooking | null>(null);
+  const [historyReg, setHistoryReg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !spLoading && !user) {
@@ -316,6 +320,12 @@ const ServiceProviderPanel = () => {
                                     +Wash
                                   </Button>
                                 )}
+                                <Button size="sm" variant="default" onClick={() => setInvoiceBooking(b)}>
+                                  <Receipt className="w-3 h-3 mr-1" />Bill
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => setHistoryReg(b.car_registration)}>
+                                  <History className="w-3 h-3 mr-1" />History
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -360,6 +370,19 @@ const ServiceProviderPanel = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <ServiceInvoiceDialog
+          booking={invoiceBooking}
+          providerName={providerInfo?.business_name || "Service Provider"}
+          providerCity={providerInfo?.city}
+          providerPhone={providerInfo?.phone}
+          onClose={() => setInvoiceBooking(null)}
+        />
+
+        <VehicleHistoryDialog
+          registration={historyReg}
+          onClose={() => setHistoryReg(null)}
+        />
       </main>
       <Footer />
     </div>
