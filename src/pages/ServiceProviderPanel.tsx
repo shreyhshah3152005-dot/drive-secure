@@ -320,6 +320,12 @@ const ServiceProviderPanel = () => {
                                     +Wash
                                   </Button>
                                 )}
+                                <Button size="sm" variant="default" onClick={() => setInvoiceBooking(b)}>
+                                  <Receipt className="w-3 h-3 mr-1" />Bill
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => setHistoryReg(b.car_registration)}>
+                                  <History className="w-3 h-3 mr-1" />History
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
