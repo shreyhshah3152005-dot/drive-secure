@@ -1153,6 +1153,66 @@ export type Database = {
           },
         ]
       }
+      service_invoices: {
+        Row: {
+          booking_id: string
+          created_at: string
+          id: string
+          invoice_number: string
+          labor_charge: number
+          notes: string | null
+          parts: Json
+          parts_total: number
+          provider_id: string | null
+          service_date: string
+          service_description: string | null
+          subtotal: number
+          tax_amount: number
+          tax_percent: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          id?: string
+          invoice_number?: string
+          labor_charge?: number
+          notes?: string | null
+          parts?: Json
+          parts_total?: number
+          provider_id?: string | null
+          service_date?: string
+          service_description?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_percent?: number
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          id?: string
+          invoice_number?: string
+          labor_charge?: number
+          notes?: string | null
+          parts?: Json
+          parts_total?: number
+          provider_id?: string | null
+          service_date?: string
+          service_description?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_percent?: number
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_providers: {
         Row: {
           address: string | null
