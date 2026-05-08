@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Phone, MapPin, Camera, Upload, X, Save, Calendar, Sun, Moon, Trash2, AlertTriangle, Download } from "lucide-react";
 import MyBookings from "@/components/MyBookings";
+import MyServiceInvoices from "@/components/MyServiceInvoices";
 import { toast } from "sonner";
 import { z } from "zod";
 import { format } from "date-fns";
