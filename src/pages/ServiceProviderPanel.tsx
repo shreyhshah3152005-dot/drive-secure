@@ -53,6 +53,7 @@ const ServiceProviderPanel = () => {
   const [updateDialog, setUpdateDialog] = useState<ServiceBooking | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [confirmStep, setConfirmStep] = useState(false);
   const [invoiceBooking, setInvoiceBooking] = useState<ServiceBooking | null>(null);
   const [historyReg, setHistoryReg] = useState<string | null>(null);
 
@@ -129,6 +130,7 @@ const ServiceProviderPanel = () => {
       toast.success(`Booking status updated to ${newStatus}`);
       setUpdateDialog(null);
       setNewStatus("");
+      setConfirmStep(false);
       fetchBookings();
     } catch {
       toast.error("Failed to update booking status");
@@ -311,7 +313,7 @@ const ServiceProviderPanel = () => {
                             <TableCell>
                               <div className="flex gap-1 flex-wrap">
                                 {b.status !== "cancelled" && b.status !== "completed" && (
-                                  <Button size="sm" variant="outline" onClick={() => { setUpdateDialog(b); setNewStatus(b.status); }}>
+                                  <Button size="sm" variant="outline" onClick={() => { setUpdateDialog(b); setNewStatus(b.status); setConfirmStep(false); }}>
                                     Update
                                   </Button>
                                 )}
@@ -340,20 +342,21 @@ const ServiceProviderPanel = () => {
         </Tabs>
 
         {/* Update Dialog */}
-        <Dialog open={!!updateDialog} onOpenChange={() => setUpdateDialog(null)}>
+        <Dialog open={!!updateDialog} onOpenChange={() => { setUpdateDialog(null); setConfirmStep(false); }}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Update Booking Status</DialogTitle>
+              <DialogTitle>{confirmStep ? "Confirm Status Change" : "Update Booking Status"}</DialogTitle>
             </DialogHeader>
-            {updateDialog && (
+            {updateDialog && !confirmStep && (
               <div className="space-y-4">
                 <div className="p-3 rounded-lg bg-secondary/30 text-sm space-y-1">
                   <p><strong>{updateDialog.package_name}</strong></p>
                   <p className="text-muted-foreground">{updateDialog.car_brand} {updateDialog.car_model} — {updateDialog.car_registration}</p>
                   <p className="text-muted-foreground">{format(new Date(updateDialog.booking_date), "dd MMM yyyy")} at {updateDialog.booking_time}</p>
+                  <p className="text-xs">Current: <span className="capitalize font-medium">{updateDialog.status.replace("_", " ")}</span></p>
                 </div>
                 <Select value={newStatus} onValueChange={setNewStatus}>
-                  <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select new status" /></SelectTrigger>
                   <SelectContent>
                     {statusOptions.map((s) => (
                       <SelectItem key={s} value={s} className="capitalize">{s.replace("_", " ")}</SelectItem>
@@ -362,11 +365,34 @@ const ServiceProviderPanel = () => {
                 </Select>
               </div>
             )}
+            {updateDialog && confirmStep && (
+              <div className="space-y-3">
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm flex gap-2">
+                  <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                  <div>
+                    <p className="font-semibold">Please confirm this change</p>
+                    <p className="text-muted-foreground text-xs mt-1">
+                      Change status from <strong className="capitalize">{updateDialog.status.replace("_", " ")}</strong> to <strong className="capitalize">{newStatus.replace("_", " ")}</strong>?
+                      {newStatus === "completed" && " This will increment the services-used counter and notify the customer."}
+                      {newStatus === "cancelled" && " The customer will be notified by email."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <DialogFooter>
-              <Button variant="outline" onClick={() => setUpdateDialog(null)}>Cancel</Button>
-              <Button onClick={handleUpdateStatus} disabled={updating}>
-                {updating ? "Updating..." : "Update Status"}
+              <Button variant="outline" onClick={() => { if (confirmStep) setConfirmStep(false); else setUpdateDialog(null); }}>
+                {confirmStep ? "Back" : "Cancel"}
               </Button>
+              {!confirmStep ? (
+                <Button onClick={() => setConfirmStep(true)} disabled={!newStatus || newStatus === updateDialog?.status}>
+                  Continue
+                </Button>
+              ) : (
+                <Button onClick={handleUpdateStatus} disabled={updating}>
+                  {updating ? "Updating..." : "Confirm & Update"}
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -381,6 +407,9 @@ const ServiceProviderPanel = () => {
 
         <VehicleHistoryDialog
           registration={historyReg}
+          providerName={providerInfo?.business_name || "Service Provider"}
+          providerCity={providerInfo?.city}
+          providerPhone={providerInfo?.phone}
           onClose={() => setHistoryReg(null)}
         />
       </main>
