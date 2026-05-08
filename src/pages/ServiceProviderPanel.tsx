@@ -53,6 +53,7 @@ const ServiceProviderPanel = () => {
   const [updateDialog, setUpdateDialog] = useState<ServiceBooking | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [confirmStep, setConfirmStep] = useState(false);
   const [invoiceBooking, setInvoiceBooking] = useState<ServiceBooking | null>(null);
   const [historyReg, setHistoryReg] = useState<string | null>(null);
 
