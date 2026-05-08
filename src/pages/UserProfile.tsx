@@ -522,6 +522,7 @@ const UserProfile = () => {
         {/* My Bookings */}
         <div className="mt-6">
           <MyBookings />
+          <MyServiceInvoices />
         </div>
 
         {/* Data Export */}
