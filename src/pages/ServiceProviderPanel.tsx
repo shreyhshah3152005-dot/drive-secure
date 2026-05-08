@@ -313,7 +313,7 @@ const ServiceProviderPanel = () => {
                             <TableCell>
                               <div className="flex gap-1 flex-wrap">
                                 {b.status !== "cancelled" && b.status !== "completed" && (
-                                  <Button size="sm" variant="outline" onClick={() => { setUpdateDialog(b); setNewStatus(b.status); }}>
+                                  <Button size="sm" variant="outline" onClick={() => { setUpdateDialog(b); setNewStatus(b.status); setConfirmStep(false); }}>
                                     Update
                                   </Button>
                                 )}
