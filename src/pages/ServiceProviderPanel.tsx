@@ -130,6 +130,7 @@ const ServiceProviderPanel = () => {
       toast.success(`Booking status updated to ${newStatus}`);
       setUpdateDialog(null);
       setNewStatus("");
+      setConfirmStep(false);
       fetchBookings();
     } catch {
       toast.error("Failed to update booking status");
