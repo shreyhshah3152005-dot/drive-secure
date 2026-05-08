@@ -1,19 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Printer, Save } from "lucide-react";
+import { Plus, Trash2, Printer, Save, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
-
-interface Part {
-  name: string;
-  qty: number;
-  price: number;
-}
+import { printInvoiceDocument, InvoicePart } from "@/lib/printInvoice";
 
 interface BookingLite {
   id: string;
@@ -36,51 +30,96 @@ interface Props {
 }
 
 const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPhone, onClose, onSaved }: Props) => {
-  const [parts, setParts] = useState<Part[]>([{ name: "", qty: 1, price: 0 }]);
+  const [parts, setParts] = useState<InvoicePart[]>([{ name: "", qty: 1, price: 0 }]);
   const [labor, setLabor] = useState(0);
   const [taxPercent, setTaxPercent] = useState(18);
   const [serviceDescription, setServiceDescription] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const totals = useMemo(() => {
+    const partsTotal = parts.reduce((s, p) => s + (Number(p.qty) || 0) * (Number(p.price) || 0), 0);
+    const laborNum = Number(labor) || 0;
+    const taxPct = Math.max(0, Math.min(100, Number(taxPercent) || 0));
+    const subtotal = partsTotal + laborNum;
+    const taxAmount = +(subtotal * taxPct / 100).toFixed(2);
+    const total = +(subtotal + taxAmount).toFixed(2);
+    return { partsTotal: +partsTotal.toFixed(2), laborNum, taxPct, subtotal: +subtotal.toFixed(2), taxAmount, total };
+  }, [parts, labor, taxPercent]);
+
+  const validation = useMemo(() => {
+    const errors: string[] = [];
+    if (!serviceDescription.trim() && !booking?.package_name) errors.push("Service description is required");
+    parts.forEach((p, i) => {
+      if (p.name.trim()) {
+        if (!Number.isFinite(Number(p.qty)) || Number(p.qty) <= 0) errors.push(`Part ${i + 1}: qty must be > 0`);
+        if (!Number.isFinite(Number(p.price)) || Number(p.price) < 0) errors.push(`Part ${i + 1}: price must be ≥ 0`);
+      } else if (Number(p.qty) > 0 && Number(p.price) > 0) {
+        errors.push(`Part ${i + 1}: name is required`);
+      }
+    });
+    if (Number(labor) < 0) errors.push("Labor charge cannot be negative");
+    if (totals.total <= 0) errors.push("Invoice total must be greater than 0");
+    return errors;
+  }, [parts, labor, serviceDescription, booking, totals.total]);
+
   if (!booking) return null;
 
-  const partsTotal = parts.reduce((sum, p) => sum + (Number(p.qty) || 0) * (Number(p.price) || 0), 0);
-  const subtotal = partsTotal + Number(labor || 0);
-  const taxAmount = (subtotal * Number(taxPercent || 0)) / 100;
-  const total = subtotal + taxAmount;
-
-  const updatePart = (i: number, key: keyof Part, val: string | number) => {
+  const updatePart = (i: number, key: keyof InvoicePart, val: string | number) => {
     const next = [...parts];
-    next[i] = { ...next[i], [key]: key === "name" ? val : Number(val) };
+    next[i] = { ...next[i], [key]: key === "name" ? String(val) : Number(val) };
     setParts(next);
   };
 
   const handleSave = async (thenPrint = false) => {
+    if (validation.length > 0) {
+      toast.error(validation[0]);
+      return;
+    }
     setSaving(true);
     try {
-      const cleanParts = parts.filter((p) => p.name.trim());
+      const cleanParts = parts.filter((p) => p.name.trim()).map(p => ({ name: p.name.trim(), qty: Number(p.qty), price: Number(p.price) }));
+      const desc = serviceDescription.trim() || booking.package_name;
       const { data, error } = await (supabase as any)
         .from("service_invoices")
         .insert({
           booking_id: booking.id,
           user_id: booking.user_id,
-          service_description: serviceDescription || booking.package_name,
+          service_description: desc,
           parts: cleanParts,
-          labor_charge: labor,
-          parts_total: partsTotal,
-          subtotal,
-          tax_percent: taxPercent,
-          tax_amount: taxAmount,
-          total_amount: total,
-          notes,
+          labor_charge: totals.laborNum,
+          parts_total: totals.partsTotal,
+          subtotal: totals.subtotal,
+          tax_percent: totals.taxPct,
+          tax_amount: totals.taxAmount,
+          total_amount: totals.total,
+          notes: notes.trim() || null,
         })
         .select()
         .single();
       if (error) throw error;
       toast.success("Invoice saved");
       onSaved?.();
-      if (thenPrint) printInvoice(data.invoice_number);
+      if (thenPrint) {
+        printInvoiceDocument({
+          invoice_number: data.invoice_number,
+          service_date: data.service_date,
+          service_description: desc,
+          parts: cleanParts,
+          labor_charge: totals.laborNum,
+          parts_total: totals.partsTotal,
+          subtotal: totals.subtotal,
+          tax_percent: totals.taxPct,
+          tax_amount: totals.taxAmount,
+          total_amount: totals.total,
+          notes,
+          provider: { name: providerName, city: providerCity, phone: providerPhone },
+          vehicle: {
+            brand: booking.car_brand, model: booking.car_model, year: booking.car_year,
+            registration: booking.car_registration, package: booking.package_name,
+          },
+        });
+      }
       onClose();
     } catch (e) {
       console.error(e);
@@ -88,87 +127,6 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
     } finally {
       setSaving(false);
     }
-  };
-
-  const printInvoice = (invoiceNumber: string) => {
-    const cleanParts = parts.filter((p) => p.name.trim());
-    const html = `
-<!DOCTYPE html><html><head><title>Invoice ${invoiceNumber}</title>
-<style>
-  *{box-sizing:border-box;font-family:'Helvetica Neue',Arial,sans-serif;}
-  body{margin:0;padding:40px;color:#1a1a1a;background:#fff;}
-  .header{display:flex;justify-content:space-between;border-bottom:3px solid #b8860b;padding-bottom:20px;margin-bottom:30px;}
-  .brand{font-size:28px;font-weight:700;color:#b8860b;letter-spacing:2px;}
-  .brand span{color:#1a1a1a;}
-  .meta{text-align:right;font-size:13px;color:#555;}
-  h1{font-size:22px;margin:0 0 6px;}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:30px;}
-  .box{border:1px solid #e5e5e5;padding:15px;border-radius:6px;}
-  .box h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#888;letter-spacing:1px;}
-  .box p{margin:4px 0;font-size:14px;}
-  table{width:100%;border-collapse:collapse;margin-bottom:20px;}
-  th{background:#1a1a1a;color:#fff;padding:10px;text-align:left;font-size:12px;text-transform:uppercase;}
-  td{padding:10px;border-bottom:1px solid #eee;font-size:14px;}
-  td.r,th.r{text-align:right;}
-  .totals{margin-left:auto;width:300px;}
-  .totals tr td{border:none;padding:6px 10px;}
-  .totals .total{font-size:18px;font-weight:700;border-top:2px solid #1a1a1a;color:#b8860b;}
-  .notes{margin-top:30px;padding:15px;background:#fafafa;border-left:4px solid #b8860b;font-size:13px;}
-  .footer{margin-top:50px;text-align:center;font-size:12px;color:#888;border-top:1px solid #eee;padding-top:20px;}
-  @media print{body{padding:20px;}}
-</style></head><body>
-  <div class="header">
-    <div>
-      <div class="brand">CAR<span>BAZAAR</span></div>
-      <p style="margin:8px 0 0;font-size:12px;color:#666;">Service Invoice</p>
-    </div>
-    <div class="meta">
-      <h1>Invoice #${invoiceNumber}</h1>
-      <p>Date: ${format(new Date(), "dd MMM yyyy")}</p>
-    </div>
-  </div>
-  <div class="grid">
-    <div class="box">
-      <h3>Service Provider</h3>
-      <p><strong>${providerName}</strong></p>
-      ${providerCity ? `<p>${providerCity}</p>` : ""}
-      ${providerPhone ? `<p>${providerPhone}</p>` : ""}
-    </div>
-    <div class="box">
-      <h3>Vehicle</h3>
-      <p><strong>${booking.car_brand} ${booking.car_model} (${booking.car_year})</strong></p>
-      <p>Reg: ${booking.car_registration}</p>
-      <p>Package: ${booking.package_name}</p>
-    </div>
-  </div>
-
-  <h3 style="font-size:14px;text-transform:uppercase;color:#888;letter-spacing:1px;">Service Performed</h3>
-  <p style="margin:0 0 20px;font-size:14px;">${serviceDescription || booking.package_name}</p>
-
-  <table>
-    <thead><tr><th>Part / Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Total</th></tr></thead>
-    <tbody>
-      ${cleanParts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#999;">No parts replaced</td></tr>' : cleanParts.map(p => `
-        <tr><td>${p.name}</td><td class="r">${p.qty}</td><td class="r">₹${p.price.toFixed(2)}</td><td class="r">₹${(p.qty*p.price).toFixed(2)}</td></tr>
-      `).join("")}
-    </tbody>
-  </table>
-
-  <table class="totals">
-    <tr><td>Parts Total</td><td class="r">₹${partsTotal.toFixed(2)}</td></tr>
-    <tr><td>Labor Charge</td><td class="r">₹${Number(labor).toFixed(2)}</td></tr>
-    <tr><td>Subtotal</td><td class="r">₹${subtotal.toFixed(2)}</td></tr>
-    <tr><td>Tax (${taxPercent}%)</td><td class="r">₹${taxAmount.toFixed(2)}</td></tr>
-    <tr class="total"><td>Total Amount</td><td class="r">₹${total.toFixed(2)}</td></tr>
-  </table>
-
-  ${notes ? `<div class="notes"><strong>Notes:</strong> ${notes}</div>` : ""}
-
-  <div class="footer">Thank you for choosing CARBAZAAR Service · This is a computer-generated invoice</div>
-  <script>window.onload=()=>{window.print();}</script>
-</body></html>`;
-    const w = window.open("", "_blank");
-    if (w) { w.document.write(html); w.document.close(); }
   };
 
   return (
@@ -185,7 +143,7 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
           </div>
 
           <div className="space-y-2">
-            <Label>Service description</Label>
+            <Label>Service description *</Label>
             <Textarea
               placeholder="e.g. Full body wash, oil change, brake inspection..."
               value={serviceDescription}
@@ -232,19 +190,27 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
           </div>
 
           <div className="rounded-lg bg-secondary/30 p-3 text-sm space-y-1">
-            <div className="flex justify-between"><span>Parts</span><span>₹{partsTotal.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>Labor</span><span>₹{Number(labor).toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>Tax ({taxPercent}%)</span><span>₹{taxAmount.toFixed(2)}</span></div>
-            <div className="flex justify-between font-bold text-primary border-t border-border pt-1 mt-1"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Parts</span><span>₹{totals.partsTotal.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Labor</span><span>₹{totals.laborNum.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Subtotal</span><span>₹{totals.subtotal.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Tax ({totals.taxPct}%)</span><span>₹{totals.taxAmount.toFixed(2)}</span></div>
+            <div className="flex justify-between font-bold text-primary border-t border-border pt-1 mt-1"><span>Total</span><span>₹{totals.total.toFixed(2)}</span></div>
           </div>
+
+          {validation.length > 0 && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive flex gap-2">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+              <ul className="space-y-0.5">{validation.map((e, i) => <li key={i}>• {e}</li>)}</ul>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button variant="secondary" onClick={() => handleSave(false)} disabled={saving}>
+          <Button variant="secondary" onClick={() => handleSave(false)} disabled={saving || validation.length > 0}>
             <Save className="w-4 h-4 mr-1" />Save
           </Button>
-          <Button onClick={() => handleSave(true)} disabled={saving}>
+          <Button onClick={() => handleSave(true)} disabled={saving || validation.length > 0}>
             <Printer className="w-4 h-4 mr-1" />Save & Print
           </Button>
         </DialogFooter>
