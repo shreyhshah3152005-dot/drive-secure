@@ -143,7 +143,7 @@ const ServiceProviderPanel = () => {
   const handleWashChange = async () => {
     if (!washDialog) return;
     const { booking, action } = washDialog;
-    if (booking.washes_used >= booking.total_washes) {
+    if (action === "done" && booking.washes_used >= booking.total_washes) {
       toast.error("All washes have been used");
       return;
     }
@@ -314,8 +314,8 @@ const ServiceProviderPanel = () => {
                             </TableCell>
                             <TableCell>
                               <div className="text-xs space-y-1">
-                                <div>Services: {b.services_used}/{b.total_services}</div>
-                                <div>Washes: {b.washes_used}/{b.total_washes}</div>
+                                <div className="font-medium">Services done: {b.services_used}/{b.total_services}</div>
+                                <div className="font-medium">Washes done: {b.washes_used}/{b.total_washes}</div>
                               </div>
                             </TableCell>
                             <TableCell>{getStatusBadge(b.status)}</TableCell>
@@ -327,8 +327,13 @@ const ServiceProviderPanel = () => {
                                   </Button>
                                 )}
                                 {b.washes_used < b.total_washes && b.status !== "cancelled" && (
-                                  <Button size="sm" variant="secondary" onClick={() => handleMarkWash(b)}>
-                                    +Wash
+                                  <Button size="sm" variant="secondary" onClick={() => setWashDialog({ booking: b, action: "done" })}>
+                                    <Droplets className="w-3 h-3 mr-1" />Wash Done
+                                  </Button>
+                                )}
+                                {b.washes_used > 0 && b.status !== "cancelled" && (
+                                  <Button size="sm" variant="outline" onClick={() => setWashDialog({ booking: b, action: "undo" })}>
+                                    <RotateCcw className="w-3 h-3 mr-1" />Undo Wash
                                   </Button>
                                 )}
                                 <Button size="sm" variant="default" onClick={() => setInvoiceBooking(b)}>
