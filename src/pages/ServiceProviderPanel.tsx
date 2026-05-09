@@ -448,6 +448,34 @@ const ServiceProviderPanel = () => {
           </DialogContent>
         </Dialog>
 
+        <Dialog open={!!serviceDialog} onOpenChange={() => setServiceDialog(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{serviceDialog?.action === "undo" ? "Undo service mark?" : "Mark service as done?"}</DialogTitle>
+            </DialogHeader>
+            {serviceDialog && (
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-secondary/30 text-sm space-y-1">
+                  <p><strong>{serviceDialog.booking.car_brand} {serviceDialog.booking.car_model}</strong> — {serviceDialog.booking.car_registration}</p>
+                  <p className="text-muted-foreground">{serviceDialog.booking.package_name}</p>
+                  <p className="text-xs">Current services done: <strong>{serviceDialog.booking.services_used}/{serviceDialog.booking.total_services}</strong></p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {serviceDialog.action === "undo"
+                    ? "This will reduce the customer's completed service count by one. Use this only if the previous mark was a mistake."
+                    : "This will increase the customer's completed service count by one and immediately update their profile progress."}
+                </p>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setServiceDialog(null)}>Cancel</Button>
+              <Button onClick={handleServiceChange} variant={serviceDialog?.action === "undo" ? "outline" : "default"}>
+                {serviceDialog?.action === "undo" ? "Confirm Undo" : "Confirm Done"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={!!washDialog} onOpenChange={() => setWashDialog(null)}>
           <DialogContent>
             <DialogHeader>
