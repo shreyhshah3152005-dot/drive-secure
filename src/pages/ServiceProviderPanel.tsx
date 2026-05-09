@@ -54,6 +54,7 @@ const ServiceProviderPanel = () => {
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
   const [confirmStep, setConfirmStep] = useState(false);
+  const [serviceDialog, setServiceDialog] = useState<{ booking: ServiceBooking; action: "done" | "undo" } | null>(null);
   const [washDialog, setWashDialog] = useState<{ booking: ServiceBooking; action: "done" | "undo" } | null>(null);
   const [invoiceBooking, setInvoiceBooking] = useState<ServiceBooking | null>(null);
   const [historyReg, setHistoryReg] = useState<string | null>(null);
@@ -163,6 +164,32 @@ const ServiceProviderPanel = () => {
       fetchBookings();
     } catch {
       toast.error("Failed to update wash count");
+    }
+  };
+
+  const handleServiceChange = async () => {
+    if (!serviceDialog) return;
+    const { booking, action } = serviceDialog;
+    if (action === "done" && booking.services_used >= booking.total_services) {
+      toast.error("All services have been used");
+      return;
+    }
+    const nextCount = action === "done" ? booking.services_used + 1 : booking.services_used - 1;
+    if (nextCount < 0 || nextCount > booking.total_services) {
+      toast.error("Service count cannot be changed further");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("service_bookings")
+        .update({ services_used: nextCount })
+        .eq("id", booking.id);
+      if (error) throw error;
+      toast.success(action === "done" ? "Service marked as done" : "Service mark undone");
+      setServiceDialog(null);
+      fetchBookings();
+    } catch {
+      toast.error("Failed to update service count");
     }
   };
 
