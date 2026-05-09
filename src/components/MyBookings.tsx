@@ -62,6 +62,20 @@ const MyBookings = () => {
 
   useEffect(() => {
     fetchBookings();
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`my-service-bookings-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "service_bookings", filter: `user_id=eq.${user.id}` },
+        () => fetchBookings()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const handleCancel = async () => {
@@ -258,18 +272,26 @@ const MyBookings = () => {
                       <div className="flex items-center gap-2 p-2 rounded-md bg-background/50 border border-border/20">
                         <Wrench className="w-4 h-4 text-primary" />
                         <div>
-                          <p className="text-xs font-semibold text-foreground">{remainingServices}/{b.total_services}</p>
-                          <p className="text-[10px] text-muted-foreground">Services left</p>
+                          <p className="text-xs font-semibold text-foreground">{b.services_used}/{b.total_services} done</p>
+                          <p className="text-[10px] text-muted-foreground">{remainingServices} services left</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-md bg-background/50 border border-border/20">
                         <Droplets className="w-4 h-4 text-primary" />
                         <div>
-                          <p className="text-xs font-semibold text-foreground">{remainingWashes}/{b.total_washes}</p>
-                          <p className="text-[10px] text-muted-foreground">Washes left</p>
+                          <p className="text-xs font-semibold text-foreground">{b.washes_used}/{b.total_washes} done</p>
+                          <p className="text-[10px] text-muted-foreground">{remainingWashes} washes left</p>
                         </div>
                       </div>
                     </div>
+
+                    {(b.services_used > 0 || b.washes_used > 0 || b.status === "completed") && (
+                      <div className="flex flex-wrap gap-2 text-[11px]">
+                        {b.services_used > 0 && <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">{b.services_used} service{b.services_used > 1 ? "s" : ""} completed</Badge>}
+                        {b.washes_used > 0 && <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">{b.washes_used} wash{b.washes_used > 1 ? "es" : ""} completed</Badge>}
+                        {b.status === "completed" && <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">Marked done by servicer</Badge>}
+                      </div>
+                    )}
 
                     {nextService && !isExpired && remainingServices > 0 && (
                       <div className="flex items-center gap-2 p-2 rounded-md bg-primary/5 border border-primary/20">
