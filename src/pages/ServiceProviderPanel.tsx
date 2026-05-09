@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History } from "lucide-react";
+import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History, Droplets, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ServiceInvoiceDialog from "@/components/ServiceInvoiceDialog";
@@ -54,6 +54,7 @@ const ServiceProviderPanel = () => {
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
   const [confirmStep, setConfirmStep] = useState(false);
+  const [washDialog, setWashDialog] = useState<{ booking: ServiceBooking; action: "done" | "undo" } | null>(null);
   const [invoiceBooking, setInvoiceBooking] = useState<ServiceBooking | null>(null);
   const [historyReg, setHistoryReg] = useState<string | null>(null);
 
@@ -90,7 +91,7 @@ const ServiceProviderPanel = () => {
 
       // If marking as completed, increment usage
       if (newStatus === "completed" && updateDialog.status !== "completed") {
-        updateData.services_used = updateDialog.services_used + 1;
+        updateData.services_used = Math.min(updateDialog.total_services, updateDialog.services_used + 1);
       }
 
       const { error } = await supabase
@@ -139,18 +140,26 @@ const ServiceProviderPanel = () => {
     }
   };
 
-  const handleMarkWash = async (booking: ServiceBooking) => {
+  const handleWashChange = async () => {
+    if (!washDialog) return;
+    const { booking, action } = washDialog;
     if (booking.washes_used >= booking.total_washes) {
       toast.error("All washes have been used");
+      return;
+    }
+    const nextCount = action === "done" ? booking.washes_used + 1 : booking.washes_used - 1;
+    if (nextCount < 0 || nextCount > booking.total_washes) {
+      toast.error("Wash count cannot be changed further");
       return;
     }
     try {
       const { error } = await supabase
         .from("service_bookings")
-        .update({ washes_used: booking.washes_used + 1 })
+        .update({ washes_used: nextCount })
         .eq("id", booking.id);
       if (error) throw error;
-      toast.success("Wash marked as completed");
+      toast.success(action === "done" ? "Wash marked as done" : "Wash mark undone");
+      setWashDialog(null);
       fetchBookings();
     } catch {
       toast.error("Failed to update wash count");
