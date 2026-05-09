@@ -167,6 +167,41 @@ const ServiceProviderPanel = () => {
     }
   };
 
+  const markWashDone = async (booking: ServiceBooking) => {
+    if (booking.washes_used >= booking.total_washes || booking.status === "cancelled") {
+      toast.error("Wash count cannot be changed further");
+      return;
+    }
+    const nextCount = booking.washes_used + 1;
+    try {
+      const { error } = await supabase
+        .from("service_bookings")
+        .update({ washes_used: nextCount })
+        .eq("id", booking.id);
+      if (error) throw error;
+      toast.success("Wash marked as done", {
+        description: `${booking.car_registration} now shows ${nextCount}/${booking.total_washes} washes done in the customer profile.`,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const { error: undoError } = await supabase
+              .from("service_bookings")
+              .update({ washes_used: booking.washes_used })
+              .eq("id", booking.id);
+            if (undoError) toast.error("Failed to undo wash mark");
+            else {
+              toast.success("Wash mark undone");
+              fetchBookings();
+            }
+          },
+        },
+      });
+      fetchBookings();
+    } catch {
+      toast.error("Failed to update wash count");
+    }
+  };
+
   const handleServiceChange = async () => {
     if (!serviceDialog) return;
     const { booking, action } = serviceDialog;
@@ -364,7 +399,7 @@ const ServiceProviderPanel = () => {
                                   </Button>
                                 )}
                                 {b.washes_used < b.total_washes && b.status !== "cancelled" && (
-                                  <Button size="sm" variant="secondary" onClick={() => setWashDialog({ booking: b, action: "done" })}>
+                                  <Button size="sm" variant="secondary" onClick={() => markWashDone(b)}>
                                     <Droplets className="w-3 h-3 mr-1" />Wash Done
                                   </Button>
                                 )}
