@@ -411,6 +411,34 @@ const ServiceProviderPanel = () => {
           </DialogContent>
         </Dialog>
 
+        <Dialog open={!!washDialog} onOpenChange={() => setWashDialog(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{washDialog?.action === "undo" ? "Undo wash mark?" : "Mark wash as done?"}</DialogTitle>
+            </DialogHeader>
+            {washDialog && (
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-secondary/30 text-sm space-y-1">
+                  <p><strong>{washDialog.booking.car_brand} {washDialog.booking.car_model}</strong> — {washDialog.booking.car_registration}</p>
+                  <p className="text-muted-foreground">{washDialog.booking.package_name}</p>
+                  <p className="text-xs">Current washes done: <strong>{washDialog.booking.washes_used}/{washDialog.booking.total_washes}</strong></p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {washDialog.action === "undo"
+                    ? "This will reduce the customer's completed wash count by one. Use this only if the previous mark was a mistake."
+                    : "This will increase the customer's completed wash count by one and update their profile progress."}
+                </p>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setWashDialog(null)}>Cancel</Button>
+              <Button onClick={handleWashChange} variant={washDialog?.action === "undo" ? "outline" : "default"}>
+                {washDialog?.action === "undo" ? "Confirm Undo" : "Confirm Done"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <ServiceInvoiceDialog
           booking={invoiceBooking}
           providerName={providerInfo?.business_name || "Service Provider"}
