@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History } from "lucide-react";
+import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History, Droplets, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ServiceInvoiceDialog from "@/components/ServiceInvoiceDialog";
@@ -54,6 +54,8 @@ const ServiceProviderPanel = () => {
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
   const [confirmStep, setConfirmStep] = useState(false);
+  const [serviceDialog, setServiceDialog] = useState<{ booking: ServiceBooking; action: "done" | "undo" } | null>(null);
+  const [washDialog, setWashDialog] = useState<{ booking: ServiceBooking; action: "done" | "undo" } | null>(null);
   const [invoiceBooking, setInvoiceBooking] = useState<ServiceBooking | null>(null);
   const [historyReg, setHistoryReg] = useState<string | null>(null);
 
@@ -90,7 +92,7 @@ const ServiceProviderPanel = () => {
 
       // If marking as completed, increment usage
       if (newStatus === "completed" && updateDialog.status !== "completed") {
-        updateData.services_used = updateDialog.services_used + 1;
+        updateData.services_used = Math.min(updateDialog.total_services, updateDialog.services_used + 1);
       }
 
       const { error } = await supabase
@@ -139,21 +141,90 @@ const ServiceProviderPanel = () => {
     }
   };
 
-  const handleMarkWash = async (booking: ServiceBooking) => {
-    if (booking.washes_used >= booking.total_washes) {
+  const handleWashChange = async () => {
+    if (!washDialog) return;
+    const { booking, action } = washDialog;
+    if (action === "done" && booking.washes_used >= booking.total_washes) {
       toast.error("All washes have been used");
+      return;
+    }
+    const nextCount = action === "done" ? booking.washes_used + 1 : booking.washes_used - 1;
+    if (nextCount < 0 || nextCount > booking.total_washes) {
+      toast.error("Wash count cannot be changed further");
       return;
     }
     try {
       const { error } = await supabase
         .from("service_bookings")
-        .update({ washes_used: booking.washes_used + 1 })
+        .update({ washes_used: nextCount })
         .eq("id", booking.id);
       if (error) throw error;
-      toast.success("Wash marked as completed");
+      toast.success(action === "done" ? "Wash marked as done" : "Wash mark undone");
+      setWashDialog(null);
       fetchBookings();
     } catch {
       toast.error("Failed to update wash count");
+    }
+  };
+
+  const markWashDone = async (booking: ServiceBooking) => {
+    if (booking.washes_used >= booking.total_washes || booking.status === "cancelled") {
+      toast.error("Wash count cannot be changed further");
+      return;
+    }
+    const nextCount = booking.washes_used + 1;
+    try {
+      const { error } = await supabase
+        .from("service_bookings")
+        .update({ washes_used: nextCount })
+        .eq("id", booking.id);
+      if (error) throw error;
+      toast.success("Wash marked as done", {
+        description: `${booking.car_registration} now shows ${nextCount}/${booking.total_washes} washes done in the customer profile.`,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const { error: undoError } = await supabase
+              .from("service_bookings")
+              .update({ washes_used: booking.washes_used })
+              .eq("id", booking.id);
+            if (undoError) toast.error("Failed to undo wash mark");
+            else {
+              toast.success("Wash mark undone");
+              fetchBookings();
+            }
+          },
+        },
+      });
+      fetchBookings();
+    } catch {
+      toast.error("Failed to update wash count");
+    }
+  };
+
+  const handleServiceChange = async () => {
+    if (!serviceDialog) return;
+    const { booking, action } = serviceDialog;
+    if (action === "done" && booking.services_used >= booking.total_services) {
+      toast.error("All services have been used");
+      return;
+    }
+    const nextCount = action === "done" ? booking.services_used + 1 : booking.services_used - 1;
+    if (nextCount < 0 || nextCount > booking.total_services) {
+      toast.error("Service count cannot be changed further");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("service_bookings")
+        .update({ services_used: nextCount })
+        .eq("id", booking.id);
+      if (error) throw error;
+      toast.success(action === "done" ? "Service marked as done" : "Service mark undone");
+      setServiceDialog(null);
+      fetchBookings();
+    } catch {
+      toast.error("Failed to update service count");
     }
   };
 
@@ -305,8 +376,8 @@ const ServiceProviderPanel = () => {
                             </TableCell>
                             <TableCell>
                               <div className="text-xs space-y-1">
-                                <div>Services: {b.services_used}/{b.total_services}</div>
-                                <div>Washes: {b.washes_used}/{b.total_washes}</div>
+                                <div className="font-medium">Services done: {b.services_used}/{b.total_services}</div>
+                                <div className="font-medium">Washes done: {b.washes_used}/{b.total_washes}</div>
                               </div>
                             </TableCell>
                             <TableCell>{getStatusBadge(b.status)}</TableCell>
@@ -317,9 +388,24 @@ const ServiceProviderPanel = () => {
                                     Update
                                   </Button>
                                 )}
+                                {b.services_used < b.total_services && b.status !== "cancelled" && (
+                                  <Button size="sm" variant="secondary" onClick={() => setServiceDialog({ booking: b, action: "done" })}>
+                                    <Wrench className="w-3 h-3 mr-1" />Service Done
+                                  </Button>
+                                )}
+                                {b.services_used > 0 && b.status !== "cancelled" && (
+                                  <Button size="sm" variant="outline" onClick={() => setServiceDialog({ booking: b, action: "undo" })}>
+                                    <RotateCcw className="w-3 h-3 mr-1" />Undo Service
+                                  </Button>
+                                )}
                                 {b.washes_used < b.total_washes && b.status !== "cancelled" && (
-                                  <Button size="sm" variant="secondary" onClick={() => handleMarkWash(b)}>
-                                    +Wash
+                                  <Button size="sm" variant="secondary" onClick={() => markWashDone(b)}>
+                                    <Droplets className="w-3 h-3 mr-1" />Wash Done
+                                  </Button>
+                                )}
+                                {b.washes_used > 0 && b.status !== "cancelled" && (
+                                  <Button size="sm" variant="outline" onClick={() => setWashDialog({ booking: b, action: "undo" })}>
+                                    <RotateCcw className="w-3 h-3 mr-1" />Undo Wash
                                   </Button>
                                 )}
                                 <Button size="sm" variant="default" onClick={() => setInvoiceBooking(b)}>
@@ -393,6 +479,62 @@ const ServiceProviderPanel = () => {
                   {updating ? "Updating..." : "Confirm & Update"}
                 </Button>
               )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!serviceDialog} onOpenChange={() => setServiceDialog(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{serviceDialog?.action === "undo" ? "Undo service mark?" : "Mark service as done?"}</DialogTitle>
+            </DialogHeader>
+            {serviceDialog && (
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-secondary/30 text-sm space-y-1">
+                  <p><strong>{serviceDialog.booking.car_brand} {serviceDialog.booking.car_model}</strong> — {serviceDialog.booking.car_registration}</p>
+                  <p className="text-muted-foreground">{serviceDialog.booking.package_name}</p>
+                  <p className="text-xs">Current services done: <strong>{serviceDialog.booking.services_used}/{serviceDialog.booking.total_services}</strong></p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {serviceDialog.action === "undo"
+                    ? "This will reduce the customer's completed service count by one. Use this only if the previous mark was a mistake."
+                    : "This will increase the customer's completed service count by one and immediately update their profile progress."}
+                </p>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setServiceDialog(null)}>Cancel</Button>
+              <Button onClick={handleServiceChange} variant={serviceDialog?.action === "undo" ? "outline" : "default"}>
+                {serviceDialog?.action === "undo" ? "Confirm Undo" : "Confirm Done"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!washDialog} onOpenChange={() => setWashDialog(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{washDialog?.action === "undo" ? "Undo wash mark?" : "Mark wash as done?"}</DialogTitle>
+            </DialogHeader>
+            {washDialog && (
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-secondary/30 text-sm space-y-1">
+                  <p><strong>{washDialog.booking.car_brand} {washDialog.booking.car_model}</strong> — {washDialog.booking.car_registration}</p>
+                  <p className="text-muted-foreground">{washDialog.booking.package_name}</p>
+                  <p className="text-xs">Current washes done: <strong>{washDialog.booking.washes_used}/{washDialog.booking.total_washes}</strong></p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {washDialog.action === "undo"
+                    ? "This will reduce the customer's completed wash count by one. Use this only if the previous mark was a mistake."
+                    : "This will increase the customer's completed wash count by one and update their profile progress."}
+                </p>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setWashDialog(null)}>Cancel</Button>
+              <Button onClick={handleWashChange} variant={washDialog?.action === "undo" ? "outline" : "default"}>
+                {washDialog?.action === "undo" ? "Confirm Undo" : "Confirm Done"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
