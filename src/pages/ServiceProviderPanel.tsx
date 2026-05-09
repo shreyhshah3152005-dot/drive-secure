@@ -353,6 +353,16 @@ const ServiceProviderPanel = () => {
                                     Update
                                   </Button>
                                 )}
+                                {b.services_used < b.total_services && b.status !== "cancelled" && (
+                                  <Button size="sm" variant="secondary" onClick={() => setServiceDialog({ booking: b, action: "done" })}>
+                                    <Wrench className="w-3 h-3 mr-1" />Service Done
+                                  </Button>
+                                )}
+                                {b.services_used > 0 && b.status !== "cancelled" && (
+                                  <Button size="sm" variant="outline" onClick={() => setServiceDialog({ booking: b, action: "undo" })}>
+                                    <RotateCcw className="w-3 h-3 mr-1" />Undo Service
+                                  </Button>
+                                )}
                                 {b.washes_used < b.total_washes && b.status !== "cancelled" && (
                                   <Button size="sm" variant="secondary" onClick={() => setWashDialog({ booking: b, action: "done" })}>
                                     <Droplets className="w-3 h-3 mr-1" />Wash Done
