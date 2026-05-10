@@ -131,12 +131,13 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
   };
 
   const currentUsage = useMemo(() => {
-    // Most recent (active) booking for this registration
     const latest = bookings[0];
     if (!latest) return null;
     return {
       services_used: latest.services_used,
       total_services: latest.total_services,
+      washes_used: latest.washes_used,
+      total_washes: latest.total_washes,
       package: latest.package_name,
     };
   }, [bookings]);
