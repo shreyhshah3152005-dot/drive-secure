@@ -179,8 +179,8 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
               <Input type="number" min={0} value={labor} onChange={(e) => setLabor(Number(e.target.value))} />
             </div>
             <div className="space-y-2">
-              <Label>Tax %</Label>
-              <Input type="number" min={0} max={100} value={taxPercent} onChange={(e) => setTaxPercent(Number(e.target.value))} />
+              <Label>GST (fixed)</Label>
+              <Input value="18%" disabled readOnly />
             </div>
           </div>
 
