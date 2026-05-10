@@ -115,27 +115,39 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
     </div>
   </div>
 
-  <div class="service-box">
-    <h3 class="section-title">Service Performed</h3>
-    <p>${escapeHtml(inv.service_description || "—")}</p>
+  <div class="section-block">
+    <h3 class="section-title">A. Service / Labor Performed</h3>
+    <table>
+      <thead><tr><th>Description</th><th class="r">Charge</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>${escapeHtml(inv.service_description || "—")}</td>
+          <td class="r">${money(inv.labor_charge)}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <table>
-    <thead><tr><th>Part / Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Total</th></tr></thead>
-    <tbody>
-      ${inv.parts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#999;">No parts replaced</td></tr>' : inv.parts.map(p => `
-        <tr><td>${escapeHtml(p.name)}</td><td class="r">${Number(p.qty || 0)}</td><td class="r">${money(Number(p.price))}</td><td class="r">${money(Number(p.qty)*Number(p.price))}</td></tr>
-      `).join("")}
-    </tbody>
-  </table>
+  <div class="section-block">
+    <h3 class="section-title">B. Parts / Items Replaced</h3>
+    <table>
+      <thead><tr><th>Part / Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Total</th></tr></thead>
+      <tbody>
+        ${inv.parts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#999;">No parts replaced</td></tr>' : inv.parts.map(p => `
+          <tr><td>${escapeHtml(p.name)}</td><td class="r">${Number(p.qty || 0)}</td><td class="r">${money(Number(p.price))}</td><td class="r">${money(Number(p.qty)*Number(p.price))}</td></tr>
+        `).join("")}
+        <tr class="subtotal-row"><td colspan="3" class="r"><strong>Parts Subtotal</strong></td><td class="r"><strong>${money(inv.parts_total)}</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="totals-wrap">
   <table class="totals">
-    <tr><td>Parts Total</td><td class="r">${money(inv.parts_total)}</td></tr>
-    <tr><td>Labor Charge</td><td class="r">${money(inv.labor_charge)}</td></tr>
-    <tr><td>Subtotal</td><td class="r">${money(inv.subtotal)}</td></tr>
-    <tr><td>Tax (${Number(inv.tax_percent || 0)}%)</td><td class="r">${money(inv.tax_amount)}</td></tr>
-    <tr class="total"><td>Total Amount</td><td class="r">${money(inv.total_amount)}</td></tr>
+    <tr><td>A. Labor Total</td><td class="r">${money(inv.labor_charge)}</td></tr>
+    <tr><td>B. Parts Total</td><td class="r">${money(inv.parts_total)}</td></tr>
+    <tr class="sub"><td>Subtotal (A + B)</td><td class="r">${money(inv.subtotal)}</td></tr>
+    <tr><td>GST @ ${Number(inv.tax_percent || 0)}%</td><td class="r">${money(inv.tax_amount)}</td></tr>
+    <tr class="total"><td>Grand Total</td><td class="r">${money(inv.total_amount)}</td></tr>
   </table>
   </div>
 
