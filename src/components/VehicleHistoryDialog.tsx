@@ -24,6 +24,8 @@ interface BookingRow {
   status: string;
   services_used: number;
   total_services: number;
+  washes_used: number;
+  total_washes: number;
   car_brand: string;
   car_model: string;
   car_year: number;
