@@ -157,6 +157,7 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
             <span className="font-semibold text-primary">Current usage</span>
             <span>Plan: <strong>{currentUsage.package}</strong></span>
             <span>Services: <strong>{currentUsage.services_used}/{currentUsage.total_services}</strong></span>
+            <span>Washes: <strong>{currentUsage.washes_used}/{currentUsage.total_washes}</strong></span>
           </div>
         )}
 
