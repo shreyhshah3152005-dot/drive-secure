@@ -69,7 +69,16 @@ const MyServiceInvoices = () => {
         { event: "*", schema: "public", table: "service_invoices", filter: `user_id=eq.${user.id}` },
         () => load())
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const refresh = () => load();
+    const timer = window.setInterval(load, 15000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+      supabase.removeChannel(channel);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
