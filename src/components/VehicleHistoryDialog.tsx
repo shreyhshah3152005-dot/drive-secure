@@ -62,7 +62,7 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
       try {
         const { data: b } = await supabase
           .from("service_bookings")
-          .select("id, package_name, booking_date, status, services_used, total_services, car_brand, car_model, car_year")
+          .select("id, package_name, booking_date, status, services_used, total_services, washes_used, total_washes, car_brand, car_model, car_year")
           .eq("car_registration", registration)
           .order("booking_date", { ascending: false });
         setBookings((b as BookingRow[]) || []);
