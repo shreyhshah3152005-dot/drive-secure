@@ -76,9 +76,12 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
   tr:last-child td{border-bottom:none;}
   td.r,th.r{text-align:right;}
   .totals-wrap{display:flex;justify-content:flex-end;}
-  .totals{width:330px;border:none;border-radius:0;}
-  .totals tr td{border:none;padding:7px 10px;background:#fff;}
+  .totals{width:340px;border:none;border-radius:0;}
+  .totals tr td{border:none;padding:7px 10px;background:#fff;font-size:13px;}
+  .totals .sub td{border-top:1px dashed #bdb29f;font-weight:600;color:#191715;padding-top:10px;}
   .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #191715;color:#b8860b;padding-top:12px;}
+  .section-block{margin-bottom:20px;}
+  .subtotal-row td{background:#fffaf0 !important;font-size:12px;color:#5f5749;}
   .notes{margin-top:24px;padding:15px;background:#fffaf0;border-left:4px solid #b8860b;font-size:13px;line-height:1.5;}
   .signature{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:42px;font-size:12px;color:#756b5d;}
   .line{border-top:1px solid #bdb29f;padding-top:8px;text-align:center;}
@@ -115,27 +118,39 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
     </div>
   </div>
 
-  <div class="service-box">
-    <h3 class="section-title">Service Performed</h3>
-    <p>${escapeHtml(inv.service_description || "—")}</p>
+  <div class="section-block">
+    <h3 class="section-title">A. Service / Labor Performed</h3>
+    <table>
+      <thead><tr><th>Description</th><th class="r">Charge</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>${escapeHtml(inv.service_description || "—")}</td>
+          <td class="r">${money(inv.labor_charge)}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <table>
-    <thead><tr><th>Part / Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Total</th></tr></thead>
-    <tbody>
-      ${inv.parts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#999;">No parts replaced</td></tr>' : inv.parts.map(p => `
-        <tr><td>${escapeHtml(p.name)}</td><td class="r">${Number(p.qty || 0)}</td><td class="r">${money(Number(p.price))}</td><td class="r">${money(Number(p.qty)*Number(p.price))}</td></tr>
-      `).join("")}
-    </tbody>
-  </table>
+  <div class="section-block">
+    <h3 class="section-title">B. Parts / Items Replaced</h3>
+    <table>
+      <thead><tr><th>Part / Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Total</th></tr></thead>
+      <tbody>
+        ${inv.parts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#999;">No parts replaced</td></tr>' : inv.parts.map(p => `
+          <tr><td>${escapeHtml(p.name)}</td><td class="r">${Number(p.qty || 0)}</td><td class="r">${money(Number(p.price))}</td><td class="r">${money(Number(p.qty)*Number(p.price))}</td></tr>
+        `).join("")}
+        <tr class="subtotal-row"><td colspan="3" class="r"><strong>Parts Subtotal</strong></td><td class="r"><strong>${money(inv.parts_total)}</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="totals-wrap">
   <table class="totals">
-    <tr><td>Parts Total</td><td class="r">${money(inv.parts_total)}</td></tr>
-    <tr><td>Labor Charge</td><td class="r">${money(inv.labor_charge)}</td></tr>
-    <tr><td>Subtotal</td><td class="r">${money(inv.subtotal)}</td></tr>
-    <tr><td>Tax (${Number(inv.tax_percent || 0)}%)</td><td class="r">${money(inv.tax_amount)}</td></tr>
-    <tr class="total"><td>Total Amount</td><td class="r">${money(inv.total_amount)}</td></tr>
+    <tr><td>A. Labor Total</td><td class="r">${money(inv.labor_charge)}</td></tr>
+    <tr><td>B. Parts Total</td><td class="r">${money(inv.parts_total)}</td></tr>
+    <tr class="sub"><td>Subtotal (A + B)</td><td class="r">${money(inv.subtotal)}</td></tr>
+    <tr><td>GST @ ${Number(inv.tax_percent || 0)}%</td><td class="r">${money(inv.tax_amount)}</td></tr>
+    <tr class="total"><td>Grand Total</td><td class="r">${money(inv.total_amount)}</td></tr>
   </table>
   </div>
 

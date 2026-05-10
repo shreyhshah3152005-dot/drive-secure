@@ -24,6 +24,8 @@ interface BookingRow {
   status: string;
   services_used: number;
   total_services: number;
+  washes_used: number;
+  total_washes: number;
   car_brand: string;
   car_model: string;
   car_year: number;
@@ -60,7 +62,7 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
       try {
         const { data: b } = await supabase
           .from("service_bookings")
-          .select("id, package_name, booking_date, status, services_used, total_services, car_brand, car_model, car_year")
+          .select("id, package_name, booking_date, status, services_used, total_services, washes_used, total_washes, car_brand, car_model, car_year")
           .eq("car_registration", registration)
           .order("booking_date", { ascending: false });
         setBookings((b as BookingRow[]) || []);
@@ -128,6 +130,18 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
     });
   };
 
+  const currentUsage = useMemo(() => {
+    const latest = bookings[0];
+    if (!latest) return null;
+    return {
+      services_used: latest.services_used,
+      total_services: latest.total_services,
+      washes_used: latest.washes_used,
+      total_washes: latest.total_washes,
+      package: latest.package_name,
+    };
+  }, [bookings]);
+
   return (
     <Dialog open={!!registration} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
@@ -137,6 +151,15 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
             Vehicle History — <span className="font-mono text-sm">{registration}</span>
           </DialogTitle>
         </DialogHeader>
+
+        {currentUsage && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm flex flex-wrap gap-4 items-center mb-2">
+            <span className="font-semibold text-primary">Current usage</span>
+            <span>Plan: <strong>{currentUsage.package}</strong></span>
+            <span>Services: <strong>{currentUsage.services_used}/{currentUsage.total_services}</strong></span>
+            <span>Washes: <strong>{currentUsage.washes_used}/{currentUsage.total_washes}</strong></span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <div>

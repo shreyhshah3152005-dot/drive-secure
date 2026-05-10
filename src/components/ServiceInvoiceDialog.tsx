@@ -32,7 +32,7 @@ interface Props {
 const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPhone, onClose, onSaved }: Props) => {
   const [parts, setParts] = useState<InvoicePart[]>([{ name: "", qty: 1, price: 0 }]);
   const [labor, setLabor] = useState(0);
-  const [taxPercent, setTaxPercent] = useState(18);
+  const FIXED_TAX_PERCENT = 18;
   const [serviceDescription, setServiceDescription] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
@@ -40,12 +40,12 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
   const totals = useMemo(() => {
     const partsTotal = parts.reduce((s, p) => s + (Number(p.qty) || 0) * (Number(p.price) || 0), 0);
     const laborNum = Number(labor) || 0;
-    const taxPct = Math.max(0, Math.min(100, Number(taxPercent) || 0));
+    const taxPct = FIXED_TAX_PERCENT;
     const subtotal = partsTotal + laborNum;
     const taxAmount = +(subtotal * taxPct / 100).toFixed(2);
     const total = +(subtotal + taxAmount).toFixed(2);
     return { partsTotal: +partsTotal.toFixed(2), laborNum, taxPct, subtotal: +subtotal.toFixed(2), taxAmount, total };
-  }, [parts, labor, taxPercent]);
+  }, [parts, labor]);
 
   const validation = useMemo(() => {
     const errors: string[] = [];
@@ -179,8 +179,8 @@ const ServiceInvoiceDialog = ({ booking, providerName, providerCity, providerPho
               <Input type="number" min={0} value={labor} onChange={(e) => setLabor(Number(e.target.value))} />
             </div>
             <div className="space-y-2">
-              <Label>Tax %</Label>
-              <Input type="number" min={0} max={100} value={taxPercent} onChange={(e) => setTaxPercent(Number(e.target.value))} />
+              <Label>GST (fixed)</Label>
+              <Input value="18%" disabled readOnly />
             </div>
           </div>
 

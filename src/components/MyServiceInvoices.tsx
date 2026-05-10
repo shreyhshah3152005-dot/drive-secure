@@ -38,29 +38,48 @@ const MyServiceInvoices = () => {
   const [bookings, setBookings] = useState<Record<string, BookingMeta>>({});
   const [loading, setLoading] = useState(true);
 
+  const load = async () => {
+    if (!user) return;
+    const { data: inv } = await (supabase as any)
+      .from("service_invoices")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("service_date", { ascending: false });
+    const list = (inv as InvoiceRow[]) || [];
+    setInvoices(list);
+    const ids = Array.from(new Set(list.map(i => i.booking_id)));
+    if (ids.length) {
+      const { data: bs } = await supabase
+        .from("service_bookings")
+        .select("id, package_name, car_brand, car_model, car_year, car_registration")
+        .in("id", ids);
+      const map: Record<string, BookingMeta> = {};
+      (bs as BookingMeta[] || []).forEach(b => { map[b.id] = b; });
+      setBookings(map);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (!user) return;
-    const load = async () => {
-      const { data: inv } = await (supabase as any)
-        .from("service_invoices")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("service_date", { ascending: false });
-      const list = (inv as InvoiceRow[]) || [];
-      setInvoices(list);
-      const ids = Array.from(new Set(list.map(i => i.booking_id)));
-      if (ids.length) {
-        const { data: bs } = await supabase
-          .from("service_bookings")
-          .select("id, package_name, car_brand, car_model, car_year, car_registration")
-          .in("id", ids);
-        const map: Record<string, BookingMeta> = {};
-        (bs as BookingMeta[] || []).forEach(b => { map[b.id] = b; });
-        setBookings(map);
-      }
-      setLoading(false);
-    };
     load();
+    const channel = supabase
+      .channel(`my-service-invoices-${user.id}`)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "service_invoices", filter: `user_id=eq.${user.id}` },
+        () => load())
+      .subscribe();
+    const refresh = () => load();
+    const timer = window.setInterval(load, 15000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const reprint = (inv: InvoiceRow) => {
