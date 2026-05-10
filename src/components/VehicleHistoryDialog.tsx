@@ -128,6 +128,17 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
     });
   };
 
+  const currentUsage = useMemo(() => {
+    // Most recent (active) booking for this registration
+    const latest = bookings[0];
+    if (!latest) return null;
+    return {
+      services_used: latest.services_used,
+      total_services: latest.total_services,
+      package: latest.package_name,
+    };
+  }, [bookings]);
+
   return (
     <Dialog open={!!registration} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
@@ -137,6 +148,14 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
             Vehicle History — <span className="font-mono text-sm">{registration}</span>
           </DialogTitle>
         </DialogHeader>
+
+        {currentUsage && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm flex flex-wrap gap-4 items-center mb-2">
+            <span className="font-semibold text-primary">Current usage</span>
+            <span>Plan: <strong>{currentUsage.package}</strong></span>
+            <span>Services: <strong>{currentUsage.services_used}/{currentUsage.total_services}</strong></span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
           <div>
