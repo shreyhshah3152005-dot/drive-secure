@@ -114,9 +114,9 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
     [invoices, fromDate, toDate, serviceType]
   );
 
-  const reprint = (inv: InvoiceRow) => {
+  const buildPrintable = (inv: InvoiceRow) => {
     const b = bookings.find((x) => x.id === inv.booking_id);
-    printInvoiceDocument({
+    return {
       invoice_number: inv.invoice_number,
       service_date: inv.service_date,
       service_description: inv.service_description,
@@ -128,12 +128,28 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
       tax_amount: inv.tax_amount,
       total_amount: inv.total_amount,
       notes: inv.notes,
+      payment_status: inv.payment_status,
+      paid_at: inv.paid_at,
+      payment_method: inv.payment_method,
       provider: { name: providerName || "Service Provider", city: providerCity, phone: providerPhone },
       vehicle: b ? {
         brand: b.car_brand, model: b.car_model, year: b.car_year,
         registration: registration!, package: b.package_name,
       } : undefined,
-    });
+      vehicle_label: b ? `${b.car_brand} ${b.car_model} (${registration})` : (registration || ""),
+    };
+  };
+
+  const reprint = (inv: InvoiceRow) => printInvoiceDocument(buildPrintable(inv));
+
+  const exportCSV = () => {
+    if (filteredInvoices.length === 0) { toast.error("Nothing to export"); return; }
+    downloadInvoicesCSV(filteredInvoices.map(buildPrintable), `invoices-${registration}-${Date.now()}.csv`);
+    toast.success(`Exported ${filteredInvoices.length} invoices`);
+  };
+  const exportPDF = () => {
+    if (filteredInvoices.length === 0) { toast.error("Nothing to export"); return; }
+    downloadInvoicesPDF(filteredInvoices.map(buildPrintable));
   };
 
   const currentUsage = useMemo(() => {
