@@ -13,11 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History, Droplets, RotateCcw, LayoutDashboard } from "lucide-react";
+import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History, Droplets, RotateCcw, LayoutDashboard, Activity } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ServiceInvoiceDialog from "@/components/ServiceInvoiceDialog";
 import VehicleHistoryDialog from "@/components/VehicleHistoryDialog";
+import ProviderInvoicesList from "@/components/ProviderInvoicesList";
+import ServiceAuditLog from "@/components/ServiceAuditLog";
 
 interface ServiceBooking {
   id: string;
