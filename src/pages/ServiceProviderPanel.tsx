@@ -457,6 +457,13 @@ const ServiceProviderPanel = () => {
                 )}
               </CardContent>
             </Card>
+            <div className="mt-6">
+              <ProviderInvoicesList
+                providerName={providerInfo?.business_name || "Service Provider"}
+                providerCity={providerInfo?.city}
+                providerPhone={providerInfo?.phone}
+              />
+            </div>
           </TabsContent>
 
           {/* HISTORY */}
@@ -487,6 +494,11 @@ const ServiceProviderPanel = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* ACTIVITY */}
+          <TabsContent value="activity">
+            <ServiceAuditLog />
           </TabsContent>
         </Tabs>
 
