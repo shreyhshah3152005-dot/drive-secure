@@ -18,6 +18,9 @@ export interface PrintableInvoice {
   tax_amount: number;
   total_amount: number;
   notes?: string | null;
+  payment_status?: string | null;
+  paid_at?: string | Date | null;
+  payment_method?: string | null;
   provider?: { name: string; city?: string | null; phone?: string | null };
   vehicle?: { brand: string; model: string; year: number; registration: string; package?: string };
 }
@@ -31,9 +34,9 @@ const escapeHtml = (value: unknown) =>
     .replace(/'/g, "&#039;");
 
 const money = (value: number) =>
-  `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `\u20B9${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-export const printInvoiceDocument = (inv: PrintableInvoice) => {
+export const buildInvoiceHtml = (inv: PrintableInvoice) => {
   const dateStr = format(inv.service_date ? new Date(inv.service_date) : new Date(), "dd MMM yyyy");
   const safeInvoiceNo = escapeHtml(inv.invoice_number);
   const safeProvider = inv.provider ? {
@@ -48,44 +51,44 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
     registration: escapeHtml(inv.vehicle.registration),
     package: escapeHtml(inv.vehicle.package),
   } : null;
-  const html = `
+  const isPaid = (inv.payment_status || "unpaid").toLowerCase() === "paid";
+  const statusLabel = isPaid ? "PAID" : "UNPAID";
+  const statusBg = isPaid ? "#06d6a0" : "#ff5470";
+  return `
 <!DOCTYPE html><html><head><title>Invoice ${safeInvoiceNo}</title>
 <style>
   *{box-sizing:border-box;font-family:'Space Grotesk','Helvetica Neue',Arial,sans-serif;}
-  body{margin:0;padding:34px;color:#171717;background:#f7f3ea;}
-  .sheet{max-width:860px;margin:0 auto;background:#fff;border:1px solid #e7dcc8;box-shadow:0 24px 70px rgba(28,22,12,.12);}
-  .topbar{height:10px;background:linear-gradient(90deg,#b8860b,#191715);}
+  body{margin:0;padding:34px;color:#0a1628;background:#f4f9ff;}
+  .sheet{max-width:860px;margin:0 auto;background:#fff;border:1px solid #cfe6ff;box-shadow:0 24px 70px rgba(8,30,60,.16);}
+  .topbar{height:10px;background:linear-gradient(90deg,#00e5ff 0%,#0080ff 50%,#0a1628 100%);}
   .wrap{padding:34px;}
-  .header{display:flex;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid #e7dcc8;}
-  .brand{font-size:30px;font-weight:800;color:#b8860b;letter-spacing:1.2px;line-height:1;}
-  .brand span{color:#191715;}
-  .subtitle{margin:9px 0 0;font-size:12px;color:#6b6252;text-transform:uppercase;letter-spacing:1.4px;}
-  .invoice-chip{display:inline-block;margin-bottom:8px;padding:7px 12px;border-radius:999px;background:#191715;color:#fff;font-size:12px;font-weight:700;letter-spacing:.7px;}
-  .meta{text-align:right;font-size:13px;color:#5f5749;}
-  h1{font-size:24px;margin:0 0 6px;color:#191715;}
+  .header{display:flex;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid #cfe6ff;}
+  .brand{font-size:30px;font-weight:800;color:#0080ff;letter-spacing:1.2px;line-height:1;text-shadow:0 0 12px rgba(0,229,255,.35);}
+  .brand span{color:#0a1628;}
+  .subtitle{margin:9px 0 0;font-size:12px;color:#3a5a7a;text-transform:uppercase;letter-spacing:1.4px;}
+  .invoice-chip{display:inline-block;margin-bottom:8px;padding:7px 12px;border-radius:999px;background:${statusBg};color:#fff;font-size:12px;font-weight:700;letter-spacing:.7px;}
+  .meta{text-align:right;font-size:13px;color:#3a5a7a;}
+  h1{font-size:24px;margin:0 0 6px;color:#0a1628;}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0;}
-  .box{border:1px solid #e7dcc8;background:#fffaf0;padding:16px;border-radius:8px;min-height:116px;}
-  .box h3,.section-title{margin:0 0 10px;font-size:11px;text-transform:uppercase;color:#8c7a57;letter-spacing:1.2px;}
-  .box p{margin:4px 0;font-size:14px;color:#28231c;}
-  .service-box{margin-bottom:22px;padding:16px;border-radius:8px;background:#191715;color:#fff;}
-  .service-box .section-title{color:#d8b15b;}
-  .service-box p{margin:0;font-size:14px;line-height:1.55;}
-  table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;border:1px solid #e7dcc8;border-radius:8px;overflow:hidden;}
-  th{background:#191715;color:#fff;padding:12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;}
-  td{padding:12px;border-bottom:1px solid #eee4d3;font-size:13px;color:#27231d;}
+  .box{border:1px solid #cfe6ff;background:#f4faff;padding:16px;border-radius:8px;min-height:116px;}
+  .box h3,.section-title{margin:0 0 10px;font-size:11px;text-transform:uppercase;color:#0080ff;letter-spacing:1.2px;}
+  .box p{margin:4px 0;font-size:14px;color:#0a1628;}
+  table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;border:1px solid #cfe6ff;border-radius:8px;overflow:hidden;}
+  th{background:#0a1628;color:#00e5ff;padding:12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;}
+  td{padding:12px;border-bottom:1px solid #e3f0ff;font-size:13px;color:#0a1628;}
   tr:last-child td{border-bottom:none;}
   td.r,th.r{text-align:right;}
   .totals-wrap{display:flex;justify-content:flex-end;}
   .totals{width:340px;border:none;border-radius:0;}
   .totals tr td{border:none;padding:7px 10px;background:#fff;font-size:13px;}
-  .totals .sub td{border-top:1px dashed #bdb29f;font-weight:600;color:#191715;padding-top:10px;}
-  .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #191715;color:#b8860b;padding-top:12px;}
+  .totals .sub td{border-top:1px dashed #7fb6ff;font-weight:600;color:#0a1628;padding-top:10px;}
+  .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #0080ff;color:#0080ff;padding-top:12px;}
   .section-block{margin-bottom:20px;}
-  .subtotal-row td{background:#fffaf0 !important;font-size:12px;color:#5f5749;}
-  .notes{margin-top:24px;padding:15px;background:#fffaf0;border-left:4px solid #b8860b;font-size:13px;line-height:1.5;}
-  .signature{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:42px;font-size:12px;color:#756b5d;}
-  .line{border-top:1px solid #bdb29f;padding-top:8px;text-align:center;}
-  .footer{margin-top:28px;text-align:center;font-size:11px;color:#817766;border-top:1px solid #e7dcc8;padding-top:16px;}
+  .subtotal-row td{background:#f4faff !important;font-size:12px;color:#3a5a7a;}
+  .notes{margin-top:24px;padding:15px;background:#f4faff;border-left:4px solid #00e5ff;font-size:13px;line-height:1.5;}
+  .signature{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:42px;font-size:12px;color:#3a5a7a;}
+  .line{border-top:1px solid #7fb6ff;padding-top:8px;text-align:center;}
+  .footer{margin-top:28px;text-align:center;font-size:11px;color:#3a5a7a;border-top:1px solid #cfe6ff;padding-top:16px;}
   @page{size:A4;margin:12mm;}
   @media print{body{padding:0;background:#fff;}.sheet{box-shadow:none;border:none;}.wrap{padding:24px;}}
 </style></head><body>
@@ -96,9 +99,10 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
       <p class="subtitle">Authorised Service Invoice</p>
     </div>
     <div class="meta">
-      <span class="invoice-chip">PAID SERVICE BILL</span>
+      <span class="invoice-chip">${statusLabel}</span>
       <h1>Invoice #${safeInvoiceNo}</h1>
       <p>Date: ${dateStr}</p>
+      ${inv.payment_method ? `<p>Method: ${escapeHtml(inv.payment_method)}</p>` : ""}
     </div>
   </div>
   <div class="grid">
@@ -136,7 +140,7 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
     <table>
       <thead><tr><th>Part / Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Total</th></tr></thead>
       <tbody>
-        ${inv.parts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#999;">No parts replaced</td></tr>' : inv.parts.map(p => `
+        ${inv.parts.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:#7a90a8;">No parts replaced</td></tr>' : inv.parts.map(p => `
           <tr><td>${escapeHtml(p.name)}</td><td class="r">${Number(p.qty || 0)}</td><td class="r">${money(Number(p.price))}</td><td class="r">${money(Number(p.qty)*Number(p.price))}</td></tr>
         `).join("")}
         <tr class="subtotal-row"><td colspan="3" class="r"><strong>Parts Subtotal</strong></td><td class="r"><strong>${money(inv.parts_total)}</strong></td></tr>
@@ -159,8 +163,11 @@ export const printInvoiceDocument = (inv: PrintableInvoice) => {
   <div class="signature"><div class="line">Customer Signature</div><div class="line">Service Provider Signature</div></div>
   <div class="footer">Thank you for choosing CARBAZAAR Service · This is a computer-generated invoice</div>
   </div></div>
-  <script>window.onload=()=>{window.print();}</script>
 </body></html>`;
+};
+
+export const printInvoiceDocument = (inv: PrintableInvoice) => {
+  const html = buildInvoiceHtml(inv) + `<script>window.onload=()=>{window.print();}</script>`;
   const w = window.open("", "_blank");
   if (w) { w.document.write(html); w.document.close(); }
 };
