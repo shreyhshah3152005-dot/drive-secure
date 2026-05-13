@@ -162,6 +162,7 @@ const ServiceProviderPanel = () => {
       const { error } = await supabase.from("service_bookings")
         .update({ washes_used: nextCount }).eq("id", booking.id);
       if (error) throw error;
+      await logAudit(booking, action === "done" ? "wash_done" : "wash_undo", booking.washes_used, nextCount);
       toast.success(action === "done" ? "Wash marked as done" : "Wash mark undone");
       setWashDialog(null);
       fetchBookings();
@@ -184,6 +185,7 @@ const ServiceProviderPanel = () => {
       const { error } = await supabase.from("service_bookings")
         .update({ services_used: nextCount }).eq("id", booking.id);
       if (error) throw error;
+      await logAudit(booking, action === "done" ? "service_done" : "service_undo", booking.services_used, nextCount);
       toast.success(action === "done" ? "Service marked as done" : "Service mark undone");
       setServiceDialog(null);
       fetchBookings();
