@@ -48,6 +48,9 @@ interface InvoiceRow {
   tax_percent: number;
   tax_amount: number;
   notes: string | null;
+  payment_status: string | null;
+  paid_at: string | null;
+  payment_method: string | null;
 }
 
 const VehicleHistoryDialog = ({ registration, providerName, providerCity, providerPhone, onClose }: Props) => {
