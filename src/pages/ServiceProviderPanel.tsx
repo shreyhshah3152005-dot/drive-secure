@@ -13,11 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History, Droplets, RotateCcw, LayoutDashboard } from "lucide-react";
+import { Wrench, Package, Clock, CheckCircle, XCircle, Car, Search, Filter, AlertCircle, Receipt, History, Droplets, RotateCcw, LayoutDashboard, Activity } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ServiceInvoiceDialog from "@/components/ServiceInvoiceDialog";
 import VehicleHistoryDialog from "@/components/VehicleHistoryDialog";
+import ProviderInvoicesList from "@/components/ProviderInvoicesList";
+import ServiceAuditLog from "@/components/ServiceAuditLog";
 
 interface ServiceBooking {
   id: string;
@@ -100,6 +102,15 @@ const ServiceProviderPanel = () => {
     return () => { supabase.removeChannel(channel); };
   }, [isServiceProvider]);
 
+  const logAudit = async (b: ServiceBooking, action: string, prev: number | string, next: number | string) => {
+    try {
+      await (supabase as any).from("service_audit_log").insert({
+        booking_id: b.id, user_id: b.user_id, actor_id: user?.id,
+        action_type: action, previous_value: String(prev), new_value: String(next),
+      });
+    } catch (e) { console.error("audit log failed", e); }
+  };
+
   const handleUpdateStatus = async () => {
     if (!updateDialog || !newStatus) return;
     setUpdating(true);
@@ -110,6 +121,7 @@ const ServiceProviderPanel = () => {
       }
       const { error } = await supabase.from("service_bookings").update(updateData).eq("id", updateDialog.id);
       if (error) throw error;
+      await logAudit(updateDialog, "status_change", updateDialog.status, newStatus);
 
       try {
         const { data: profile } = await supabase
@@ -152,6 +164,7 @@ const ServiceProviderPanel = () => {
       const { error } = await supabase.from("service_bookings")
         .update({ washes_used: nextCount }).eq("id", booking.id);
       if (error) throw error;
+      await logAudit(booking, action === "done" ? "wash_done" : "wash_undo", booking.washes_used, nextCount);
       toast.success(action === "done" ? "Wash marked as done" : "Wash mark undone");
       setWashDialog(null);
       fetchBookings();
@@ -174,6 +187,7 @@ const ServiceProviderPanel = () => {
       const { error } = await supabase.from("service_bookings")
         .update({ services_used: nextCount }).eq("id", booking.id);
       if (error) throw error;
+      await logAudit(booking, action === "done" ? "service_done" : "service_undo", booking.services_used, nextCount);
       toast.success(action === "done" ? "Service marked as done" : "Service mark undone");
       setServiceDialog(null);
       fetchBookings();
@@ -286,6 +300,7 @@ const ServiceProviderPanel = () => {
             <TabsTrigger value="washes" className="gap-2"><Droplets className="w-4 h-4" />Washes</TabsTrigger>
             <TabsTrigger value="billing" className="gap-2"><Receipt className="w-4 h-4" />Billing</TabsTrigger>
             <TabsTrigger value="history" className="gap-2"><History className="w-4 h-4" />History</TabsTrigger>
+            <TabsTrigger value="activity" className="gap-2"><Activity className="w-4 h-4" />Activity</TabsTrigger>
           </TabsList>
 
           {/* OVERVIEW */}
@@ -442,6 +457,13 @@ const ServiceProviderPanel = () => {
                 )}
               </CardContent>
             </Card>
+            <div className="mt-6">
+              <ProviderInvoicesList
+                providerName={providerInfo?.business_name || "Service Provider"}
+                providerCity={providerInfo?.city}
+                providerPhone={providerInfo?.phone}
+              />
+            </div>
           </TabsContent>
 
           {/* HISTORY */}
@@ -472,6 +494,11 @@ const ServiceProviderPanel = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* ACTIVITY */}
+          <TabsContent value="activity">
+            <ServiceAuditLog />
           </TabsContent>
         </Tabs>
 
