@@ -210,35 +210,50 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
         ) : (
           <div className="space-y-6">
             <section>
-              <h3 className="font-semibold mb-2 flex items-center gap-2"><FileText className="w-4 h-4" />Invoice Timeline ({filteredInvoices.length})</h3>
+              <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
+                <h3 className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4" />Invoice Timeline ({filteredInvoices.length})</h3>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={exportCSV}><FileSpreadsheet className="w-3 h-3 mr-1" />CSV</Button>
+                  <Button size="sm" variant="outline" onClick={exportPDF}><FileText className="w-3 h-3 mr-1" />PDF</Button>
+                </div>
+              </div>
               {filteredInvoices.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No invoices match your filters.</p>
               ) : (
                 <div className="relative pl-6 space-y-3 border-l-2 border-primary/20">
-                  {filteredInvoices.map((inv) => (
-                    <div key={inv.id} className="relative">
-                      <span className="absolute -left-[27px] top-2 w-3 h-3 rounded-full bg-primary ring-4 ring-background" />
-                      <div className="p-3 rounded-lg border border-border/50 text-sm">
-                        <div className="flex justify-between items-start gap-2 mb-1">
-                          <div>
-                            <p className="font-mono font-medium">{inv.invoice_number}</p>
-                            <p className="text-xs text-muted-foreground">{format(new Date(inv.service_date), "dd MMM yyyy")} · {inv.service_description || "—"}</p>
+                  {filteredInvoices.map((inv) => {
+                    const isPaid = (inv.payment_status || "unpaid") === "paid";
+                    return (
+                      <div key={inv.id} className="relative">
+                        <span className="absolute -left-[27px] top-2 w-3 h-3 rounded-full bg-primary ring-4 ring-background" />
+                        <div className="p-3 rounded-lg border border-border/50 text-sm">
+                          <div className="flex justify-between items-start gap-2 mb-1 flex-wrap">
+                            <div>
+                              <p className="font-mono font-medium flex items-center gap-2">
+                                {inv.invoice_number}
+                                <Badge variant="outline" className={isPaid ? "bg-green-500/10 text-green-600 border-green-500/30" : "bg-red-500/10 text-red-600 border-red-500/30"}>
+                                  {isPaid ? <CheckCircle className="w-3 h-3 mr-1" /> : <Circle className="w-3 h-3 mr-1" />}
+                                  {isPaid ? "Paid" : "Unpaid"}
+                                </Badge>
+                              </p>
+                              <p className="text-xs text-muted-foreground">{format(new Date(inv.service_date), "dd MMM yyyy")} · {inv.service_description || "—"}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-primary">₹{Number(inv.total_amount).toFixed(2)}</p>
+                              <Button size="sm" variant="outline" onClick={() => reprint(inv)}>
+                                <Printer className="w-3 h-3 mr-1" />Print
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-bold text-primary">₹{Number(inv.total_amount).toFixed(2)}</p>
-                            <Button size="sm" variant="outline" onClick={() => reprint(inv)}>
-                              <Printer className="w-3 h-3 mr-1" />Print
-                            </Button>
-                          </div>
+                          {inv.parts && inv.parts.length > 0 && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Parts: {inv.parts.map((p) => `${p.name}×${p.qty}`).join(", ")}
+                            </p>
+                          )}
                         </div>
-                        {inv.parts && inv.parts.length > 0 && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Parts: {inv.parts.map((p) => `${p.name}×${p.qty}`).join(", ")}
-                          </p>
-                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </section>
@@ -261,6 +276,8 @@ const VehicleHistoryDialog = ({ registration, providerName, providerCity, provid
                 </div>
               )}
             </section>
+
+            {bookings[0] && <ServiceAuditLog bookingId={bookings[0].id} />}
           </div>
         )}
       </DialogContent>
