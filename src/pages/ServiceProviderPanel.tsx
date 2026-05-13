@@ -300,6 +300,7 @@ const ServiceProviderPanel = () => {
             <TabsTrigger value="washes" className="gap-2"><Droplets className="w-4 h-4" />Washes</TabsTrigger>
             <TabsTrigger value="billing" className="gap-2"><Receipt className="w-4 h-4" />Billing</TabsTrigger>
             <TabsTrigger value="history" className="gap-2"><History className="w-4 h-4" />History</TabsTrigger>
+            <TabsTrigger value="activity" className="gap-2"><Activity className="w-4 h-4" />Activity</TabsTrigger>
           </TabsList>
 
           {/* OVERVIEW */}
