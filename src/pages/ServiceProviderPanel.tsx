@@ -100,6 +100,15 @@ const ServiceProviderPanel = () => {
     return () => { supabase.removeChannel(channel); };
   }, [isServiceProvider]);
 
+  const logAudit = async (b: ServiceBooking, action: string, prev: number | string, next: number | string) => {
+    try {
+      await (supabase as any).from("service_audit_log").insert({
+        booking_id: b.id, user_id: b.user_id, actor_id: user?.id,
+        action_type: action, previous_value: String(prev), new_value: String(next),
+      });
+    } catch (e) { console.error("audit log failed", e); }
+  };
+
   const handleUpdateStatus = async () => {
     if (!updateDialog || !newStatus) return;
     setUpdating(true);
@@ -110,6 +119,7 @@ const ServiceProviderPanel = () => {
       }
       const { error } = await supabase.from("service_bookings").update(updateData).eq("id", updateDialog.id);
       if (error) throw error;
+      await logAudit(updateDialog, "status_change", updateDialog.status, newStatus);
 
       try {
         const { data: profile } = await supabase
