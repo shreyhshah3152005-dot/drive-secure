@@ -5,9 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { History, FileText, Calendar, Printer, Filter } from "lucide-react";
+import { History, FileText, Calendar, Printer, Filter, FileSpreadsheet, CheckCircle, Circle } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { printInvoiceDocument, InvoicePart } from "@/lib/printInvoice";
+import { downloadInvoicesCSV, downloadInvoicesPDF } from "@/lib/exportInvoices";
+import ServiceAuditLog from "@/components/ServiceAuditLog";
 
 interface Props {
   registration: string | null;
