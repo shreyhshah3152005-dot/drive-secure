@@ -1036,6 +1036,42 @@ export type Database = {
         }
         Relationships: []
       }
+      service_audit_log: {
+        Row: {
+          action_type: string
+          actor_id: string
+          booking_id: string
+          created_at: string
+          id: string
+          new_value: string | null
+          notes: string | null
+          previous_value: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          actor_id: string
+          booking_id: string
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          previous_value?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          actor_id?: string
+          booking_id?: string
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          previous_value?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_bookings: {
         Row: {
           booking_date: string
@@ -1161,8 +1197,11 @@ export type Database = {
           invoice_number: string
           labor_charge: number
           notes: string | null
+          paid_at: string | null
           parts: Json
           parts_total: number
+          payment_method: string | null
+          payment_status: string
           provider_id: string | null
           service_date: string
           service_description: string | null
@@ -1180,8 +1219,11 @@ export type Database = {
           invoice_number?: string
           labor_charge?: number
           notes?: string | null
+          paid_at?: string | null
           parts?: Json
           parts_total?: number
+          payment_method?: string | null
+          payment_status?: string
           provider_id?: string | null
           service_date?: string
           service_description?: string | null
@@ -1199,8 +1241,11 @@ export type Database = {
           invoice_number?: string
           labor_charge?: number
           notes?: string | null
+          paid_at?: string | null
           parts?: Json
           parts_total?: number
+          payment_method?: string | null
+          payment_status?: string
           provider_id?: string | null
           service_date?: string
           service_description?: string | null
