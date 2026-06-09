@@ -1486,6 +1486,12 @@ export type Database = {
       get_dealer_car_count: { Args: { _dealer_id: string }; Returns: number }
       get_dealer_car_limit: { Args: { _dealer_id: string }; Returns: number }
       get_dealer_id: { Args: { _user_id: string }; Returns: string }
+      get_wishlist_by_share_code: {
+        Args: { _code: string }
+        Returns: {
+          car_ids: string[]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
