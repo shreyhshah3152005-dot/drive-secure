@@ -18,12 +18,10 @@ const SharedWishlist = () => {
     const fetchShare = async () => {
       if (!code) { setError(true); setLoading(false); return; }
       const { data, error: err } = await supabase
-        .from("wishlist_shares")
-        .select("car_ids")
-        .eq("share_code", code)
-        .single();
+        .rpc("get_wishlist_by_share_code", { _code: code });
 
-      if (err || !data) { setError(true); } else { setCarIds(data.car_ids); }
+      const row = Array.isArray(data) ? data[0] : null;
+      if (err || !row) { setError(true); } else { setCarIds(row.car_ids as string[]); }
       setLoading(false);
     };
     fetchShare();
