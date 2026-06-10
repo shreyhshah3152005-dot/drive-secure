@@ -31,6 +31,23 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authorize: accept either CRON_SECRET (for trigger/cron) or a valid JWT
+    const cronSecret = req.headers.get("x-cron-secret");
+    const expectedSecret = Deno.env.get("CRON_SECRET");
+    const authHeader = req.headers.get("Authorization");
+
+    let authorized = false;
+    if (expectedSecret && cronSecret && cronSecret === expectedSecret) {
+      authorized = true;
+    } else if (authHeader?.startsWith("Bearer ")) {
+      const supabaseAuth = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "");
+      const { data: authData } = await supabaseAuth.auth.getUser(authHeader.replace("Bearer ", ""));
+      if (authData?.user) authorized = true;
+    }
+    if (!authorized) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
