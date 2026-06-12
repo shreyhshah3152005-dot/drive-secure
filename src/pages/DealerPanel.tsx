@@ -522,11 +522,28 @@ const DealerPanel = () => {
               <Layers className="w-4 h-4" />
               Bulk Actions
             </TabsTrigger>
+            <TabsTrigger value="aging" className="gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              Aging
+            </TabsTrigger>
+            <TabsTrigger value="ai-pricing" className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              AI Pricing
+            </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
               Settings
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="aging">
+            <DealerInventoryAging cars={cars} />
+          </TabsContent>
+
+          <TabsContent value="ai-pricing">
+            <AIPriceSuggestion cars={cars} />
+          </TabsContent>
+
 
           <TabsContent value="analytics">
             <DealerAnalytics cars={cars} testDrives={testDrives} />
