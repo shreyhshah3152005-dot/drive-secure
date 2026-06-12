@@ -26,6 +26,11 @@ import DealerAppointmentCalendar from "@/components/DealerAppointmentCalendar";
 import DealerNegotiations from "@/components/DealerNegotiations";
 import ServiceHistoryManager from "@/components/ServiceHistoryManager";
 import DealerBulkInventory from "@/components/DealerBulkInventory";
+import DealerInventoryAging from "@/components/DealerInventoryAging";
+import AIPriceSuggestion from "@/components/AIPriceSuggestion";
+import { AlertTriangle, Sparkles } from "lucide-react";
+
+
 
 
 interface DealerCar {
