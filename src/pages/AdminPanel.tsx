@@ -30,6 +30,8 @@ import AdminDashboardWidget from "@/components/AdminDashboardWidget";
 import AdminEmailTemplates from "@/components/AdminEmailTemplates";
 import AdminRevenueDashboard from "@/components/AdminRevenueDashboard";
 import AdminServiceProviders from "@/components/AdminServiceProviders";
+import AdminKycReview from "@/components/AdminKycReview";
+import { ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
