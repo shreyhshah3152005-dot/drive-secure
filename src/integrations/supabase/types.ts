@@ -676,6 +676,57 @@ export type Database = {
         }
         Relationships: []
       }
+      kyc_verifications: {
+        Row: {
+          account_type: string
+          admin_notes: string | null
+          created_at: string
+          document_number: string
+          document_type: string
+          document_url: string | null
+          full_name: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          selfie_url: string | null
+          status: Database["public"]["Enums"]["kyc_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_type?: string
+          admin_notes?: string | null
+          created_at?: string
+          document_number: string
+          document_type: string
+          document_url?: string | null
+          full_name: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_url?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_type?: string
+          admin_notes?: string | null
+          created_at?: string
+          document_number?: string
+          document_type?: string
+          document_url?: string | null
+          full_name?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_url?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       loan_preapprovals: {
         Row: {
           annual_income: number
@@ -1504,6 +1555,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "dealer" | "service_provider"
+      kyc_status: "pending" | "verified" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1632,6 +1684,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user", "dealer", "service_provider"],
+      kyc_status: ["pending", "verified", "rejected"],
     },
   },
 } as const
