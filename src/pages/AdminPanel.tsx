@@ -442,7 +442,16 @@ const AdminPanel = () => {
               <Wrench className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Services</span>
             </TabsTrigger>
+            <TabsTrigger value="kyc" className="gap-1.5 text-xs px-2 py-1.5">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">KYC</span>
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="kyc">
+            <AdminKycReview />
+          </TabsContent>
+
 
           <TabsContent value="dashboard">
             <AdminDashboardWidget />
