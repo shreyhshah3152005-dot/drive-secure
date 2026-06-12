@@ -30,6 +30,8 @@ import AdminDashboardWidget from "@/components/AdminDashboardWidget";
 import AdminEmailTemplates from "@/components/AdminEmailTemplates";
 import AdminRevenueDashboard from "@/components/AdminRevenueDashboard";
 import AdminServiceProviders from "@/components/AdminServiceProviders";
+import AdminKycReview from "@/components/AdminKycReview";
+import { ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -440,7 +442,16 @@ const AdminPanel = () => {
               <Wrench className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Services</span>
             </TabsTrigger>
+            <TabsTrigger value="kyc" className="gap-1.5 text-xs px-2 py-1.5">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">KYC</span>
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="kyc">
+            <AdminKycReview />
+          </TabsContent>
+
 
           <TabsContent value="dashboard">
             <AdminDashboardWidget />
