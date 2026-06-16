@@ -287,7 +287,7 @@ const UserProfile = () => {
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
         {/* Hero header */}
         <Card className="gradient-card border-border/50 overflow-hidden mb-8">
-          <div className="h-28 sm:h-36 gradient-primary relative" />
+          <div className="h-28 sm:h-36 bg-gradient-to-br from-secondary/60 via-muted/40 to-background relative border-b border-border/30" />
           <CardContent className="pt-0 pb-6">
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6 -mt-12 sm:-mt-14">
               <div className="relative shrink-0">
