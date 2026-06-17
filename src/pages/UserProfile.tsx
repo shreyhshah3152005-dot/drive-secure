@@ -323,7 +323,7 @@ const UserProfile = () => {
                   {profile?.name || "Welcome"}
                 </h1>
                 <div className="flex items-center gap-x-3 sm:gap-x-4 gap-y-0 mt-1.5 text-sm text-muted-foreground overflow-hidden">
-                  <span className="flex items-center gap-1.5 truncate whitespace-nowrap"><Mail className="w-3.5 h-3.5 shrink-0" />{user?.email}</span>
+                  <span className="flex items-center gap-1.5 min-w-0 truncate whitespace-nowrap"><Mail className="w-3.5 h-3.5 shrink-0" />{user?.email}</span>
                   {profile?.city && <span className="hidden sm:flex items-center gap-1.5 whitespace-nowrap"><MapPin className="w-3.5 h-3.5 shrink-0" />{profile.city}</span>}
                   {profile?.created_at && (
                     <span className="hidden sm:flex items-center gap-1.5 whitespace-nowrap">
