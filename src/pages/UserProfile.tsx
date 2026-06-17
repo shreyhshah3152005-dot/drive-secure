@@ -45,6 +45,7 @@ const UserProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
@@ -286,29 +287,33 @@ const UserProfile = () => {
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
         {/* Hero header */}
-        <Card className="gradient-card border-border/50 overflow-hidden mb-8">
-          <div className="h-24 sm:h-32 bg-gradient-to-br from-secondary/60 via-muted/40 to-background relative" />
+        <Card className="gradient-card border-border/50 overflow-hidden mb-8" aria-labelledby="profile-name">
+          <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/40 via-primary/20 to-background relative" aria-hidden="true" />
           <CardContent className="pt-0 pb-5 sm:pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 -mt-10 sm:-mt-12">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-5 -mt-10 sm:-mt-12">
               <div className="relative shrink-0">
                 {profile?.profile_image_url ? (
                   <img
                     src={profile.profile_image_url}
-                    alt="Profile"
+                    alt={`${profile?.name || "User"}'s profile photo`}
                     className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-4 border-background shadow-card"
                   />
                 ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-secondary border-4 border-background shadow-card flex items-center justify-center">
+                  <div
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-secondary border-4 border-background shadow-card flex items-center justify-center"
+                    role="img"
+                    aria-label={`${profile?.name || "User"} avatar placeholder`}
+                  >
                     <span className="text-2xl font-bold text-foreground">{initials}</span>
                   </div>
                 )}
                 <button
                   onClick={() => document.getElementById("profile-pic-upload")?.click()}
                   disabled={isUploading}
-                  className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
-                  aria-label="Change photo"
+                  className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  aria-label={isUploading ? "Uploading profile photo" : "Change profile photo"}
                 >
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-4 h-4" aria-hidden="true" />
                 </button>
                 <input
                   id="profile-pic-upload"
@@ -316,31 +321,58 @@ const UserProfile = () => {
                   accept="image/jpeg,image/png,image/webp"
                   className="hidden"
                   onChange={handleImageUpload}
+                  aria-label="Upload profile photo"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-[1.65rem] sm:text-[2rem] leading-tight font-semibold tracking-tight text-foreground truncate">
+                <h1
+                  id="profile-name"
+                  className="text-[1.65rem] sm:text-[2rem] leading-tight font-semibold tracking-tight text-white truncate drop-shadow-sm"
+                >
                   {profile?.name || "Welcome"}
                 </h1>
-                <div className="flex items-center gap-x-3 sm:gap-x-4 gap-y-0 mt-1.5 text-sm text-muted-foreground overflow-hidden">
-                  <span className="flex items-center gap-1.5 min-w-0 truncate whitespace-nowrap"><Mail className="w-3.5 h-3.5 shrink-0" />{user?.email}</span>
-                  {profile?.city && <span className="hidden sm:flex items-center gap-1.5 whitespace-nowrap"><MapPin className="w-3.5 h-3.5 shrink-0" />{profile.city}</span>}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5 min-w-0 max-w-full truncate" aria-label={`Email ${user?.email}`}>
+                    <Mail className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="truncate">{user?.email}</span>
+                  </span>
+                  {profile?.city && (
+                    <span className="flex items-center gap-1.5 whitespace-nowrap" aria-label={`City ${profile.city}`}>
+                      <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      {profile.city}
+                    </span>
+                  )}
                   {profile?.created_at && (
                     <span className="hidden sm:flex items-center gap-1.5 whitespace-nowrap">
-                      <Calendar className="w-3.5 h-3.5 shrink-0" />
+                      <Calendar className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                       Member since {format(new Date(profile.created_at), "MMM yyyy")}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="flex gap-2 sm:shrink-0">
+              <div className="flex flex-wrap gap-2 md:shrink-0 md:justify-end">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => { setActiveTab("overview"); setIsEditing(true); setTimeout(() => document.getElementById("profile-name")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0); }}
+                  className="gap-2"
+                  aria-label="Edit profile details"
+                >
+                  <Pencil className="w-4 h-4" aria-hidden="true" /> Edit Profile
+                </Button>
                 {profile?.profile_image_url && (
-                  <Button variant="outline" size="sm" onClick={handleRemoveImage} className="gap-2">
-                    <X className="w-4 h-4" /> Remove
+                  <Button variant="outline" size="sm" onClick={handleRemoveImage} className="gap-2" aria-label="Remove profile photo">
+                    <X className="w-4 h-4" aria-hidden="true" /> Remove
                   </Button>
                 )}
-                <Button variant="outline" size="sm" onClick={async () => { await signOut(); navigate("/"); }} className="gap-2">
-                  <LogOut className="w-4 h-4" /> Sign Out
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => { await signOut(); navigate("/"); }}
+                  className="gap-2"
+                  aria-label="Sign out of your account"
+                >
+                  <LogOut className="w-4 h-4" aria-hidden="true" /> Sign Out
                 </Button>
               </div>
             </div>
@@ -348,13 +380,14 @@ const UserProfile = () => {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto p-1">
             <TabsTrigger value="overview" className="py-2.5">Overview</TabsTrigger>
             <TabsTrigger value="activity" className="py-2.5">Activity</TabsTrigger>
             <TabsTrigger value="verification" className="py-2.5">Verification</TabsTrigger>
             <TabsTrigger value="settings" className="py-2.5">Settings</TabsTrigger>
           </TabsList>
+
 
           {/* OVERVIEW */}
           <TabsContent value="overview" className="space-y-6">
