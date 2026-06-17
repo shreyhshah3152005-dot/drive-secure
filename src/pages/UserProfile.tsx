@@ -289,16 +289,16 @@ const UserProfile = () => {
         <Card className="gradient-card border-border/50 overflow-hidden mb-8">
           <div className="h-24 sm:h-32 bg-gradient-to-br from-secondary/60 via-muted/40 to-background relative" />
           <CardContent className="pt-0 pb-5 sm:pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 -mt-11 sm:-mt-12">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 -mt-10 sm:-mt-12">
               <div className="relative shrink-0">
                 {profile?.profile_image_url ? (
                   <img
                     src={profile.profile_image_url}
                     alt="Profile"
-                    className="w-22 h-22 sm:w-26 sm:h-26 rounded-2xl object-cover border-4 border-background shadow-card"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-4 border-background shadow-card"
                   />
                 ) : (
-                  <div className="w-22 h-22 sm:w-26 sm:h-26 rounded-2xl bg-secondary border-4 border-background shadow-card flex items-center justify-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-secondary border-4 border-background shadow-card flex items-center justify-center">
                     <span className="text-2xl font-bold text-foreground">{initials}</span>
                   </div>
                 )}
