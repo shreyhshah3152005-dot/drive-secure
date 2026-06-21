@@ -288,9 +288,9 @@ const UserProfile = () => {
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
         {/* Hero header */}
         <Card className="gradient-card border-border/50 overflow-hidden mb-8" aria-labelledby="profile-name">
-          <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/40 via-primary/20 to-background relative" aria-hidden="true" />
+          <div className="h-28 sm:h-36 bg-gradient-to-br from-primary/40 via-primary/20 to-background relative" aria-hidden="true" />
           <CardContent className="pt-0 pb-5 sm:pb-6">
-            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-5 -mt-10 sm:-mt-12">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5 -mt-10 sm:-mt-12">
               <div className="relative shrink-0">
                 {profile?.profile_image_url ? (
                   <img
@@ -324,7 +324,7 @@ const UserProfile = () => {
                   aria-label="Upload profile photo"
                 />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 pb-1">
                 <h1
                   id="profile-name"
                   className="text-[1.65rem] sm:text-[2rem] leading-tight font-semibold tracking-tight text-white truncate drop-shadow-sm"
@@ -350,31 +350,31 @@ const UserProfile = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 md:shrink-0 md:justify-end">
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => { setActiveTab("overview"); setIsEditing(true); setTimeout(() => document.getElementById("profile-name")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0); }}
-                  className="gap-2"
-                  aria-label="Edit profile details"
-                >
-                  <Pencil className="w-4 h-4" aria-hidden="true" /> Edit Profile
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4 sm:mt-5 justify-start sm:justify-end">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => { setActiveTab("overview"); setIsEditing(true); setTimeout(() => document.getElementById("profile-name")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0); }}
+                className="gap-2"
+                aria-label="Edit profile details"
+              >
+                <Pencil className="w-4 h-4" aria-hidden="true" /> Edit Profile
+              </Button>
+              {profile?.profile_image_url && (
+                <Button variant="outline" size="sm" onClick={handleRemoveImage} className="gap-2" aria-label="Remove profile photo">
+                  <X className="w-4 h-4" aria-hidden="true" /> Remove
                 </Button>
-                {profile?.profile_image_url && (
-                  <Button variant="outline" size="sm" onClick={handleRemoveImage} className="gap-2" aria-label="Remove profile photo">
-                    <X className="w-4 h-4" aria-hidden="true" /> Remove
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={async () => { await signOut(); navigate("/"); }}
-                  className="gap-2"
-                  aria-label="Sign out of your account"
-                >
-                  <LogOut className="w-4 h-4" aria-hidden="true" /> Sign Out
-                </Button>
-              </div>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => { await signOut(); navigate("/"); }}
+                className="gap-2"
+                aria-label="Sign out of your account"
+              >
+                <LogOut className="w-4 h-4" aria-hidden="true" /> Sign Out
+              </Button>
             </div>
           </CardContent>
         </Card>
