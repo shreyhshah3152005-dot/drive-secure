@@ -15,7 +15,7 @@ import SocialShareButtons from "@/components/SocialShareButtons";
 import TradeInCalculator from "@/components/TradeInCalculator";
 import LoanPreapproval from "@/components/LoanPreapproval";
 import StaticSimilarCars from "@/components/StaticSimilarCars";
-import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewedCars } from "@/hooks/useRecentlyViewedCars";
 
@@ -168,7 +168,13 @@ const CarDetail = () => {
                 <Car3DViewer carName={car.model} carBrand={car.brand} />
                 <VirtualCarTour carName={car.model} carBrand={car.brand} mainImage={car.image} />
                 <TradeInCalculator />
-                <LoanPreapproval carPrice={car.price} carName={`${car.brand} ${car.model}`} />
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById("loan-preapproval")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Check Loan Eligibility
+                </Button>
                 <SocialShareButtons
                   title={`${car.brand} ${car.model} - ${formatPrice(car.price)}`}
                   description={car.description}
@@ -183,7 +189,25 @@ const CarDetail = () => {
           <div className="max-w-4xl mx-auto">
             <CarFinanceCalculator carPrice={car.price} carName={`${car.brand} ${car.model}`} />
           </div>
+
         </section>
+
+        {/* Loan Pre-Approval Section */}
+        <section id="loan-preapproval" className="container mx-auto px-4 py-12 scroll-mt-24">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                <CreditCard className="w-6 h-6 text-primary" />
+                Loan Pre-Approval for {car.brand} {car.model}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Check instant eligibility across 7+ leading banks — interest rates, EMI and total payable tailored to this car's price.
+              </p>
+            </div>
+            <LoanPreapproval carPrice={car.price} carName={`${car.brand} ${car.model}`} />
+          </div>
+        </section>
+
 
         {/* Full Specifications */}
         <CarSpecifications car={car} />

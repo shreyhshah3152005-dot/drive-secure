@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bot, Send, X, Sparkles, Loader2, Trash2 } from "lucide-react";
+import { Bot, Send, X, Sparkles, Loader2, Trash2, Minus, Maximize2, Minimize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
@@ -26,6 +26,8 @@ const allowImageDataUrl = (url: string) =>
 
 const AICarChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -131,16 +133,50 @@ const AICarChatbot = () => {
       </Button>
 
       {isOpen && (
-        <Card className="fixed bottom-40 right-6 w-[400px] h-[520px] shadow-2xl z-50 flex flex-col border-primary/20">
-          <CardHeader className="py-3 px-4 border-b gradient-card flex flex-row items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base flex-1">CARBAZAAR AI Assistant</CardTitle>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setMessages([])}>
-              <Trash2 className="h-4 w-4" />
+        <Card
+          className={cn(
+            "fixed shadow-2xl z-50 flex flex-col border-primary/20 transition-all duration-300",
+            isMaximized
+              ? "bottom-4 right-4 left-4 top-4 sm:bottom-6 sm:right-6 sm:left-auto sm:top-6 sm:w-[600px] sm:h-[calc(100vh-3rem)]"
+              : isMinimized
+              ? "bottom-40 right-6 w-[280px] h-12"
+              : "bottom-40 right-6 w-[400px] h-[520px]"
+          )}
+        >
+          <CardHeader className="py-2 px-4 border-b gradient-card flex flex-row items-center gap-2 shrink-0">
+            <Sparkles className="h-5 w-5 text-primary shrink-0" />
+            <CardTitle className="text-sm flex-1 truncate">CARBAZAAR AI Assistant</CardTitle>
+            {!isMinimized && (
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setMessages([])} aria-label="Clear chat">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => { setIsMinimized(!isMinimized); if (isMaximized) setIsMaximized(false); }}
+              aria-label={isMinimized ? "Expand chat" : "Minimize chat"}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => { setIsMaximized(!isMaximized); if (isMinimized) setIsMinimized(false); }}
+              aria-label={isMaximized ? "Restore chat" : "Maximize chat"}
+            >
+              {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsOpen(false)} aria-label="Close chat">
+              <X className="h-4 w-4" />
             </Button>
           </CardHeader>
 
+          {!isMinimized && (
           <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
+
             <ScrollArea className="flex-1 p-4">
               {messages.length === 0 ? (
                 <div className="space-y-4 pt-4">
@@ -225,6 +261,7 @@ const AICarChatbot = () => {
               </Button>
             </div>
           </CardContent>
+          )}
         </Card>
       )}
     </>
