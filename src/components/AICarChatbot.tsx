@@ -261,6 +261,7 @@ const AICarChatbot = () => {
               </Button>
             </div>
           </CardContent>
+          )}
         </Card>
       )}
     </>
