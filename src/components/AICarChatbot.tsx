@@ -24,19 +24,35 @@ const QUICK_PROMPTS = [
 const allowImageDataUrl = (url: string) =>
   url.startsWith("data:image/") ? url : defaultUrlTransform(url);
 
+const CHAT_UI_STATE_KEY = "carbazaar_chatbot_ui_state";
+
 const AICarChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return JSON.parse(localStorage.getItem(CHAT_UI_STATE_KEY) || "{}").isMinimized ?? false; } catch { return false; }
+  });
+  const [isMaximized, setIsMaximized] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return JSON.parse(localStorage.getItem(CHAT_UI_STATE_KEY) || "{}").isMaximized ?? false; } catch { return false; }
+  });
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    try {
+      localStorage.setItem(CHAT_UI_STATE_KEY, JSON.stringify({ isMinimized, isMaximized }));
+    } catch {}
+  }, [isMinimized, isMaximized]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
 
   const streamChat = async (allMessages: Msg[]) => {
     const resp = await fetch(CHAT_URL, {
