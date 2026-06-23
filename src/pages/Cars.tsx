@@ -4,8 +4,8 @@ import CarCard from "@/components/CarCard";
 import CarFilters from "@/components/CarFilters";
 import Footer from "@/components/Footer";
 import SavedSearches from "@/components/SavedSearches";
+
 import TradeInCalculator from "@/components/TradeInCalculator";
-import LoanPreapproval from "@/components/LoanPreapproval";
 import { cars } from "@/data/cars";
 
 const Cars = () => {
@@ -65,7 +65,6 @@ const Cars = () => {
             </div>
             <div className="flex gap-2">
               <TradeInCalculator />
-              <LoanPreapproval />
             </div>
           </div>
 
