@@ -15,7 +15,7 @@ import SocialShareButtons from "@/components/SocialShareButtons";
 import TradeInCalculator from "@/components/TradeInCalculator";
 import LoanPreapproval from "@/components/LoanPreapproval";
 import StaticSimilarCars from "@/components/StaticSimilarCars";
-import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewedCars } from "@/hooks/useRecentlyViewedCars";
 
