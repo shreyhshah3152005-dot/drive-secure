@@ -120,19 +120,28 @@ const AICarChatbot = () => {
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+    setError(null);
 
     try {
       await streamChat([...messages, userMsg]);
     } catch (e: any) {
+      const msg = e?.message || "Failed to get response. Please check your connection and try again.";
+      setError(msg);
       toast({
-        title: "Error",
-        description: e.message || "Failed to get response",
+        title: "Chatbot Error",
+        description: msg,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const retryLast = () => {
+    const lastUser = [...messages].reverse().find(m => m.role === "user");
+    if (lastUser) send(lastUser.content);
+  };
+
 
   return (
     <>
