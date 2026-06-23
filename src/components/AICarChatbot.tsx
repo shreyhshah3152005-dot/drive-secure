@@ -24,19 +24,35 @@ const QUICK_PROMPTS = [
 const allowImageDataUrl = (url: string) =>
   url.startsWith("data:image/") ? url : defaultUrlTransform(url);
 
+const CHAT_UI_STATE_KEY = "carbazaar_chatbot_ui_state";
+
 const AICarChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return JSON.parse(localStorage.getItem(CHAT_UI_STATE_KEY) || "{}").isMinimized ?? false; } catch { return false; }
+  });
+  const [isMaximized, setIsMaximized] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return JSON.parse(localStorage.getItem(CHAT_UI_STATE_KEY) || "{}").isMaximized ?? false; } catch { return false; }
+  });
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    try {
+      localStorage.setItem(CHAT_UI_STATE_KEY, JSON.stringify({ isMinimized, isMaximized }));
+    } catch {}
+  }, [isMinimized, isMaximized]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
 
   const streamChat = async (allMessages: Msg[]) => {
     const resp = await fetch(CHAT_URL, {
@@ -104,19 +120,28 @@ const AICarChatbot = () => {
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+    setError(null);
 
     try {
       await streamChat([...messages, userMsg]);
     } catch (e: any) {
+      const msg = e?.message || "Failed to get response. Please check your connection and try again.";
+      setError(msg);
       toast({
-        title: "Error",
-        description: e.message || "Failed to get response",
+        title: "Chatbot Error",
+        description: msg,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const retryLast = () => {
+    const lastUser = [...messages].reverse().find(m => m.role === "user");
+    if (lastUser) send(lastUser.content);
+  };
+
 
   return (
     <>
@@ -233,8 +258,9 @@ const AICarChatbot = () => {
                   ))}
                   {isLoading && messages[messages.length - 1]?.role === "user" && (
                     <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg px-3 py-2">
+                      <div className="bg-muted rounded-lg px-3 py-2 flex items-center gap-2 text-xs text-muted-foreground">
                         <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Thinking...</span>
                       </div>
                     </div>
                   )}
@@ -242,6 +268,18 @@ const AICarChatbot = () => {
                 </div>
               )}
             </ScrollArea>
+
+            {error && (
+              <div className="mx-3 mb-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-start justify-between gap-2">
+                <span className="flex-1">{error}</span>
+                <button
+                  onClick={retryLast}
+                  className="font-semibold underline underline-offset-2 hover:opacity-80"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
 
             <div className="p-3 border-t flex gap-2">
               <Input
@@ -256,10 +294,12 @@ const AICarChatbot = () => {
                 size="icon"
                 onClick={() => send(input)}
                 disabled={!input.trim() || isLoading}
+                aria-label="Send message"
               >
-                <Send className="h-4 w-4" />
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
             </div>
+
           </CardContent>
           )}
         </Card>

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CreditCard, Calculator, CheckCircle, XCircle, AlertTriangle, IndianRupee, Building2 } from "lucide-react";
+import { CreditCard, Calculator, CheckCircle, XCircle, AlertTriangle, IndianRupee, Building2, Loader2 } from "lucide-react";
 
 interface Bank {
   name: string;
@@ -74,6 +74,9 @@ const LoanPreapproval = ({ carPrice, carName }: LoanPreapprovalProps) => {
   const [tenure, setTenure] = useState("60");
   const [results, setResults] = useState<BankResult[]>([]);
   const [calculated, setCalculated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
 
   const price = carPrice || 0;
 
@@ -87,50 +90,60 @@ const LoanPreapproval = ({ carPrice, carName }: LoanPreapprovalProps) => {
 
   const handleCalculate = async () => {
     if (!cibilScore || !annualIncome || !price) {
-      toast.error("Please fill in all required fields");
+      const msg = "Please fill in CIBIL score, annual income, and ensure car price is set.";
+      setErrorMsg(msg);
+      toast.error(msg);
       return;
     }
 
-    const score = parseInt(cibilScore);
-    const income = parseFloat(annualIncome);
-    const months = parseInt(tenure);
-    const downPayment = (price * downPaymentPercent) / 100;
-    const loanAmount = price - downPayment;
-    const monthlyIncome = income / 12;
+    setErrorMsg(null);
+    setLoading(true);
 
-    const bankResults: BankResult[] = BANKS.map(bank => {
-      const eligible = score >= bank.minCibil && months <= bank.maxTenure;
-      const effectiveRate = getEffectiveRate(bank, score);
-      const maxLoan = (price * bank.maxLoanPercent) / 100;
-      const actualLoan = Math.min(loanAmount, maxLoan);
-      const emi = Math.round(calcEMI(actualLoan, effectiveRate, months));
-      const dti = (emi / monthlyIncome) * 100;
+    try {
+      const score = parseInt(cibilScore);
+      const income = parseFloat(annualIncome);
+      const months = parseInt(tenure);
 
-      return {
-        bank,
-        eligible: eligible && dti <= 50 && actualLoan === loanAmount,
-        effectiveRate,
-        emi,
-        loanAmount: actualLoan,
-        totalPayable: emi * months,
-        totalInterest: (emi * months) - actualLoan,
-      };
-    });
+      if (Number.isNaN(score) || Number.isNaN(income) || income <= 0) {
+        throw new Error("Please enter a valid annual income.");
+      }
 
-    bankResults.sort((a, b) => {
-      if (a.eligible && !b.eligible) return -1;
-      if (!a.eligible && b.eligible) return 1;
-      return a.effectiveRate - b.effectiveRate;
-    });
+      const downPayment = (price * downPaymentPercent) / 100;
+      const loanAmount = price - downPayment;
+      const monthlyIncome = income / 12;
 
-    setResults(bankResults);
-    setCalculated(true);
+      const bankResults: BankResult[] = BANKS.map(bank => {
+        const eligible = score >= bank.minCibil && months <= bank.maxTenure;
+        const effectiveRate = getEffectiveRate(bank, score);
+        const maxLoan = (price * bank.maxLoanPercent) / 100;
+        const actualLoan = Math.min(loanAmount, maxLoan);
+        const emi = Math.round(calcEMI(actualLoan, effectiveRate, months));
+        const dti = (emi / monthlyIncome) * 100;
 
-    if (user) {
-      const best = bankResults.find(r => r.eligible);
-      if (best) {
-        try {
-          await supabase.from("loan_preapprovals").insert({
+        return {
+          bank,
+          eligible: eligible && dti <= 50 && actualLoan === loanAmount,
+          effectiveRate,
+          emi,
+          loanAmount: actualLoan,
+          totalPayable: emi * months,
+          totalInterest: (emi * months) - actualLoan,
+        };
+      });
+
+      bankResults.sort((a, b) => {
+        if (a.eligible && !b.eligible) return -1;
+        if (!a.eligible && b.eligible) return 1;
+        return a.effectiveRate - b.effectiveRate;
+      });
+
+      setResults(bankResults);
+      setCalculated(true);
+
+      if (user) {
+        const best = bankResults.find(r => r.eligible);
+        if (best) {
+          const { error: dbError } = await supabase.from("loan_preapprovals").insert({
             user_id: user.id,
             car_price: price,
             down_payment: downPayment,
@@ -141,12 +154,21 @@ const LoanPreapproval = ({ carPrice, carName }: LoanPreapprovalProps) => {
             interest_rate: best.effectiveRate,
             approval_status: "approved",
           });
-        } catch (e) {
-          console.error("Failed to save preapproval:", e);
+          if (dbError) {
+            console.error("Failed to save preapproval:", dbError);
+            toast.error("Eligibility calculated, but we couldn't save it to your account.");
+          }
         }
       }
+    } catch (e: any) {
+      const msg = e?.message || "Could not check eligibility. Please try again.";
+      setErrorMsg(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   return (
     <Card>
@@ -208,10 +230,21 @@ const LoanPreapproval = ({ carPrice, carName }: LoanPreapprovalProps) => {
           </Select>
         </div>
 
-        <Button onClick={handleCalculate} className="w-full" disabled={!cibilScore || !annualIncome || !price}>
-          <Calculator className="w-4 h-4 mr-2" />
-          Check Eligibility from {BANKS.length} Banks
+        {errorMsg && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        <Button onClick={handleCalculate} className="w-full" disabled={loading || !cibilScore || !annualIncome || !price}>
+          {loading ? (
+            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Checking eligibility...</>
+          ) : (
+            <><Calculator className="w-4 h-4 mr-2" /> Check Eligibility from {BANKS.length} Banks</>
+          )}
         </Button>
+
 
         {calculated && (
           <div className="space-y-3 mt-4">
