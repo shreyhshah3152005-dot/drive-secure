@@ -258,8 +258,9 @@ const AICarChatbot = () => {
                   ))}
                   {isLoading && messages[messages.length - 1]?.role === "user" && (
                     <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg px-3 py-2">
+                      <div className="bg-muted rounded-lg px-3 py-2 flex items-center gap-2 text-xs text-muted-foreground">
                         <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Thinking...</span>
                       </div>
                     </div>
                   )}
@@ -267,6 +268,18 @@ const AICarChatbot = () => {
                 </div>
               )}
             </ScrollArea>
+
+            {error && (
+              <div className="mx-3 mb-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-start justify-between gap-2">
+                <span className="flex-1">{error}</span>
+                <button
+                  onClick={retryLast}
+                  className="font-semibold underline underline-offset-2 hover:opacity-80"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
 
             <div className="p-3 border-t flex gap-2">
               <Input
@@ -281,10 +294,12 @@ const AICarChatbot = () => {
                 size="icon"
                 onClick={() => send(input)}
                 disabled={!input.trim() || isLoading}
+                aria-label="Send message"
               >
-                <Send className="h-4 w-4" />
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
             </div>
+
           </CardContent>
           )}
         </Card>
