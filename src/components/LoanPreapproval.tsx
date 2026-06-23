@@ -230,10 +230,21 @@ const LoanPreapproval = ({ carPrice, carName }: LoanPreapprovalProps) => {
           </Select>
         </div>
 
-        <Button onClick={handleCalculate} className="w-full" disabled={!cibilScore || !annualIncome || !price}>
-          <Calculator className="w-4 h-4 mr-2" />
-          Check Eligibility from {BANKS.length} Banks
+        {errorMsg && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        <Button onClick={handleCalculate} className="w-full" disabled={loading || !cibilScore || !annualIncome || !price}>
+          {loading ? (
+            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Checking eligibility...</>
+          ) : (
+            <><Calculator className="w-4 h-4 mr-2" /> Check Eligibility from {BANKS.length} Banks</>
+          )}
         </Button>
+
 
         {calculated && (
           <div className="space-y-3 mt-4">
