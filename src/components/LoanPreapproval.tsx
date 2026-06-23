@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CreditCard, Calculator, CheckCircle, XCircle, AlertTriangle, IndianRupee, Building2 } from "lucide-react";
+import { CreditCard, Calculator, CheckCircle, XCircle, AlertTriangle, IndianRupee, Building2, Loader2 } from "lucide-react";
 
 interface Bank {
   name: string;
