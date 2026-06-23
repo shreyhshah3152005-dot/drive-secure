@@ -168,7 +168,13 @@ const CarDetail = () => {
                 <Car3DViewer carName={car.model} carBrand={car.brand} />
                 <VirtualCarTour carName={car.model} carBrand={car.brand} mainImage={car.image} />
                 <TradeInCalculator />
-                <LoanPreapproval carPrice={car.price} carName={`${car.brand} ${car.model}`} />
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById("loan-preapproval")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Check Loan Eligibility
+                </Button>
                 <SocialShareButtons
                   title={`${car.brand} ${car.model} - ${formatPrice(car.price)}`}
                   description={car.description}
@@ -183,6 +189,7 @@ const CarDetail = () => {
           <div className="max-w-4xl mx-auto">
             <CarFinanceCalculator carPrice={car.price} carName={`${car.brand} ${car.model}`} />
           </div>
+
         </section>
 
         {/* Full Specifications */}
