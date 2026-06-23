@@ -65,7 +65,6 @@ const Cars = () => {
             </div>
             <div className="flex gap-2">
               <TradeInCalculator />
-              <LoanPreapproval />
             </div>
           </div>
 

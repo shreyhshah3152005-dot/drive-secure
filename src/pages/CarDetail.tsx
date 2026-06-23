@@ -13,6 +13,7 @@ import VirtualCarTour from "@/components/VirtualCarTour";
 import Car3DViewer from "@/components/Car3DViewer";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import TradeInCalculator from "@/components/TradeInCalculator";
+import LoanPreapproval from "@/components/LoanPreapproval";
 import StaticSimilarCars from "@/components/StaticSimilarCars";
 import { ArrowLeft, MapPin, Phone, Star, Shield, Zap, Gauge, Fuel, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -167,6 +168,7 @@ const CarDetail = () => {
                 <Car3DViewer carName={car.model} carBrand={car.brand} />
                 <VirtualCarTour carName={car.model} carBrand={car.brand} mainImage={car.image} />
                 <TradeInCalculator />
+                <LoanPreapproval carPrice={car.price} carName={`${car.brand} ${car.model}`} />
                 <SocialShareButtons
                   title={`${car.brand} ${car.model} - ${formatPrice(car.price)}`}
                   description={car.description}
