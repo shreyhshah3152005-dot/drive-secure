@@ -192,6 +192,23 @@ const CarDetail = () => {
 
         </section>
 
+        {/* Loan Pre-Approval Section */}
+        <section id="loan-preapproval" className="container mx-auto px-4 py-12 scroll-mt-24">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                <CreditCard className="w-6 h-6 text-primary" />
+                Loan Pre-Approval for {car.brand} {car.model}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Check instant eligibility across 7+ leading banks — interest rates, EMI and total payable tailored to this car's price.
+              </p>
+            </div>
+            <LoanPreapproval carPrice={car.price} carName={`${car.brand} ${car.model}`} />
+          </div>
+        </section>
+
+
         {/* Full Specifications */}
         <CarSpecifications car={car} />
 
