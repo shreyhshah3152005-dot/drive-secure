@@ -74,6 +74,9 @@ const LoanPreapproval = ({ carPrice, carName }: LoanPreapprovalProps) => {
   const [tenure, setTenure] = useState("60");
   const [results, setResults] = useState<BankResult[]>([]);
   const [calculated, setCalculated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
 
   const price = carPrice || 0;
 
