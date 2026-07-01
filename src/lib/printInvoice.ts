@@ -53,44 +53,44 @@ export const buildInvoiceHtml = (inv: PrintableInvoice) => {
   } : null;
   const isPaid = (inv.payment_status || "unpaid").toLowerCase() === "paid";
   const statusLabel = isPaid ? "PAID" : "UNPAID";
-  const statusBg = isPaid ? "#06d6a0" : "#ff5470";
+  const statusBg = isPaid ? "#111111" : "#e11d1d";
   return `
 <!DOCTYPE html><html><head><title>Invoice ${safeInvoiceNo}</title>
 <style>
   *{box-sizing:border-box;font-family:'Space Grotesk','Helvetica Neue',Arial,sans-serif;}
-  body{margin:0;padding:34px;color:#0a1628;background:#f4f9ff;}
-  .sheet{max-width:860px;margin:0 auto;background:#fff;border:1px solid #cfe6ff;box-shadow:0 24px 70px rgba(8,30,60,.16);}
-  .topbar{height:10px;background:linear-gradient(90deg,#00e5ff 0%,#0080ff 50%,#0a1628 100%);}
+  body{margin:0;padding:34px;color:#111111;background:#f5f5f5;}
+  .sheet{max-width:860px;margin:0 auto;background:#ffffff;border:1px solid #e5e5e5;box-shadow:0 24px 70px rgba(0,0,0,.18);}
+  .topbar{height:10px;background:linear-gradient(90deg,#e11d1d 0%,#111111 100%);}
   .wrap{padding:34px;}
-  .header{display:flex;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid #cfe6ff;}
-  .brand{font-size:30px;font-weight:800;color:#0080ff;letter-spacing:1.2px;line-height:1;text-shadow:0 0 12px rgba(0,229,255,.35);}
-  .brand span{color:#0a1628;}
-  .subtitle{margin:9px 0 0;font-size:12px;color:#3a5a7a;text-transform:uppercase;letter-spacing:1.4px;}
-  .invoice-chip{display:inline-block;margin-bottom:8px;padding:7px 12px;border-radius:999px;background:${statusBg};color:#fff;font-size:12px;font-weight:700;letter-spacing:.7px;}
-  .meta{text-align:right;font-size:13px;color:#3a5a7a;}
-  h1{font-size:24px;margin:0 0 6px;color:#0a1628;}
+  .header{display:flex;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid #e5e5e5;}
+  .brand{font-size:30px;font-weight:800;color:#e11d1d;letter-spacing:1.2px;line-height:1;}
+  .brand span{color:#111111;}
+  .subtitle{margin:9px 0 0;font-size:12px;color:#555555;text-transform:uppercase;letter-spacing:1.4px;}
+  .invoice-chip{display:inline-block;margin-bottom:8px;padding:7px 12px;border-radius:999px;background:${statusBg};color:#ffffff;font-size:12px;font-weight:700;letter-spacing:.7px;}
+  .meta{text-align:right;font-size:13px;color:#555555;}
+  h1{font-size:24px;margin:0 0 6px;color:#111111;}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0;}
-  .box{border:1px solid #cfe6ff;background:#f4faff;padding:16px;border-radius:8px;min-height:116px;}
-  .box h3,.section-title{margin:0 0 10px;font-size:11px;text-transform:uppercase;color:#0080ff;letter-spacing:1.2px;}
-  .box p{margin:4px 0;font-size:14px;color:#0a1628;}
-  table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;border:1px solid #cfe6ff;border-radius:8px;overflow:hidden;}
-  th{background:#0a1628;color:#00e5ff;padding:12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;}
-  td{padding:12px;border-bottom:1px solid #e3f0ff;font-size:13px;color:#0a1628;}
+  .box{border:1px solid #e5e5e5;background:#fafafa;padding:16px;border-radius:8px;min-height:116px;}
+  .box h3,.section-title{margin:0 0 10px;font-size:11px;text-transform:uppercase;color:#e11d1d;letter-spacing:1.2px;}
+  .box p{margin:4px 0;font-size:14px;color:#111111;}
+  table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;}
+  th{background:#111111;color:#ffffff;padding:12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;}
+  td{padding:12px;border-bottom:1px solid #efefef;font-size:13px;color:#111111;}
   tr:last-child td{border-bottom:none;}
   td.r,th.r{text-align:right;}
   .totals-wrap{display:flex;justify-content:flex-end;}
   .totals{width:340px;border:none;border-radius:0;}
-  .totals tr td{border:none;padding:7px 10px;background:#fff;font-size:13px;}
-  .totals .sub td{border-top:1px dashed #7fb6ff;font-weight:600;color:#0a1628;padding-top:10px;}
-  .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #0080ff;color:#0080ff;padding-top:12px;}
+  .totals tr td{border:none;padding:7px 10px;background:#ffffff;font-size:13px;}
+  .totals .sub td{border-top:1px dashed #cccccc;font-weight:600;color:#111111;padding-top:10px;}
+  .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #e11d1d;color:#e11d1d;padding-top:12px;}
   .section-block{margin-bottom:20px;}
-  .subtotal-row td{background:#f4faff !important;font-size:12px;color:#3a5a7a;}
-  .notes{margin-top:24px;padding:15px;background:#f4faff;border-left:4px solid #00e5ff;font-size:13px;line-height:1.5;}
-  .signature{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:42px;font-size:12px;color:#3a5a7a;}
-  .line{border-top:1px solid #7fb6ff;padding-top:8px;text-align:center;}
-  .footer{margin-top:28px;text-align:center;font-size:11px;color:#3a5a7a;border-top:1px solid #cfe6ff;padding-top:16px;}
+  .subtotal-row td{background:#fafafa !important;font-size:12px;color:#555555;}
+  .notes{margin-top:24px;padding:15px;background:#fafafa;border-left:4px solid #e11d1d;font-size:13px;line-height:1.5;color:#111111;}
+  .signature{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:42px;font-size:12px;color:#555555;}
+  .line{border-top:1px solid #cccccc;padding-top:8px;text-align:center;}
+  .footer{margin-top:28px;text-align:center;font-size:11px;color:#555555;border-top:1px solid #e5e5e5;padding-top:16px;}
   @page{size:A4;margin:12mm;}
-  @media print{body{padding:0;background:#fff;}.sheet{box-shadow:none;border:none;}.wrap{padding:24px;}}
+  @media print{body{padding:0;background:#ffffff;}.sheet{box-shadow:none;border:none;}.wrap{padding:24px;}}
 </style></head><body>
 <div class="sheet"><div class="topbar"></div><div class="wrap">
   <div class="header">
