@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -15,6 +16,16 @@ import wallpaperWhite from "@/assets/wallpaper-white-supercar.jpg";
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const wallpapers = [
+    { src: wallpaperRed, title: "Midnight Rush", tag: "Sports" },
+    { src: wallpaperBlack, title: "Obsidian Prestige", tag: "Luxury SUV" },
+    { src: wallpaperWhite, title: "Storm Chaser", tag: "Supercar" },
+  ];
+  const [wpIndex, setWpIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setWpIndex((i) => (i + 1) % wallpapers.length), 10000);
+    return () => clearInterval(id);
+  }, [wallpapers.length]);
 
   if (loading) {
     return (
@@ -36,39 +47,32 @@ const Index = () => {
       <Navbar />
       <HeroSection />
 
-      {/* Live Car Wallpapers */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-3">Live <span className="text-gradient-primary">Showcase</span></h2>
-            <p className="text-muted-foreground">Cinematic looks at the machines turning heads right now</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { src: wallpaperRed, title: "Midnight Rush", tag: "Sports" },
-              { src: wallpaperBlack, title: "Obsidian Prestige", tag: "Luxury SUV" },
-              { src: wallpaperWhite, title: "Storm Chaser", tag: "Supercar" },
-            ].map((w) => (
-              <div
-                key={w.title}
-                className="group relative overflow-hidden rounded-2xl border border-border shadow-card aspect-[4/3]"
-              >
-                <img
-                  src={w.src}
-                  alt={`${w.title} car wallpaper`}
-                  width={1920}
-                  height={1088}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <span className="inline-block text-[11px] uppercase tracking-widest text-primary font-semibold mb-1">
-                    {w.tag}
-                  </span>
-                  <h3 className="text-xl font-bold text-white">{w.title}</h3>
-                </div>
-              </div>
+      {/* Live Wallpaper - auto-rotates every 10s */}
+      <section className="relative w-full h-[70vh] min-h-[420px] overflow-hidden">
+        {wallpapers.map((w, i) => (
+          <img
+            key={w.title}
+            src={w.src}
+            alt={`${w.title} car wallpaper`}
+            width={1920}
+            height={1088}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === wpIndex ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-end pb-12">
+          <span className="inline-block w-fit text-[11px] uppercase tracking-widest text-primary font-semibold mb-2">
+            {wallpapers[wpIndex].tag}
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white">{wallpapers[wpIndex].title}</h2>
+          <div className="flex gap-2 mt-5">
+            {wallpapers.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Show wallpaper ${i + 1}`}
+                onClick={() => setWpIndex(i)}
+                className={`h-1.5 rounded-full transition-all ${i === wpIndex ? "w-8 bg-primary" : "w-4 bg-white/50"}`}
+              />
             ))}
           </div>
         </div>
