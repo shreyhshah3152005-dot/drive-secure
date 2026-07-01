@@ -16,6 +16,16 @@ import wallpaperWhite from "@/assets/wallpaper-white-supercar.jpg";
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const wallpapers = [
+    { src: wallpaperRed, title: "Midnight Rush", tag: "Sports" },
+    { src: wallpaperBlack, title: "Obsidian Prestige", tag: "Luxury SUV" },
+    { src: wallpaperWhite, title: "Storm Chaser", tag: "Supercar" },
+  ];
+  const [wpIndex, setWpIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setWpIndex((i) => (i + 1) % wallpapers.length), 10000);
+    return () => clearInterval(id);
+  }, [wallpapers.length]);
 
   if (loading) {
     return (
