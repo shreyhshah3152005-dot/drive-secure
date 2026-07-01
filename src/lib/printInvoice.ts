@@ -53,17 +53,17 @@ export const buildInvoiceHtml = (inv: PrintableInvoice) => {
   } : null;
   const isPaid = (inv.payment_status || "unpaid").toLowerCase() === "paid";
   const statusLabel = isPaid ? "PAID" : "UNPAID";
-  const statusBg = isPaid ? "#111111" : "#e11d1d";
+  const statusBg = isPaid ? "#111111" : "#ff0000";
   return `
 <!DOCTYPE html><html><head><title>Invoice ${safeInvoiceNo}</title>
 <style>
   *{box-sizing:border-box;font-family:'Space Grotesk','Helvetica Neue',Arial,sans-serif;}
   body{margin:0;padding:34px;color:#111111;background:#f5f5f5;}
   .sheet{max-width:860px;margin:0 auto;background:#ffffff;border:1px solid #e5e5e5;box-shadow:0 24px 70px rgba(0,0,0,.18);}
-  .topbar{height:10px;background:linear-gradient(90deg,#e11d1d 0%,#111111 100%);}
+  .topbar{height:10px;background:linear-gradient(90deg,#ff0000 0%,#111111 100%);}
   .wrap{padding:34px;}
   .header{display:flex;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid #e5e5e5;}
-  .brand{font-size:30px;font-weight:800;color:#e11d1d;letter-spacing:1.2px;line-height:1;}
+  .brand{font-size:30px;font-weight:800;color:#ff0000;letter-spacing:1.2px;line-height:1;}
   .brand span{color:#111111;}
   .subtitle{margin:9px 0 0;font-size:12px;color:#555555;text-transform:uppercase;letter-spacing:1.4px;}
   .invoice-chip{display:inline-block;margin-bottom:8px;padding:7px 12px;border-radius:999px;background:${statusBg};color:#ffffff;font-size:12px;font-weight:700;letter-spacing:.7px;}
@@ -71,7 +71,7 @@ export const buildInvoiceHtml = (inv: PrintableInvoice) => {
   h1{font-size:24px;margin:0 0 6px;color:#111111;}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0;}
   .box{border:1px solid #e5e5e5;background:#fafafa;padding:16px;border-radius:8px;min-height:116px;}
-  .box h3,.section-title{margin:0 0 10px;font-size:11px;text-transform:uppercase;color:#e11d1d;letter-spacing:1.2px;}
+  .box h3,.section-title{margin:0 0 10px;font-size:11px;text-transform:uppercase;color:#ff0000;letter-spacing:1.2px;}
   .box p{margin:4px 0;font-size:14px;color:#111111;}
   table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:20px;border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;}
   th{background:#111111;color:#ffffff;padding:12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;}
@@ -82,10 +82,10 @@ export const buildInvoiceHtml = (inv: PrintableInvoice) => {
   .totals{width:340px;border:none;border-radius:0;}
   .totals tr td{border:none;padding:7px 10px;background:#ffffff;font-size:13px;}
   .totals .sub td{border-top:1px dashed #cccccc;font-weight:600;color:#111111;padding-top:10px;}
-  .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #e11d1d;color:#e11d1d;padding-top:12px;}
+  .totals .total td{font-size:18px;font-weight:800;border-top:2px solid #ff0000;color:#ff0000;padding-top:12px;}
   .section-block{margin-bottom:20px;}
   .subtotal-row td{background:#fafafa !important;font-size:12px;color:#555555;}
-  .notes{margin-top:24px;padding:15px;background:#fafafa;border-left:4px solid #e11d1d;font-size:13px;line-height:1.5;color:#111111;}
+  .notes{margin-top:24px;padding:15px;background:#fafafa;border-left:4px solid #ff0000;font-size:13px;line-height:1.5;color:#111111;}
   .signature{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:42px;font-size:12px;color:#555555;}
   .line{border-top:1px solid #cccccc;padding-top:8px;text-align:center;}
   .footer{margin-top:28px;text-align:center;font-size:11px;color:#555555;border-top:1px solid #e5e5e5;padding-top:16px;}
