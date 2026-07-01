@@ -9,6 +9,9 @@ import RecentlyViewedCars from "@/components/RecentlyViewedCars";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, ShoppingBag, Trophy, Calculator, ChevronRight, Wrench } from "lucide-react";
+import wallpaperRed from "@/assets/wallpaper-red-car.jpg";
+import wallpaperBlack from "@/assets/wallpaper-black-suv.jpg";
+import wallpaperWhite from "@/assets/wallpaper-white-supercar.jpg";
 
 const Index = () => {
   const { user, loading } = useAuth();
