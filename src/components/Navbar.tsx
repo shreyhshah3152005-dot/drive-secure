@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "./ThemeToggle";
+import carbazaarLogo from "@/assets/carbazaar-logo.png.asset.json";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -124,7 +125,7 @@ const Navbar = () => {
             </Button>
           )}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-8 sm:h-10 w-auto" />
+            <img src={carbazaarLogo.url} alt="CARBAZAAR Logo" className="h-8 sm:h-10 w-auto rounded-md" />
             <span className="text-lg sm:text-xl font-bold tracking-tight hidden xs:inline">
               <span className="text-gradient-primary">CAR</span>
               <span className="text-foreground">BAZAAR</span>
