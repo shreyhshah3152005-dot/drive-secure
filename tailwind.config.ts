@@ -26,6 +26,11 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        nardo: {
+          DEFAULT: "#a6a6a6",
+          light: "#d2d3d5",
+          dark: "#6f7072",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
