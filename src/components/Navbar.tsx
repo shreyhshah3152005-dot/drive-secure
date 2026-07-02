@@ -124,7 +124,7 @@ const Navbar = () => {
             </Button>
           )}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-8 sm:h-10 w-auto" />
+            <img src={carbazaarLogo.url} alt="CARBAZAAR Logo" className="h-8 sm:h-10 w-auto rounded-md" />
             <span className="text-lg sm:text-xl font-bold tracking-tight hidden xs:inline">
               <span className="text-gradient-primary">CAR</span>
               <span className="text-foreground">BAZAAR</span>
