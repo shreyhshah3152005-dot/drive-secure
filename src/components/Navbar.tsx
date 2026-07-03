@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "./ThemeToggle";
-import carbazaarLogo from "@/assets/carbazaar-logo.png.asset.json";
+import carbazaarLogo from "@/assets/carbazaar-mark.png.asset.json";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();

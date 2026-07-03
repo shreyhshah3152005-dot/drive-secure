@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Lock, Mail, Eye, EyeOff, Phone, User, MapPin, ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import carbazaarLogo from "@/assets/carbazaar-mark.png.asset.json";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email" }),
@@ -123,7 +124,7 @@ const Auth = () => {
       <div className="relative w-full max-w-md">
         <div className="animate-fade-in text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-16 w-auto" />
+            <img src={carbazaarLogo.url} alt="CARBAZAAR Logo" className="h-16 w-auto" />
             <span className="text-3xl font-bold tracking-tight">
               <span className="text-gradient-primary">CAR</span>
               <span className="text-foreground">BAZAAR</span>
