@@ -376,3 +376,34 @@
   }
 }
 
+
+/* ============================================
+   Hero Video Live Wallpaper
+   ============================================ */
+.hero-video-scene {
+  background: #0a0a0c;
+  will-change: transform;
+}
+.hero-video {
+  opacity: 0;
+  animation: heroVideoFadeIn 1.2s ease-out 0.2s forwards;
+  filter: saturate(1.1) contrast(1.05);
+  transform: scale(1.05);
+  will-change: opacity, transform;
+}
+.hero-video-poster {
+  animation: heroPosterFadeOut 1.2s ease-out 0.4s forwards;
+  filter: saturate(1.05) contrast(1.05) brightness(0.85);
+}
+@keyframes heroVideoFadeIn {
+  from { opacity: 0; transform: scale(1.08); }
+  to   { opacity: 1; transform: scale(1.05); }
+}
+@keyframes heroPosterFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-video { animation: none; opacity: 1; }
+  .hero-video-poster { animation: none; opacity: 0; }
+}
