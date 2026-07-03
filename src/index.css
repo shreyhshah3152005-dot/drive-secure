@@ -389,28 +389,38 @@
    ============================================ */
 .hero-video-scene {
   background: #0a0a0c;
-  will-change: transform;
+  contain: layout paint;
 }
 .hero-video {
   opacity: 0;
-  animation: heroVideoFadeIn 1.2s ease-out 0.2s forwards;
-  filter: saturate(1.1) contrast(1.05);
-  transform: scale(1.05);
-  will-change: opacity, transform;
+  animation: heroVideoFadeIn 1.4s ease-out 0.2s forwards;
+  filter: saturate(1.05) contrast(1.03);
+  transform: translateZ(0) scale(1.04);
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 .hero-video-poster {
-  animation: heroPosterFadeOut 1.2s ease-out 0.4s forwards;
-  filter: saturate(1.05) contrast(1.05) brightness(0.85);
+  animation: heroPosterFadeOut 1.4s ease-out 0.5s forwards;
+  filter: saturate(1.02) contrast(1.03) brightness(0.88);
+  will-change: opacity;
 }
 @keyframes heroVideoFadeIn {
-  from { opacity: 0; transform: scale(1.08); }
-  to   { opacity: 1; transform: scale(1.05); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes heroPosterFadeOut {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
+/* Lower-end / small viewports: drop the heavier decorative flares */
+@media (max-width: 640px) {
+  .hero-warm-light,
+  .hero-lens-flare { display: none; }
+  .hero-video { filter: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .hero-video { animation: none; opacity: 1; }
   .hero-video-poster { animation: none; opacity: 0; }
+  .hero-warm-light,
+  .hero-lens-flare { animation: none !important; }
 }
