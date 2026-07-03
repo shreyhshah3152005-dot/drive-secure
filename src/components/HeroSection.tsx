@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Shield, Award, Headphones, Sparkles, Car, ShoppingBag } from "lucide-react";
 import heroBmw from "@/assets/hero-bmw-m5.jpg";
-import heroVideo from "@/assets/hero-drift.mp4.asset.json";
+import heroVideo from "@/assets/hero-bmw-drive.mp4.asset.json";
 
 const HeroSection = () => {
   const navigate = useNavigate();
