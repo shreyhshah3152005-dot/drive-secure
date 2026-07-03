@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 8%;
 
-    --primary: 0 90% 52%;
+    --primary: 0 72% 48%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 20 10% 96%;
@@ -25,23 +25,26 @@
     --muted: 20 8% 94%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 0 85% 96%;
-    --accent-foreground: 0 90% 32%;
+    --accent: 45 95% 55%;
+    --accent-foreground: 0 0% 10%;
 
-    --destructive: 0 90% 52%;
+    --info: 200 85% 55%;
+    --info-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 20 10% 88%;
     --input: 20 10% 92%;
-    --ring: 0 90% 52%;
+    --ring: 0 72% 48%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(0, 92%, 55%) 0%, hsl(0, 88%, 45%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(0, 75%, 52%) 0%, hsl(15, 70%, 45%) 100%);
     --gradient-dark: linear-gradient(180deg, hsl(30, 20%, 99%) 0%, hsl(20, 10%, 96%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%) 0%, hsl(20, 10%, 97%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(0, 90%, 55%, 0.22) 0%, hsl(0, 90%, 50%, 0.10) 100%);
-    --shadow-primary: 0 10px 40px -10px hsl(0, 90%, 50%, 0.30);
+    --gradient-glow: linear-gradient(135deg, hsl(0, 75%, 52%, 0.18) 0%, hsl(200, 85%, 55%, 0.10) 100%);
+    --shadow-primary: 0 10px 40px -10px hsl(0, 72%, 48%, 0.28);
     --shadow-card: 0 20px 50px -20px hsl(0, 0%, 0%, 0.15);
     --shadow-glow: 0 0 80px hsl(0, 90%, 55%, 0.18);
 
@@ -63,27 +66,29 @@
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 92% 58%;
+    --primary: 0 78% 55%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14%;
     --muted-foreground: 0 0% 68%;
-    --accent: 0 85% 20%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 92% 58%;
+    --accent: 45 95% 58%;
+    --accent-foreground: 0 0% 8%;
+    --info: 200 85% 60%;
+    --info-foreground: 0 0% 100%;
+    --destructive: 0 78% 55%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 16%;
     --input: 0 0% 13%;
-    --ring: 0 92% 58%;
+    --ring: 0 78% 55%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(0, 95%, 60%) 0%, hsl(0, 90%, 48%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(0, 78%, 55%) 0%, hsl(15, 72%, 48%) 100%);
     --gradient-dark: linear-gradient(180deg, hsl(0, 0%, 5%) 0%, hsl(0, 0%, 3%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(0, 92%, 58%, 0.35) 0%, hsl(0, 0%, 0%, 0.1) 100%);
-    --shadow-primary: 0 10px 50px -10px hsl(0, 92%, 55%, 0.40);
+    --gradient-glow: linear-gradient(135deg, hsl(0, 78%, 55%, 0.28) 0%, hsl(200, 85%, 55%, 0.12) 100%);
+    --shadow-primary: 0 10px 50px -10px hsl(0, 78%, 55%, 0.35);
     --shadow-card: 0 25px 60px -15px hsl(0, 0%, 0%, 0.75);
-    --shadow-glow: 0 0 80px hsl(0, 92%, 58%, 0.25);
+    --shadow-glow: 0 0 80px hsl(0, 78%, 55%, 0.22);
 
     --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 0 0% 98%;
@@ -325,40 +330,42 @@
   to   { transform: translate3d(-120px, 0, 0); }
 }
 
-/* Warm soft daylight rim */
+/* Warm golden-sun highlight (right side) */
 .hero-warm-light {
   left: 55%;
   top: 40%;
   width: 40vw;
   height: 40vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,235,200,0.35) 0%, rgba(255,220,180,0.15) 35%, transparent 70%);
-  filter: blur(24px);
+  background: radial-gradient(circle, rgba(255,210,90,0.32) 0%, rgba(255,190,70,0.14) 35%, transparent 70%);
+  filter: blur(30px);
   mix-blend-mode: screen;
-  animation: heroWarmPulse 8s ease-in-out infinite;
+  animation: heroWarmPulse 10s ease-in-out infinite;
   pointer-events: none;
+  transform: translateZ(0);
 }
 @keyframes heroWarmPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 0.85; transform: scale(1.05); }
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.8; }
 }
 
-/* Subtle red brand flare */
+/* Cool sky-blue rim flare (left) balances the warm side */
 .hero-lens-flare {
-  right: 10%;
-  top: 22%;
-  width: 220px;
-  height: 220px;
+  left: 6%;
+  top: 18%;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,50,50,0.28) 0%, rgba(255,0,0,0.10) 40%, transparent 70%);
-  filter: blur(28px);
+  background: radial-gradient(circle, rgba(80,180,255,0.28) 0%, rgba(56,189,248,0.10) 40%, transparent 70%);
+  filter: blur(32px);
   mix-blend-mode: screen;
-  animation: heroFlarePulse 6s ease-in-out infinite;
+  animation: heroFlarePulse 9s ease-in-out infinite;
   pointer-events: none;
+  transform: translateZ(0);
 }
 @keyframes heroFlarePulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 0.9; transform: scale(1.08); }
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.8; }
 }
 
 @media (max-width: 768px) {
@@ -382,28 +389,38 @@
    ============================================ */
 .hero-video-scene {
   background: #0a0a0c;
-  will-change: transform;
+  contain: layout paint;
 }
 .hero-video {
   opacity: 0;
-  animation: heroVideoFadeIn 1.2s ease-out 0.2s forwards;
-  filter: saturate(1.1) contrast(1.05);
-  transform: scale(1.05);
-  will-change: opacity, transform;
+  animation: heroVideoFadeIn 1.4s ease-out 0.2s forwards;
+  filter: saturate(1.05) contrast(1.03);
+  transform: translateZ(0) scale(1.04);
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 .hero-video-poster {
-  animation: heroPosterFadeOut 1.2s ease-out 0.4s forwards;
-  filter: saturate(1.05) contrast(1.05) brightness(0.85);
+  animation: heroPosterFadeOut 1.4s ease-out 0.5s forwards;
+  filter: saturate(1.02) contrast(1.03) brightness(0.88);
+  will-change: opacity;
 }
 @keyframes heroVideoFadeIn {
-  from { opacity: 0; transform: scale(1.08); }
-  to   { opacity: 1; transform: scale(1.05); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes heroPosterFadeOut {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
+/* Lower-end / small viewports: drop the heavier decorative flares */
+@media (max-width: 640px) {
+  .hero-warm-light,
+  .hero-lens-flare { display: none; }
+  .hero-video { filter: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .hero-video { animation: none; opacity: 1; }
   .hero-video-poster { animation: none; opacity: 0; }
+  .hero-warm-light,
+  .hero-lens-flare { animation: none !important; }
 }

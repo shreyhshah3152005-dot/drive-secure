@@ -31,6 +31,20 @@ export default {
           light: "#d2d3d5",
           dark: "#6f7072",
         },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        sunbeam: {
+          DEFAULT: "#f5c518",
+          light: "#ffd75e",
+          dark: "#c99a00",
+        },
+        sky: {
+          DEFAULT: "#38bdf8",
+          light: "#7dd3fc",
+          dark: "#0284c7",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
