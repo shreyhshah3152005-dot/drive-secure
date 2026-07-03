@@ -330,40 +330,42 @@
   to   { transform: translate3d(-120px, 0, 0); }
 }
 
-/* Warm soft daylight rim */
+/* Warm golden-sun highlight (right side) */
 .hero-warm-light {
   left: 55%;
   top: 40%;
   width: 40vw;
   height: 40vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,235,200,0.35) 0%, rgba(255,220,180,0.15) 35%, transparent 70%);
-  filter: blur(24px);
+  background: radial-gradient(circle, rgba(255,210,90,0.32) 0%, rgba(255,190,70,0.14) 35%, transparent 70%);
+  filter: blur(30px);
   mix-blend-mode: screen;
-  animation: heroWarmPulse 8s ease-in-out infinite;
+  animation: heroWarmPulse 10s ease-in-out infinite;
   pointer-events: none;
+  transform: translateZ(0);
 }
 @keyframes heroWarmPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 0.85; transform: scale(1.05); }
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.8; }
 }
 
-/* Subtle red brand flare */
+/* Cool sky-blue rim flare (left) balances the warm side */
 .hero-lens-flare {
-  right: 10%;
-  top: 22%;
-  width: 220px;
-  height: 220px;
+  left: 6%;
+  top: 18%;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,50,50,0.28) 0%, rgba(255,0,0,0.10) 40%, transparent 70%);
-  filter: blur(28px);
+  background: radial-gradient(circle, rgba(80,180,255,0.28) 0%, rgba(56,189,248,0.10) 40%, transparent 70%);
+  filter: blur(32px);
   mix-blend-mode: screen;
-  animation: heroFlarePulse 6s ease-in-out infinite;
+  animation: heroFlarePulse 9s ease-in-out infinite;
   pointer-events: none;
+  transform: translateZ(0);
 }
 @keyframes heroFlarePulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 0.9; transform: scale(1.08); }
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.8; }
 }
 
 @media (max-width: 768px) {
