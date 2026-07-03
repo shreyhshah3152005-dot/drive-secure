@@ -31,12 +31,12 @@ const HeroSection = () => {
           aria-hidden="true"
         />
 
-        {/* Cinematic tint — deep charcoal wash to keep text readable in both themes */}
+        {/* Cinematic tint — deep charcoal wash with a subtle sky-cool edge and warm sun accent */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, rgba(10,10,12,0.72) 0%, rgba(15,15,18,0.55) 45%, rgba(20,20,24,0.35) 75%, rgba(10,10,12,0.60) 100%)",
+              "linear-gradient(90deg, rgba(8,12,20,0.72) 0%, rgba(15,18,26,0.52) 45%, rgba(20,22,28,0.32) 75%, rgba(10,12,18,0.62) 100%)",
           }}
           aria-hidden="true"
         />
