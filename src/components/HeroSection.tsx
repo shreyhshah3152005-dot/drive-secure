@@ -2,48 +2,55 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Shield, Award, Headphones, Sparkles, Car, ShoppingBag } from "lucide-react";
 import heroBmw from "@/assets/hero-bmw-m5.jpg";
+import heroVideo from "@/assets/hero-drift.mp4.asset.json";
 
 const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Cinematic BMW M5 live wallpaper — nardo grey daylight */}
-      <div className="absolute inset-0 hero-bmw-scene">
-        {/* Car — subtle suspension bob + slow parallax */}
+      {/* Cinematic live wallpaper — drifting Toyota footage */}
+      <div className="absolute inset-0 hero-video-scene">
+        {/* Poster fallback (shown until video is ready) */}
         <div
-          className="hero-bmw-image absolute inset-0 bg-center bg-cover"
+          className="absolute inset-0 bg-center bg-cover hero-video-poster"
           style={{ backgroundImage: `url(${heroBmw})` }}
           aria-hidden="true"
         />
 
-        {/* Speed streaks flying past — creates driving-past sensation */}
-        <div className="hero-speed-streaks absolute inset-0" aria-hidden="true" />
-        <div className="hero-speed-streaks hero-speed-streaks--slow absolute inset-0" aria-hidden="true" />
+        {/* Looping background video */}
+        <video
+          className="hero-video absolute inset-0 h-full w-full object-cover"
+          src={heroVideo.url}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          poster={heroBmw}
+          aria-hidden="true"
+        />
 
-        {/* Road blur strip at bottom for motion cue */}
-        <div className="hero-road-blur absolute inset-x-0 bottom-0 h-40" aria-hidden="true" />
-
-        {/* Nardo grey wash + soft daylight — replaces dark night mood */}
+        {/* Cinematic tint — deep charcoal wash to keep text readable in both themes */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, rgba(166,166,166,0.55) 0%, rgba(184,185,187,0.35) 45%, rgba(210,211,213,0.20) 75%, rgba(166,166,166,0.35) 100%)",
+              "linear-gradient(90deg, rgba(10,10,12,0.72) 0%, rgba(15,15,18,0.55) 45%, rgba(20,20,24,0.35) 75%, rgba(10,10,12,0.60) 100%)",
           }}
           aria-hidden="true"
         />
 
-        {/* Warm rim light + subtle red flare */}
+        {/* Warm rim light + subtle red brand flare */}
         <div className="hero-warm-light absolute" aria-hidden="true" />
         <div className="hero-lens-flare absolute" aria-hidden="true" />
 
-        {/* Gentle vignette (lighter than before) */}
+        {/* Vignette */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at center, transparent 55%, rgba(60,60,65,0.35) 100%)",
+              "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%)",
           }}
           aria-hidden="true"
         />
@@ -52,14 +59,14 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center md:text-left md:ml-0">
           <div className="animate-fade-in">
-            <span className="inline-flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium tracking-wider uppercase rounded-full border border-primary/50 text-primary bg-nardo/70 backdrop-blur-md shadow-sm">
+            <span className="inline-flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium tracking-wider uppercase rounded-full border border-primary/50 text-primary bg-black/50 backdrop-blur-md shadow-sm">
               <Sparkles className="w-4 h-4" />
               Premium Automotive Marketplace
             </span>
           </div>
 
           <h1
-            className="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-slide-up text-foreground drop-shadow-[0_2px_10px_rgba(255,255,255,0.4)]"
+            className="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-slide-up text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]"
             style={{ animationDelay: "100ms" }}
           >
             Your Dream Car{" "}
@@ -67,7 +74,7 @@ const HeroSection = () => {
           </h1>
 
           <p
-            className="text-xl text-foreground/85 mb-10 max-w-2xl md:mx-0 mx-auto animate-slide-up font-medium"
+            className="text-xl text-white/90 mb-10 max-w-2xl md:mx-0 mx-auto animate-slide-up font-medium drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
             style={{ animationDelay: "200ms" }}
           >
             Discover India's trusted collection of the finest automobiles. From reliable family cars to luxury SUVs, find your perfect ride today with us.
@@ -90,21 +97,22 @@ const HeroSection = () => {
 
           {/* Trust badges */}
           <div
-            className="mt-16 grid grid-cols-3 gap-8 max-w-lg md:mx-0 mx-auto animate-fade-in"
+            className="mt-16 grid grid-cols-3 gap-4 md:gap-8 max-w-lg md:mx-0 mx-auto animate-fade-in"
             style={{ animationDelay: "500ms" }}
           >
-            <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-nardo/70 backdrop-blur-md border border-white/40 shadow-sm">
-              <Shield className="w-6 h-6 text-primary" />
-              <span className="text-sm text-foreground/80 text-center font-medium">Certified Pre-Owned</span>
-            </div>
-            <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-nardo/70 backdrop-blur-md border border-white/40 shadow-sm">
-              <Award className="w-6 h-6 text-primary" />
-              <span className="text-sm text-foreground/80 text-center font-medium">Premium Quality</span>
-            </div>
-            <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-nardo/70 backdrop-blur-md border border-white/40 shadow-sm">
-              <Headphones className="w-6 h-6 text-primary" />
-              <span className="text-sm text-foreground/80 text-center font-medium">24/7 Support</span>
-            </div>
+            {[
+              { Icon: Shield, label: "Certified Pre-Owned" },
+              { Icon: Award, label: "Premium Quality" },
+              { Icon: Headphones, label: "24/7 Support" },
+            ].map(({ Icon, label }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center gap-3 p-4 rounded-xl bg-black/50 backdrop-blur-md border border-white/15 shadow-lg"
+              >
+                <Icon className="w-6 h-6 text-primary" />
+                <span className="text-sm text-white/90 text-center font-medium">{label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
