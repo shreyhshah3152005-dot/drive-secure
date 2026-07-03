@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin } from "lucide-react";
+import carbazaarLogo from "@/assets/carbazaar-mark.png.asset.json";
 
 const Footer = () => {
   return (
@@ -9,7 +10,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <img src="/carbazaar-logo.png" alt="CARBAZAAR Logo" className="h-10 w-auto" />
+              <img src={carbazaarLogo.url} alt="CARBAZAAR Logo" className="h-10 w-auto" loading="lazy" />
               <span className="text-xl font-bold tracking-tight">
                 <span className="text-gradient-primary">CAR</span>
                 <span className="text-foreground">BAZAAR</span>
