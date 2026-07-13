@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Lock, Mail, Eye, EyeOff, Phone, User, MapPin, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import carbazaarLogo from "@/assets/carbazaar-mark.png.asset.json";
+import { lovable } from "@/integrations/lovable/index";
+
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email" }),
