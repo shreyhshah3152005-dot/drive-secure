@@ -159,8 +159,10 @@ const CarServices = () => {
               <CardContent className="text-center">
                 <div className="mb-6">
                   <span className="text-4xl font-bold text-primary">₹{pkg.price.toLocaleString("en-IN")}</span>
-                  <span className="text-muted-foreground text-sm">/{pkg.duration.toLowerCase()}</span>
+                  <span className="text-muted-foreground text-sm"> + GST</span>
+                  <div className="text-xs text-muted-foreground mt-1">/{pkg.duration.toLowerCase()}</div>
                 </div>
+
 
                 <div className="flex justify-center gap-4 mb-6">
                   <div className="text-center">
