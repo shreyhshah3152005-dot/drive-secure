@@ -417,7 +417,17 @@
   .hero-warm-light,
   .hero-lens-flare { display: none; }
   .hero-video { filter: none; }
+  /* Prevent hero video from being cut off on portrait mobile screens.
+     Keep the subject centered and use a gentler zoom so the car remains
+     fully visible instead of getting cropped at the sides. */
+  .hero-video,
+  .hero-video-poster {
+    object-fit: cover;
+    object-position: center center;
+    transform: translateZ(0) scale(1.6);
+  }
 }
+
 @media (prefers-reduced-motion: reduce) {
   .hero-video { animation: none; opacity: 1; }
   .hero-video-poster { animation: none; opacity: 0; }
