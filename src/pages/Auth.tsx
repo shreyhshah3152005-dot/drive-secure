@@ -92,8 +92,9 @@ const Auth = () => {
     setIsLoading(true);
 
     if (mode === "login") {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(email, password, rememberMe);
       if (error) {
+
         toast.error(error.message || "Failed to sign in");
       } else {
         toast.success("Welcome back!");
