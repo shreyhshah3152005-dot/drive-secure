@@ -1138,6 +1138,7 @@ export type Database = {
           package_id: string
           package_name: string
           package_price: number
+          provider_id: string | null
           services_used: number
           status: string
           total_services: number
@@ -1159,6 +1160,7 @@ export type Database = {
           package_id: string
           package_name: string
           package_price: number
+          provider_id?: string | null
           services_used?: number
           status?: string
           total_services?: number
@@ -1180,6 +1182,7 @@ export type Database = {
           package_id?: string
           package_name?: string
           package_price?: number
+          provider_id?: string | null
           services_used?: number
           status?: string
           total_services?: number
@@ -1187,7 +1190,15 @@ export type Database = {
           user_id?: string
           washes_used?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "service_bookings_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_history: {
         Row: {
@@ -1534,6 +1545,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_provider_id: { Args: never; Returns: string }
       get_dealer_car_count: { Args: { _dealer_id: string }; Returns: number }
       get_dealer_car_limit: { Args: { _dealer_id: string }; Returns: number }
       get_dealer_id: { Args: { _user_id: string }; Returns: string }
