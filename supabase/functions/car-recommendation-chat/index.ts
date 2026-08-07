@@ -199,6 +199,18 @@ Guidelines:
       /\b(show|generate|create|display|image|photo|picture|pic|render|visual(?:ize)?|illustrate)\b/.test(lastUserMsg) ||
       /what does .+ look like/.test(lastUserMsg);
 
+    // Only allow image generation for car / automotive subjects
+    const isCarRelated =
+      /\b(car|cars|vehicle|suv|sedan|hatchback|coupe|convertible|truck|jeep|muv|mpv|automobile|automotive|ev|electric vehicle|bike|scooter|engine|tyre|tire|wheel|alloy|dashboard|interior|exterior|bumper|sunroof|showroom|dealership|tata|mahindra|maruti|suzuki|hyundai|kia|toyota|honda|mg|byd|bmw|mercedes|audi|volkswagen|skoda|nissan|renault|ford|jaguar|land rover|porsche|ferrari|lamborghini|volvo|lexus|tesla|thar|nexon|creta|scorpio|fortuner|swift|baleno|seltos|safari|harrier|punch|xuv|innova|city|verna|i20|altroz|curvv|brezza|ertiga)\b/.test(
+        lastUserMsg
+      );
+
+    if (isImageRequest && !isCarRelated) {
+      return buildStreamResponse(
+        "I'm CARBAZAAR's car expert, so I can only create car-related images 🚗 — try asking for a photo of a specific car model instead!"
+      );
+    }
+
     if (isImageRequest) {
       const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
