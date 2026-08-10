@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const idleTimerRef = useRef<number | null>(null);
+  const userRef = useRef<User | null>(null);
 
   const doSignOut = useCallback(async (reason?: string) => {
     await supabase.auth.signOut();
@@ -51,34 +52,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        userRef.current = newSession?.user ?? null;
         setSession(newSession);
         setUser(newSession?.user ?? null);
-        setLoading(false);
-        if (newSession) resetIdleTimer();
-      }
-    );
-
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      if (existingSession) {
-        // Check if session expired due to inactivity
-        const lastActivity = parseInt(localStorage.getItem(LAST_ACTIVITY_KEY) || "0", 10);
-        const limit = getIdleLimit();
-        if (lastActivity && Date.now() - lastActivity > limit) {
-          doSignOut("Session expired. Please sign in again.");
+        if (!newSession) {
+          if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
           setLoading(false);
           return;
         }
+
+        // Only enforce a stored timeout when restoring an existing browser session.
+        // A fresh sign-in must always establish a new activity timestamp first.
+        if (event === "INITIAL_SESSION") {
+          const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
+          if (lastActivity > 0 && Date.now() - lastActivity > getIdleLimit()) {
+            void doSignOut("Session expired. Please sign in again.");
+            setLoading(false);
+            return;
+          }
+        }
+
         resetIdleTimer();
+        setLoading(false);
       }
-      setSession(existingSession);
-      setUser(existingSession?.user ?? null);
-      setLoading(false);
-    });
+    );
 
     // Track user activity
     const activityEvents = ["mousedown", "keydown", "touchstart", "scroll"];
     const handleActivity = () => {
-      if (supabase.auth.getSession) resetIdleTimer();
+      if (userRef.current) resetIdleTimer();
     };
     activityEvents.forEach((ev) => window.addEventListener(ev, handleActivity, { passive: true }));
 
@@ -91,8 +93,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string, rememberMe = false) => {
     localStorage.setItem(REMEMBER_ME_KEY, rememberMe ? "true" : "false");
+    // Clear stale activity before authentication so a fresh login can never be
+    // mistaken for an expired restored session.
+    localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error) resetIdleTimer();
+    if (!error) {
+      resetIdleTimer();
+    } else {
+      localStorage.removeItem(LAST_ACTIVITY_KEY);
+    }
     return { error: error as Error | null };
   };
 

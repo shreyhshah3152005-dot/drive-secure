@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, Store, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -26,6 +27,7 @@ const signupSchema = z.object({
 
 const DealerAuth = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,18 +54,18 @@ const DealerAuth = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      });
+      const { error } = await signIn(loginEmail, loginPassword, true);
 
       if (error) throw error;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Unable to verify the signed-in account.");
 
       // Check if user is a dealer
       const { data: dealerData, error: dealerError } = await supabase
         .from("dealers")
         .select("id, is_active")
-        .eq("user_id", data.user.id)
+        .eq("user_id", user.id)
         .maybeSingle();
 
       if (dealerError) throw dealerError;
