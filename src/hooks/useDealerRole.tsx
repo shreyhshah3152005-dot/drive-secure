@@ -15,16 +15,19 @@ export const useDealerRole = () => {
   const [isDealer, setIsDealer] = useState(false);
   const [dealerInfo, setDealerInfo] = useState<DealerInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [checkedUserId, setCheckedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkDealerRole = async () => {
       if (!user) {
         setIsDealer(false);
         setDealerInfo(null);
+        setCheckedUserId(null);
         setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from("dealers")
@@ -46,6 +49,7 @@ export const useDealerRole = () => {
         setIsDealer(false);
         setDealerInfo(null);
       } finally {
+        setCheckedUserId(user.id);
         setIsLoading(false);
       }
     };
@@ -53,5 +57,9 @@ export const useDealerRole = () => {
     checkDealerRole();
   }, [user]);
 
-  return { isDealer, dealerInfo, isLoading };
+  return {
+    isDealer,
+    dealerInfo,
+    isLoading: isLoading || (!!user && checkedUserId !== user.id),
+  };
 };
