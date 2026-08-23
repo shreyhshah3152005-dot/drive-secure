@@ -61,17 +61,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        // Only enforce a stored timeout when restoring an existing browser session.
-        // A fresh sign-in must always establish a new activity timestamp first.
-        if (event === "INITIAL_SESSION") {
-          const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
-          if (lastActivity > 0 && Date.now() - lastActivity > getIdleLimit()) {
-            void doSignOut("Session expired. Please sign in again.");
-            setLoading(false);
-            return;
-          }
-        }
-
+        // Start a fresh inactivity window whenever this tab restores a valid
+        // session. Signing out here based on an old local timestamp can race
+        // with a new password/OAuth sign-in and immediately revoke it.
         resetIdleTimer();
         setLoading(false);
       }
