@@ -6,15 +6,18 @@ export const useAdminRole = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [checkedUserId, setCheckedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAdminRole = async () => {
       if (!user) {
         setIsAdmin(false);
+        setCheckedUserId(null);
         setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from("user_roles")
@@ -29,6 +32,7 @@ export const useAdminRole = () => {
         console.error("Error checking admin role:", error);
         setIsAdmin(false);
       } finally {
+        setCheckedUserId(user.id);
         setIsLoading(false);
       }
     };
@@ -36,5 +40,5 @@ export const useAdminRole = () => {
     checkAdminRole();
   }, [user]);
 
-  return { isAdmin, isLoading };
+  return { isAdmin, isLoading: isLoading || (!!user && checkedUserId !== user.id) };
 };

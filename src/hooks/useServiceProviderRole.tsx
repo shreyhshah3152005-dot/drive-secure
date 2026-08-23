@@ -6,6 +6,7 @@ export const useServiceProviderRole = () => {
   const { user } = useAuth();
   const [isServiceProvider, setIsServiceProvider] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [checkedUserId, setCheckedUserId] = useState<string | null>(null);
   const [providerInfo, setProviderInfo] = useState<{
     id: string;
     business_name: string;
@@ -19,10 +20,13 @@ export const useServiceProviderRole = () => {
     const check = async () => {
       if (!user) {
         setIsServiceProvider(false);
+        setProviderInfo(null);
+        setCheckedUserId(null);
         setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from("service_providers")
@@ -37,6 +41,7 @@ export const useServiceProviderRole = () => {
         console.error("Error checking service provider role:", error);
         setIsServiceProvider(false);
       } finally {
+        setCheckedUserId(user.id);
         setIsLoading(false);
       }
     };
@@ -44,5 +49,9 @@ export const useServiceProviderRole = () => {
     check();
   }, [user]);
 
-  return { isServiceProvider, isLoading, providerInfo };
+  return {
+    isServiceProvider,
+    isLoading: isLoading || (!!user && checkedUserId !== user.id),
+    providerInfo,
+  };
 };
